@@ -1,0 +1,301 @@
+{% extends 'base.html' %}
+
+{% block title %}EarthX Designs | Professional Solar Design & Engineering Solutions{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <span class="section-tag" style="color: var(--accent); margin-bottom: 1rem;">Solar Engineering Excellence</span>
+            <h1>Professional Solar Design & Engineering Solutions</h1>
+            <p>Accurate 2D & 3D Solar Designs, Shadow Analysis, SLDs, BOQs, CEIG Drawings and Engineering Support for EPC Companies Worldwide.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('portfolio') }}" class="btn btn-primary">
+                    <span>View Portfolio</span>
+                    <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                </a>
+                <a href="{{ url_for('contact') }}" class="btn btn-white-outline">Request Quote</a>
+            </div>
+            
+            <!-- Hero Stats -->
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">300+</span>
+                    <span class="stat-label">Projects Completed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Residential & C&I Success</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">48 Hr</span>
+                    <span class="stat-label">Fast Turnaround</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">GW+</span>
+                    <span class="stat-label">Designed Globally</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="section-padding bg-light-sec">
+    <div class="container">
+        <div class="about-home-grid grid grid-2">
+            <div class="about-home-text">
+                <span class="section-tag">Who We Are</span>
+                <h2>Complete Design & Engineering Support for Solar Professionals</h2>
+                <p>EarthX Designs is a premium solar engineering consultancy providing complete technical design and drafting support for EPC companies, solar developers, and contractors worldwide.</p>
+                <p>Our core mission is to streamline pre-construction processes by delivering error-free blueprints, precise electrical designs, and comprehensive documentation that satisfy municipal permit departments and electrical inspectors on the first attempt.</p>
+                
+                <div class="about-features">
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">✓</div>
+                        <div>
+                            <h4>PE Stamp Ready</h4>
+                            <p>Designs compliant with NEC and local standards.</p>
+                        </div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">✓</div>
+                        <div>
+                            <h4>Optimized Layouts</h4>
+                            <p>Maximizing density and annual generation.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('about') }}" class="btn btn-outline" style="margin-top: 2rem;">Learn More About Us</a>
+            </div>
+            <div class="about-home-image">
+                <img src="/static/uploads/commercial_solar_featured.png" alt="Commercial Solar Installation Engineering">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">Our Expertise</span>
+            <h2>Premium Engineering Services</h2>
+            <p>We support every stage of the solar design pipeline, from initial feasibility studies to final permitting and electrical single line diagrams.</p>
+        </div>
+        
+        <div class="services-grid grid grid-3">
+            <!-- Card 1 -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="layers" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3>Solar 3D Design</h3>
+                <p>Realistic 3D visualizations and rendering of solar installations on residential and commercial structures using state-of-the-art CAD models.</p>
+            </div>
+            <!-- Card 2 -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="layout" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3>Solar 2D Layout Design</h3>
+                <p>Highly precise module placement layout drawings specifying row spacings, tilt angles, pitch, and structural boundaries.</p>
+            </div>
+            <!-- Card 3 -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="sun" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3>Shadow Analysis</h3>
+                <p>Advanced shade modeling software simulating yearly solar paths to identify objects obstructing solar irradiance and energy production.</p>
+            </div>
+            <!-- Card 4 -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="git-commit" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3>SLD Drawings</h3>
+                <p>Electrical Single Line Diagrams highlighting details of PV modules, string configurations, inverters, combiners, and grid connections.</p>
+            </div>
+            <!-- Card 5 -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="clipboard-list" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3>BOQ Preparation</h3>
+                <p>Complete Bills of Quantities summarizing all structural and electrical components required, preventing material ordering leaks.</p>
+            </div>
+            <!-- Card 6 -->
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="file-text" style="width: 40px; height: 40px;"></i>
+                </div>
+                <h3>CEIG Drawings</h3>
+                <p>Electrical Inspector approval drawings, lightning protection calculations, and grounding layouts compliant with CEIG regulatory standards.</p>
+            </div>
+        </div>
+        
+        <div class="text-center" style="margin-top: 3rem;">
+            <a href="{{ url_for('services') }}" class="btn btn-secondary">Explore All Services</a>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us Section -->
+<section class="section-padding bg-light-sec">
+    <div class="container">
+        <div class="why-grid grid">
+            <div>
+                <span class="section-tag">Value Proposition</span>
+                <h2>Why Solar Developers Choose EarthX Designs</h2>
+                <p style="margin-bottom: 2rem;">We integrate deep engineering expertise with modern digital workflow methods to provide unmatched drawing quality and turnaround time.</p>
+                <div class="why-card-list">
+                    <div class="why-card">
+                        <div class="why-card-icon">
+                            <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <h4>Accurate Engineering</h4>
+                        <p>Detailed calculations ensuring structures and electrical elements comply perfectly.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-card-icon">
+                            <i data-lucide="zap" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <h4>Fast Delivery</h4>
+                        <p>Standard design packages completed and returned in 24 to 48 hours.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-card-icon">
+                            <i data-lucide="user-check" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <h4>Dedicated Support</h4>
+                        <p>An assigned engineer for your project to answer revision edits promptly.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-card-icon">
+                            <i data-lucide="trending-down" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <h4>Cost Optimization</h4>
+                        <p>We reduce system construction costs through smart cable and structural designs.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="why-card-list" style="grid-template-columns: 1fr; align-self: center;">
+                <div class="why-card" style="padding: 2rem; border-left: 4px solid var(--accent);">
+                    <div class="why-card-icon">
+                        <i data-lucide="award" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem;">Industry Experience</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-muted);">Our design engineers possess years of hands-on experience in rooftop, ground-mount tracker systems, microgrids, and utility-scale projects. We understand local utility grids, solar permitting structures, and international drafting standards.</p>
+                </div>
+                <div class="why-card" style="padding: 2rem; border-left: 4px solid var(--primary);">
+                    <div class="why-card-icon">
+                        <i data-lucide="files" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.5rem;">High Quality Documentation</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.7; color: var(--text-muted);">We compile clean drafting layouts with detailed legends, labels, and schematic structures. You receive AutoCAD files and highly detailed PDFs that look premium and build easily in the field.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Projects Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">Case Studies</span>
+            <h2>Featured Solar Projects</h2>
+            <p>Take a look at some of our recently engineered residential, commercial, and ground-mounted solar designs.</p>
+        </div>
+        
+        <div class="grid grid-3">
+            {% for project in projects %}
+            <article class="project-card">
+                <div class="project-img-wrapper">
+                    <img src="{{ project.featured_image }}" alt="{{ project.title }}">
+                    <span class="project-category-badge">{{ project.category_name }}</span>
+                </div>
+                <div class="project-info">
+                    <div class="project-meta">
+                        <span><i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px;"></i>{{ project.location }}</span>
+                        <span><i data-lucide="cpu" style="width: 12px; height: 12px; display: inline; vertical-align: middle; margin-right: 4px;"></i>{{ project.capacity }}</span>
+                    </div>
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.description }}</p>
+                    <a href="{{ url_for('project_detail', project_id=project.id) }}" class="project-link">
+                        <span>View Details</span>
+                        <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center" style="margin-top: 3rem;">
+            <a href="{{ url_for('portfolio') }}" class="btn btn-outline">Browse All Projects</a>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section-padding bg-light-sec">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">Client Feedback</span>
+            <h2>What Industry Experts Say</h2>
+            <p>We work closely with solar contractors and engineering directors. Here is what they say about our support.</p>
+        </div>
+        
+        <div class="testimonial-carousel-container">
+            <div class="testimonial-track">
+                {% for t in testimonials %}
+                <div class="testimonial-slide">
+                    <div class="testimonial-bubble">
+                        <div class="quote-icon">“</div>
+                        <div class="rating-stars">
+                            {% for i in range(t.rating) %}★{% endfor %}
+                        </div>
+                        <p class="testimonial-text">{{ t.feedback }}</p>
+                        <div class="client-info">
+                            <div class="client-initials">
+                                {{ t.client_name[0] }}{{ t.client_name.split(' ')[1][0] if t.client_name.split(' ')|length > 1 else '' }}
+                            </div>
+                            <div class="client-details">
+                                <h4>{{ t.client_name }}</h4>
+                                <p>{{ t.client_role }}, {{ t.company_name }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="carousel-dots"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact CTA Section -->
+<section class="section-padding cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Scale Your Solar Installations?</h2>
+            <p>Outsource your drafting, electrical schematics, and shadow analysis to EarthX Designs. Get your first engineering design drafted within 48 hours.</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a href="{{ url_for('contact') }}" class="btn btn-primary" style="background-color: #FFFFFF; color: var(--primary);">
+                    <span>Get a Free Quote</span>
+                    <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
+                </a>
+                <a href="https://wa.me/15557652710?text=Hello%20EarthX%20Designs%2C%20I%20would%20like%20a%20quote%20for%20a%20solar%20design%20project." class="btn btn-white-outline" target="_blank" rel="noopener">
+                    <i data-lucide="message-square" style="width: 18px; height: 18px;"></i>
+                    <span>Chat on WhatsApp</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }} | EarthX Designs Solar Portfolio{% endblock %}
+
+{% block content %}
+<!-- Page Hero Banner -->
+<section class="page-hero">
+    <div class="container">
+        <span class="section-tag">{{ project.category_name }}</span>
+        <h1>{{ project.title }}</h1>
+        <p><i data-lucide="map-pin" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>{{ project.location }}</p>
+    </div>
+</section>
+
+<!-- Project Layout -->
+<section class="section-padding">
+    <div class="container">
+        
+        <div class="project-detail-layout grid">
+            
+            <!-- Left Side: Main Image, Description & Services -->
+            <div>
+                <div class="project-main-image">
+                    <img src="{{ project.featured_image }}" alt="{{ project.title }}">
+                </div>
+                
+                <div class="project-description">
+                    <h2>Project Overview</h2>
+                    <p>{{ project.description }}</p>
+                </div>
+                
+                {% if services_delivered %}
+                <div class="services-delivered-list">
+                    <h3>Services Delivered</h3>
+                    <div class="services-tags">
+                        {% for svc in services_delivered %}
+                        <span class="service-tag">{{ svc }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Right Side: Specs Card -->
+            <div>
+                <div class="project-spec-card">
+                    <h3>Technical Specs</h3>
+                    <ul class="spec-list">
+                        <li class="spec-item">
+                            <span class="spec-label">Capacity:</span>
+                            <span class="spec-value">{{ project.capacity }}</span>
+                        </li>
+                        <li class="spec-item">
+                            <span class="spec-label">Location:</span>
+                            <span class="spec-value">{{ project.location }}</span>
+                        </li>
+                        <li class="spec-item">
+                            <span class="spec-label">Category:</span>
+                            <span class="spec-value">{{ project.category_name }}</span>
+                        </li>
+                        {% if project.client_name %}
+                        <li class="spec-item">
+                            <span class="spec-label">Client Name:</span>
+                            <span class="spec-value">{{ project.client_name }}</span>
+                        </li>
+                        {% endif %}
+                        <li class="spec-item">
+                            <span class="spec-label">Completed:</span>
+                            <span class="spec-value">{{ project.completion_date }}</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Quote Banner CTA -->
+                <div class="why-card" style="margin-top: 2rem; padding: 2rem; background-color: var(--primary); color: var(--bg-white); border-color: var(--primary);">
+                    <h4 style="color: #FFFFFF; margin-bottom: 0.5rem; font-size: 1.1rem;">Need a similar design?</h4>
+                    <p style="color: var(--text-light); font-size: 0.88rem; margin-bottom: 1.5rem;">Outsource your drafting, electrical SLDs, and load calculations to our engineering team.</p>
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary" style="width: 100%; font-size: 0.9rem; padding: 0.6rem;">Get Free Consultation</a>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Gallery Section -->
+        {% if images %}
+        <div class="gallery-section">
+            <h2>Design Drawing Gallery</h2>
+            <p>Click on any image to view details of our engineering layouts and schematics.</p>
+            
+            <div class="gallery-grid grid">
+                {% for img in images %}
+                <div class="gallery-item" data-index="{{ loop.index0 }}" data-src="{{ img.image_path }}" data-caption="{{ img.caption or '' }}">
+                    <img src="{{ img.image_path }}" alt="{{ img.caption or 'Gallery drawing image' }}">
+                    <div class="gallery-overlay">
+                        <span>{{ img.caption or 'View Schematic' }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Related Projects -->
+        {% if related %}
+        <div class="related-section">
+            <h2>Related Projects</h2>
+            <div class="grid grid-3" style="margin-top: 2rem;">
+                {% for r in related %}
+                <article class="project-card">
+                    <div class="project-img-wrapper">
+                        <img src="{{ r.featured_image }}" alt="{{ r.title }}">
+                        <span class="project-category-badge">{{ r.category_name }}</span>
+                    </div>
+                    <div class="project-info">
+                        <div class="project-meta">
+                            <span><i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>{{ r.location }}</span>
+                            <span><i data-lucide="zap" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>{{ r.capacity }}</span>
+                        </div>
+                        <h3>{{ r.title }}</h3>
+                        <a href="{{ url_for('project_detail', project_id=r.id) }}" class="project-link">
+                            <span>View details</span>
+                            <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                        </a>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+    </div>
+</section>
+
+<!-- Lightbox Modal -->
+<div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">&times;</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev">&#10094;</button>
+    <div class="lightbox-content-container">
+        <img id="lightbox-img" src="" alt="Zoomed schematic diagram">
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+    </div>
+    <button class="lightbox-nav lightbox-next" id="lightbox-next">&#10095;</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+    
+    if (galleryItems.length === 0) return;
+    
+    let currentIndex = 0;
+    const imagesData = Array.from(galleryItems).map(item => ({
+        src: item.getAttribute('data-src'),
+        caption: item.getAttribute('data-caption')
+    }));
+    
+    const showImage = (index) => {
+        currentIndex = index;
+        lightboxImg.src = imagesData[index].src;
+        lightboxCaption.textContent = imagesData[index].caption;
+    };
+    
+    galleryItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const idx = parseInt(item.getAttribute('data-index'));
+            showImage(idx);
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Lock background scroll
+        });
+    });
+    
+    const closeLightbox = () => {
+        lightbox.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Unlock background scroll
+        lightboxImg.src = '';
+    };
+    
+    lightboxClose.addEventListener('click', closeLightbox);
+    
+    // Close on overlay click (but not on image content)
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.classList.contains('lightbox-content-container')) {
+            closeLightbox();
+        }
+    });
+    
+    const prevImage = () => {
+        const idx = (currentIndex - 1 + imagesData.length) % imagesData.length;
+        showImage(idx);
+    };
+    
+    const nextImage = () => {
+        const idx = (currentIndex + 1) % imagesData.length;
+        showImage(idx);
+    };
+    
+    lightboxPrev.addEventListener('click', prevImage);
+    lightboxNext.addEventListener('click', nextImage);
+    
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+        if (lightbox.style.display === 'flex') {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') prevImage();
+            if (e.key === 'ArrowRight') nextImage();
+        }
+    });
+});
+</script>
+{% endblock %}

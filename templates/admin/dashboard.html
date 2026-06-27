@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarthX Designs CMS | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="admin-body">
+
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="admin-sidebar">
+            <div class="sidebar-brand">
+                <a href="{{ url_for('home') }}">EarthX<span>Designs</span></a>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" data-target="projects-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="folder-git-2" style="width: 18px; height: 18px;"></i>
+                        <span>Projects</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-target="categories-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="tag" style="width: 18px; height: 18px;"></i>
+                        <span>Categories</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-target="testimonials-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="message-square" style="width: 18px; height: 18px;"></i>
+                        <span>Testimonials</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-target="blogs-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="file-edit" style="width: 18px; height: 18px;"></i>
+                        <span>Blog Posts</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-target="leads-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="users" style="width: 18px; height: 18px;"></i>
+                        <span>Contact Leads</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <a href="{{ url_for('admin_logout') }}" class="sidebar-logout">
+                    <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Panel -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="header-title">
+                    <h1 id="tab-title-text">Manage Projects</h1>
+                </div>
+                <div class="header-user">
+                    <span class="user-badge">{{ session.get('user_email') }}</span>
+                    <a href="{{ url_for('home') }}" target="_blank" class="btn-admin btn-admin-secondary" style="font-size: 0.82rem; padding: 0.4rem 0.8rem;">
+                        <i data-lucide="external-link" style="width: 14px; height: 14px;"></i>
+                        <span>View Site</span>
+                    </a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Dashboard tabs container -->
+                
+                <!-- 1. PROJECTS TAB -->
+                <section class="tab-panel active" id="projects-tab">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-info">
+                                <h3>Total Projects</h3>
+                                <p id="stat-proj-count">0</p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="folder"></i></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-info">
+                                <h3>Published Projects</h3>
+                                <p id="stat-proj-pub">0</p>
+                            </div>
+                            <div class="stat-icon" style="color:#10B981; background-color:rgba(16,185,129,0.1);"><i data-lucide="check-circle-2"></i></div>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <h2>All Solar Projects</h2>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-project">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add Project</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Project Title</th>
+                                        <th>Category</th>
+                                        <th>Capacity</th>
+                                        <th>Location</th>
+                                        <th>Gallery</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="projects-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. CATEGORIES TAB -->
+                <section class="tab-panel" id="categories-tab" style="display:none;">
+                    <div class="admin-card-table" style="max-width: 800px;">
+                        <div class="table-header">
+                            <h2>Project Categories</h2>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-category">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add Category</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Category Name</th>
+                                        <th>Slug</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categories-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. TESTIMONIALS TAB -->
+                <section class="tab-panel" id="testimonials-tab" style="display:none;">
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <h2>Client Testimonials</h2>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-testimonial">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add Testimonial</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Client Name</th>
+                                        <th>Role / Designation</th>
+                                        <th>Company Name</th>
+                                        <th>Rating</th>
+                                        <th>Feedback Snippet</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="testimonials-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. BLOGS TAB -->
+                <section class="tab-panel" id="blogs-tab" style="display:none;">
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <h2>Blog Articles</h2>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-blog">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Write Article</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>Article Title</th>
+                                        <th>Category</th>
+                                        <th>Slug</th>
+                                        <th>Published At</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="blogs-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. LEADS TAB -->
+                <section class="tab-panel" id="leads-tab" style="display:none;">
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <h2>Inquiries & Contact Leads</h2>
+                            <a href="/api/inquiries/export" class="btn-admin btn-admin-secondary" id="btn-export-leads">
+                                <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                                <span>Export to CSV</span>
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Name</th>
+                                        <th>Company</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Type</th>
+                                        <th>Message</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="leads-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ==========================================
+         MODALS FOR CRUD ACTIONS
+         ========================================== -->
+
+    <!-- Category Modal -->
+    <div class="modal" id="category-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="category-modal-title">Add Category</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="category-form">
+                <div class="modal-body">
+                    <input type="hidden" id="category-id" name="id">
+                    <div class="admin-form-group">
+                        <label for="category-name">Category Name *</label>
+                        <input type="text" id="category-name" name="name" required placeholder="e.g. Utility Solar">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="category-slug">Slug *</label>
+                        <input type="text" id="category-slug" name="slug" required placeholder="e.g. utility-solar">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div class="modal" id="project-modal">
+        <div class="modal-content" style="max-width: 750px;">
+            <div class="modal-header">
+                <h3 id="project-modal-title">Add Project</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="project-form" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" id="project-id" name="id">
+                    
+                    <div class="admin-form-group">
+                        <label for="project-title">Project Title *</label>
+                        <input type="text" id="project-title" name="title" required placeholder="e.g. Apex Corporate Office 50kW">
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="project-category">Category *</label>
+                            <select id="project-category" name="category_id" required>
+                                <!-- Rendered dynamically -->
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="project-capacity">Capacity *</label>
+                            <input type="text" id="project-capacity" name="capacity" required placeholder="e.g. 50 kWp or 2 MW AC">
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="project-location">Location *</label>
+                            <input type="text" id="project-location" name="location" required placeholder="e.g. Austin, Texas">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="project-client">Client Name (Optional)</label>
+                            <input type="text" id="project-client" name="client_name" placeholder="e.g. Apex Ventures">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="project-date">Completion Date *</label>
+                            <input type="date" id="project-date" name="completion_date" required>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="project-status">Status *</label>
+                            <select id="project-status" name="status">
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="project-services">Services Delivered * (Comma separated)</label>
+                        <input type="text" id="project-services" name="services_delivered" required placeholder="e.g. Solar 3D Design, Shadow Analysis, SLD Drawings">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="project-description">Project Description *</label>
+                        <textarea id="project-description" name="description" required placeholder="Describe project scope, challenges, and solutions delivered..."></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="project-featured-image">Featured Image *</label>
+                        <div class="image-upload-wrapper">
+                            <div class="image-preview" id="project-featured-preview">
+                                <i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>
+                            </div>
+                            <input type="file" id="project-featured-image" name="featured_image" accept="image/*">
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="project-gallery-images">Upload Gallery Images (Select multiple)</label>
+                        <input type="file" id="project-gallery-images" name="gallery_images" accept="image/*" multiple>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Gallery Manager Modal -->
+    <div class="modal" id="gallery-manager-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>Manage Project Gallery Drawings</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="gallery-project-id">
+                
+                <div class="admin-form-group" style="border-bottom: 1px solid var(--admin-border); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">
+                    <label>Upload More Gallery Drawings</label>
+                    <div style="display:flex; gap:10px;">
+                        <input type="file" id="gallery-manager-files" accept="image/*" multiple style="flex:1;">
+                        <button class="btn-admin btn-admin-primary" id="btn-upload-more-gallery">Upload</button>
+                    </div>
+                </div>
+
+                <label style="font-weight:600; display:block; margin-bottom: 10px;">Current Gallery Images</label>
+                <p style="font-size: 0.85rem; color:var(--admin-text-light); margin-bottom: 15rem; display:none;" id="gallery-empty-text">No gallery images found.</p>
+                <div class="gallery-preview-container" id="gallery-manager-list" style="margin-top:0.5rem; gap:20px; display:grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
+                    <!-- Rendered dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-admin btn-admin-secondary modal-close-btn" style="width:100%;">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonial Modal -->
+    <div class="modal" id="testimonial-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="testimonial-modal-title">Add Testimonial</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="testimonial-form">
+                <div class="modal-body">
+                    <input type="hidden" id="testimonial-id" name="id">
+                    
+                    <div class="admin-form-group">
+                        <label for="testimonial-name">Client Name *</label>
+                        <input type="text" id="testimonial-name" name="client_name" required placeholder="e.g. David Mercer">
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="testimonial-role">Designation / Role *</label>
+                            <input type="text" id="testimonial-role" name="client_role" required placeholder="e.g. Director of Engineering">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="testimonial-rating">Rating *</label>
+                            <select id="testimonial-rating" name="rating">
+                                <option value="5">5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3">3 Stars</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="testimonial-company">Company Name *</label>
+                        <input type="text" id="testimonial-company" name="company_name" required placeholder="e.g. Vanguard Solar">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="testimonial-feedback">Feedback *</label>
+                        <textarea id="testimonial-feedback" name="feedback" required placeholder="Paste client review text here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Testimonial</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Blog Modal -->
+    <div class="modal" id="blog-modal">
+        <div class="modal-content" style="max-width: 750px;">
+            <div class="modal-header">
+                <h3 id="blog-modal-title">Write Blog Article</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="blog-form" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" id="blog-id" name="id">
+                    
+                    <div class="admin-form-group">
+                        <label for="blog-title">Article Title *</label>
+                        <input type="text" id="blog-title" name="title" required placeholder="e.g. Understanding Ground Mount Trackers">
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="blog-category">Category *</label>
+                            <select id="blog-category" name="category" required>
+                                <option value="Solar Design">Solar Design</option>
+                                <option value="Solar Engineering">Solar Engineering</option>
+                                <option value="Ground Mount Design">Ground Mount Design</option>
+                                <option value="Shadow Analysis">Shadow Analysis</option>
+                                <option value="Industry Updates">Industry Updates</option>
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="blog-slug">URL Slug *</label>
+                            <input type="text" id="blog-slug" name="slug" required placeholder="e.g. understanding-ground-mount-trackers">
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="blog-status">Status *</label>
+                            <select id="blog-status" name="status">
+                                <option value="published">Published</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="blog-excerpt">Excerpt * (Short summary for feed)</label>
+                        <input type="text" id="blog-excerpt" name="excerpt" required placeholder="A short 1-2 sentence description of the article...">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="blog-content">Article Content * (Separate paragraphs with double Enter)</label>
+                        <textarea id="blog-content" name="content" required style="min-height: 200px;" placeholder="Write full article body text. Use double newlines for paragraphs. Start lines with ## for Subheadings, or > for Blockquotes."></textarea>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="blog-featured-image">Featured Banner Image *</label>
+                        <div class="image-upload-wrapper">
+                            <div class="image-preview" id="blog-featured-preview">
+                                <i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>
+                            </div>
+                            <input type="file" id="blog-featured-image" name="featured_image" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Article</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin dashboard core client-side scripting -->
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

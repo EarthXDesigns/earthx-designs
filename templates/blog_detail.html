@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} | EarthX Designs Solar Blog{% endblock %}
+
+{% block content %}
+<!-- Page Hero Banner -->
+<section class="page-hero" style="text-align: left; padding: 8rem 0 4rem 0;">
+    <div class="container">
+        <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 4px; display: inline-block; margin-bottom: 1rem;">
+            {{ post.category }}
+        </span>
+        <h1 style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1.2; max-width: 900px; color: #FFFFFF;">
+            {{ post.title }}
+        </h1>
+    </div>
+</section>
+
+<!-- Blog Reading Section -->
+<section class="section-padding" style="background-color: #FFFFFF;">
+    <div class="container">
+        
+        <div class="blog-detail-layout grid">
+            
+            <!-- Main Content Area -->
+            <div>
+                <div class="blog-main-image">
+                    <img src="{{ post.featured_image }}" alt="{{ post.title }}">
+                </div>
+                
+                <div class="blog-meta-details">
+                    <span>
+                        <i data-lucide="calendar" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                        Published: {{ post.created_at.split(' ')[0] }}
+                    </span>
+                    <span>
+                        <i data-lucide="user" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                        Author: EarthX Engineering Team
+                    </span>
+                </div>
+                
+                <article class="blog-rich-content">
+                    <!-- Format paragraphs split by double newlines for basic rich formatting in Jinja -->
+                    {% for paragraph in post.content.split('\n\n') %}
+                        {% if paragraph.strip() %}
+                            {% if paragraph.strip().startswith('##') %}
+                                <h2>{{ paragraph.replace('##', '').strip() }}</h2>
+                            {% elif paragraph.strip().startswith('###') %}
+                                <h3>{{ paragraph.replace('###', '').strip() }}</h3>
+                            {% elif paragraph.strip().startswith('>') %}
+                                <blockquote>{{ paragraph.replace('>', '').strip() }}</blockquote>
+                            {% else %}
+                                <p>{{ paragraph.strip() }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </article>
+                
+                <!-- Share or Return section -->
+                <div style="margin-top: 4rem; border-top: 1px solid rgba(226, 232, 240, 0.8); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <a href="{{ url_for('blog') }}" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                        <span>Back to Articles</span>
+                    </a>
+                    
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">Contact us for designs:</span>
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Get Quote</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar Widget -->
+            <aside class="blog-sidebar">
+                <div class="sidebar-widget">
+                    <h3>Recent Articles</h3>
+                    
+                    {% for r in recent %}
+                    <div class="recent-post-item">
+                        <div class="recent-post-thumb">
+                            <img src="{{ r.featured_image }}" alt="{{ r.title }}">
+                        </div>
+                        <div class="recent-post-info">
+                            <h4><a href="{{ url_for('blog_detail', slug=r.slug) }}">{{ r.title }}</a></h4>
+                            <span>{{ r.created_at.split(' ')[0] }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Consultancy Badge -->
+                <div class="why-card" style="background-color: var(--primary); color: var(--bg-white); border-color: var(--primary); padding: 1.5rem; text-align: center; border-radius: var(--radius-md);">
+                    <div class="why-card-icon" style="background-color: rgba(255,255,255,0.1); color: var(--accent); margin-bottom: 12px; padding: 10px; border-radius: 50%;">
+                        <i data-lucide="cpu" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h4 style="color: #FFFFFF; font-size: 1rem; margin-bottom: 6px;">Solar Engineering Support</h4>
+                    <p style="color: var(--text-light); font-size: 0.82rem; line-height: 1.5; margin-bottom: 1.2rem;">We draft single line diagrams, shadow charts, and tracker layout drawings for solar EPCs globally.</p>
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary" style="width: 100%; font-size: 0.82rem; padding: 0.5rem;">Request Quote</a>
+                </div>
+            </aside>
+            
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Engineering Portfolio | EarthX Designs - Solar Design & Engineering{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <h1>Solar Project Portfolio</h1>
+        <p>Explore our engineering designs, shadow modeling, and Single Line Diagram packages for residential, commercial, and utility solar farms.</p>
+    </div>
+</section>
+
+<!-- Portfolio Grid & Filters Section -->
+<section class="section-padding">
+    <div class="container">
+        
+        <!-- Search Form -->
+        <div class="search-box">
+            <form action="{{ url_for('portfolio') }}" method="GET" id="portfolio-search-form">
+                {% if active_category %}
+                    <input type="hidden" name="category" value="{{ active_category }}">
+                {% endif %}
+                <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+                <input type="text" name="q" placeholder="Search projects by title, capacity, location..." value="{{ search_query }}">
+            </form>
+        </div>
+        
+        <!-- Category Filter Pills -->
+        <div class="portfolio-filter">
+            <a href="{{ url_for('portfolio', q=search_query) }}" class="filter-btn {% if not active_category %}active{% endif %}">
+                All Categories
+            </a>
+            {% for cat in categories %}
+            <a href="{{ url_for('portfolio', category=cat.slug, q=search_query) }}" class="filter-btn {% if active_category == cat.slug %}active{% endif %}">
+                {{ cat.name }}
+            </a>
+            {% endfor %}
+        </div>
+        
+        <!-- Projects Grid -->
+        {% if projects %}
+        <div class="grid grid-3">
+            {% for project in projects %}
+            <article class="project-card">
+                <div class="project-img-wrapper">
+                    <img src="{{ project.featured_image }}" alt="{{ project.title }}">
+                    <span class="project-category-badge">{{ project.category_name }}</span>
+                </div>
+                <div class="project-info">
+                    <div class="project-meta">
+                        <span>
+                            <i data-lucide="map-pin" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+                            {{ project.location }}
+                        </span>
+                        <span>
+                            <i data-lucide="zap" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+                            {{ project.capacity }}
+                        </span>
+                    </div>
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.description }}</p>
+                    <a href="{{ url_for('project_detail', project_id=project.id) }}" class="project-link">
+                        <span>View Details</span>
+                        <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center" style="padding: 4rem 1rem;">
+            <i data-lucide="folder-open" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
+            <h3>No Projects Found</h3>
+            <p style="margin-top: 0.5rem;">We couldn't find any projects matching your search criteria. Please try another search term or filter category.</p>
+            <a href="{{ url_for('portfolio') }}" class="btn btn-primary" style="margin-top: 1.5rem;">Reset All Filters</a>
+        </div>
+        {% endif %}
+        
+    </div>
+</section>
+{% endblock %}

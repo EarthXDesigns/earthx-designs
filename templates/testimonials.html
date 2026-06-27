@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Client Testimonials | EarthX Designs - Solar Design & Engineering{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <h1>Client Testimonials</h1>
+        <p>Read review feedback from engineering directors, solar installers, developers, and consultants who trust EarthX Designs.</p>
+    </div>
+</section>
+
+<!-- Testimonials Grid Section -->
+<section class="section-padding">
+    <div class="container">
+        
+        {% if testimonials %}
+        <div class="grid grid-2" style="gap: 2.5rem;">
+            {% for t in testimonials %}
+            <div class="testimonial-bubble" style="padding: 2.5rem; margin-bottom: 0;">
+                <div class="quote-icon" style="top: 0.5rem; left: 1.5rem;">“</div>
+                <div class="rating-stars" style="margin-bottom: 0.8rem;">
+                    {% for i in range(t.rating) %}★{% endfor %}
+                </div>
+                <p class="testimonial-text" style="font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.5rem;">{{ t.feedback }}</p>
+                <div class="client-info">
+                    <div class="client-initials">
+                        {{ t.client_name[0] }}{{ t.client_name.split(' ')[1][0] if t.client_name.split(' ')|length > 1 else '' }}
+                    </div>
+                    <div class="client-details">
+                        <h4 style="font-size: 0.98rem; margin-bottom: 2px;">{{ t.client_name }}</h4>
+                        <p style="font-size: 0.8rem; color: var(--text-muted);">{{ t.client_role }}, <strong>{{ t.company_name }}</strong></p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center" style="padding: 4rem 1rem;">
+            <i data-lucide="message-square" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
+            <h3>No Reviews Available</h3>
+            <p style="margin-top: 0.5rem;">Currently there are no testimonials seeded in the system. Install them via the admin dashboard.</p>
+        </div>
+        {% endif %}
+        
+        <!-- CTA Request Reference -->
+        <div class="why-card" style="margin-top: 5rem; padding: 3rem; text-align: center; border-left: 4px solid var(--accent);">
+            <h3>Are you a client of ours?</h3>
+            <p style="margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; margin-top: 0.5rem;">We would love to hear your feedback on our solar 3D layouts, SLD schematics, and drafting turnaround times. Please share your review with our engineers.</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-outline">Submit Project Feedback</a>
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

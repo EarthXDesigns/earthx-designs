@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Request a Quote | EarthX Designs - Solar Design & Engineering{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <h1>Request a Solar Design Quote</h1>
+        <p>Submit your project details and parameters below. Our engineering team will review your requirements and follow up within 24 hours.</p>
+    </div>
+</section>
+
+<!-- Contact Form and Details -->
+<section class="section-padding">
+    <div class="container">
+        
+        <div class="contact-layout grid">
+            
+            <!-- Left Panel: Contact info -->
+            <div class="contact-info-panel">
+                <div>
+                    <h2>EarthX Designs Support</h2>
+                    <p>Contact our design offices directly or use the contact form to share project blueprints, load profiles, or structural measurements.</p>
+                    
+                    <div class="contact-details-list">
+                        <div class="contact-detail-item">
+                            <div class="contact-icon">
+                                <i data-lucide="mail"></i>
+                            </div>
+                            <div>
+                                <h4>Engineering Inquiries</h4>
+                                <p>sales.earthxdesigns@gmail.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-detail-item">
+                            <div class="contact-icon">
+                                <i data-lucide="phone"></i>
+                            </div>
+                            <div>
+                                <h4>Call Support</h4>
+                                <p>9978841256</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-detail-item">
+                            <div class="contact-icon">
+                                <i data-lucide="map-pin"></i>
+                            </div>
+                            <div>
+                                <h4>Global Headquarters</h4>
+                                <p>317, Devashish Business Park, Premchand Nagar Rd, opposite Krishna Complex, Bodakdev, Ahmedabad, Gujarat 380015</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Extra trust message -->
+                <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 2rem; margin-top: 3rem;">
+                    <p style="font-size: 0.88rem; color: var(--text-light); line-height: 1.5; margin-bottom: 0;">We take data privacy and intellectual property seriously. Any design drawings, roof mockups, or proprietary project specs you share are protected by standard NDA clauses.</p>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Form -->
+            <div class="contact-form-panel">
+                <h3>Submit Project Scope</h3>
+                
+                <!-- Flash feedback alert messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                
+                <form action="{{ url_for('contact') }}" method="POST" id="contact-inquiry-form">
+                    
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="name">Your Name *</label>
+                            <input type="text" id="name" name="name" required placeholder="e.g. John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input type="text" id="company_name" name="company_name" placeholder="e.g. Solar Pro EPC">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required placeholder="e.g. john@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="e.g. +1 (555) 000-0000">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="project_type">Project Category / Service Required</label>
+                        <select id="project_type" name="project_type">
+                            <option value="Residential Solar Design">Residential Solar Design</option>
+                            <option value="Commercial & Industrial Rooftop">Commercial & Industrial Rooftop</option>
+                            <option value="Utility-Scale Ground Mount">Utility-Scale Ground Mount</option>
+                            <option value="Shadow Analysis & Layouts">Shadow Analysis & Layouts Only</option>
+                            <option value="SLD Schematic Drafting">SLD Schematic Drafting Only</option>
+                            <option value="Engineering Consultancy">Engineering Consultancy</option>
+                            <option value="Other Service">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Project Description & Scope *</label>
+                        <textarea id="message" name="message" required placeholder="Describe your project (e.g. capacity in kW, roof material, layout criteria, files ready to share...)"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+                        <span>Submit Project Inquiry</span>
+                        <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                    </button>
+                    
+                </form>
+            </div>
+            
+        </div>
+        
+    </div>
+</section>
+{% endblock %}

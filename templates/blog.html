@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Solar Design & Engineering Blog | EarthX Designs{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <h1>Engineering & Design Blog</h1>
+        <p>Insights, guides, and regulatory checklists for solar layout design, shadow modeling, and electrical compliance.</p>
+    </div>
+</section>
+
+<!-- Blog Section -->
+<section class="section-padding">
+    <div class="container">
+        
+        <!-- Search and Category Filters -->
+        <div class="search-box" style="margin-bottom: 2.5rem;">
+            <form action="{{ url_for('blog') }}" method="GET">
+                {% if active_category %}
+                    <input type="hidden" name="category" value="{{ active_category }}">
+                {% endif %}
+                <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+                <input type="text" name="q" placeholder="Search blog articles..." value="{{ search_query }}">
+            </form>
+        </div>
+        
+        <div class="portfolio-filter" style="margin-bottom: 3.5rem;">
+            <a href="{{ url_for('blog', q=search_query) }}" class="filter-btn {% if not active_category %}active{% endif %}">
+                All Topics
+            </a>
+            {% for cat in categories %}
+            <a href="{{ url_for('blog', category=cat, q=search_query) }}" class="filter-btn {% if active_category == cat %}active{% endif %}">
+                {{ cat }}
+            </a>
+            {% endfor %}
+        </div>
+        
+        <!-- Blog Cards Grid -->
+        {% if posts %}
+        <div class="grid grid-3">
+            {% for post in posts %}
+            <article class="blog-card">
+                <div class="blog-img-wrapper">
+                    <img src="{{ post.featured_image }}" alt="{{ post.title }}">
+                </div>
+                <div class="blog-info">
+                    <div class="blog-meta">
+                        <span class="blog-tag">{{ post.category }}</span>
+                        <span>
+                            <i data-lucide="calendar" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+                            {{ post.created_at.split(' ')[0] }}
+                        </span>
+                    </div>
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.excerpt }}</p>
+                    <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="blog-readmore">
+                        <span>Read Article</span>
+                        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center" style="padding: 4rem 1rem;">
+            <i data-lucide="file-warning" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
+            <h3>No Articles Found</h3>
+            <p style="margin-top: 0.5rem;">We couldn't find any articles matching your search criteria. Please try again.</p>
+            <a href="{{ url_for('blog') }}" class="btn btn-primary" style="margin-top: 1.5rem;">Reset All Filters</a>
+        </div>
+        {% endif %}
+        
+    </div>
+</section>
+{% endblock %}

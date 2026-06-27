@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary SEO Metadata -->
+    <title>{% block title %}EarthX Designs | Solar Design & Engineering Solutions{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Professional Solar 3D Design, Shadow Analysis, SLDs, BOQs, and Engineering Consultancy for EPC companies, solar developers, and installers worldwide.{% endblock %}">
+    <meta name="keywords" content="Solar Design Company, Solar Design Services, Solar Engineering Services, Solar 3D Design, Solar Layout Design, Shadow Analysis, Solar SLD Drawings, BOQ Preparation, Ground Mount Solar Design, EarthX Designs">
+    <meta name="author" content="EarthX Designs">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}EarthX Designs | Solar Design & Engineering{% endblock %}">
+    <meta property="og:description" content="{% block og_desc %}Professional 2D & 3D solar designs, shadow analysis, SLDs and complete engineering packages for solar installers globally.{% endblock %}">
+    
+    <!-- Favicon & Fonts -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+
+    <!-- Header & Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('home') }}" class="logo">
+                <img src="{{ url_for('static', filename='uploads/logo_black.png') }}" alt="EarthX Designs Logo" style="height: 50px; width: auto;">
+            </a>
+            
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="nav-links" id="nav-links">
+                <a href="{{ url_for('home') }}">Home</a>
+                <a href="{{ url_for('about') }}">About Us</a>
+                <a href="{{ url_for('services') }}">Services</a>
+                <a href="{{ url_for('portfolio') }}">Portfolio</a>
+                <a href="{{ url_for('testimonials') }}">Testimonials</a>
+                <a href="{{ url_for('blog') }}">Blog</a>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid grid">
+                
+                <!-- Widget 1: Brand -->
+                <div class="footer-widget">
+                    <a href="{{ url_for('home') }}" class="logo" style="color: #FFFFFF;">
+                        <img src="{{ url_for('static', filename='uploads/logo_white.png') }}" alt="EarthX Designs Logo" style="height: 50px; width: auto;">
+                    </a>
+                    <p>Providing high-precision solar design, electrical engineering, shadow analysis, and BOQ preparation support for solar EPC installers and developers globally.</p>
+                </div>
+                
+                <!-- Widget 2: Services -->
+                <div class="footer-widget">
+                    <h3>Our Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('services') }}">Solar 3D Design & Rendering</a></li>
+                        <li><a href="{{ url_for('services') }}">2D Solar Layout Design</a></li>
+                        <li><a href="{{ url_for('services') }}">Shadow Analysis Modeling</a></li>
+                        <li><a href="{{ url_for('services') }}">Single Line Diagrams (SLD)</a></li>
+                        <li><a href="{{ url_for('services') }}">BOQ & Technical Drawings</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Widget 3: Quick Links -->
+                <div class="footer-widget">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('portfolio') }}">Our Portfolio</a></li>
+                        <li><a href="{{ url_for('blog') }}">Engineering Blog</a></li>
+                        <li><a href="{{ url_for('testimonials') }}">Client Reviews</a></li>
+                        <li><a href="{{ url_for('contact') }}">Contact & Quote Request</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Widget 4: Contact info -->
+                <div class="footer-widget">
+                    <h3>Get in Touch</h3>
+                    <ul class="footer-contact">
+                        <li>
+                            <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
+                            <span>sales.earthxdesigns@gmail.com</span>
+                        </li>
+                        <li>
+                            <i data-lucide="phone" style="width: 16px; height: 16px;"></i>
+                            <span>9978841256</span>
+                        </li>
+                        <li>
+                            <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+                            <span>317, Devashish Business Park, Premchand Nagar Rd, opposite Krishna Complex, Bodakdev, Ahmedabad, Gujarat 380015</span>
+                        </li>
+                    </ul>
+                </div>
+                
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; {{ now.year }} EarthX Designs. All rights reserved. Precision Solar Engineering & Design.</p>
+                <div class="footer-bottom-links">
+                    <a href="{{ url_for('admin_login') }}">Admin Portal</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Integration -->
+    <a href="https://wa.me/919978841256?text=Hello%20EarthX%20Designs%2C%20I%20would%20like%20a%20quote%20for%20a%20solar%20design%20project." 
+       class="whatsapp-float" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       aria-label="Contact us on WhatsApp">
+        <svg viewBox="0 0 24 24" width="32" height="32">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.59 2.028 14.11 1.002 11.99 1.002c-5.438 0-9.821 4.372-9.825 9.804-.002 1.8.49 3.55 1.42 5.12L2.53 20.944l5.117-1.79zM16.14 13.9c-.3-.15-1.782-.876-2.056-.975-.274-.1-.474-.15-.673.15-.2.3-.772.975-.947 1.173-.175.2-.35.225-.65.075-.3-.15-1.267-.466-2.413-1.488-.891-.795-1.493-1.777-1.668-2.077-.175-.3-.018-.462.13-.61.135-.134.3-.349.45-.524.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.673-1.62-.922-2.206-.24-.58-.507-.5-.69-.51-.178-.008-.383-.01-.588-.01-.205 0-.54.077-.822.38-.282.305-1.077 1.053-1.077 2.566 0 1.513 1.1 2.978 1.252 3.18.152.201 2.163 3.3 5.242 4.628.732.316 1.302.505 1.747.646.737.234 1.41.201 1.94.122.59-.088 1.783-.728 2.032-1.43.25-.702.25-1.303.175-1.43-.075-.127-.275-.202-.575-.352z"/>
+        </svg>
+    </a>
+
+    <!-- Page main Javascript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

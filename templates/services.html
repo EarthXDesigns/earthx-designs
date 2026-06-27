@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Services | EarthX Designs - Solar Design & Engineering{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <h1>Solar Engineering Services</h1>
+        <p>Comprehensive design and engineering packages tailored for residential installers, commercial developers, and utility EPC firms.</p>
+    </div>
+</section>
+
+<!-- Services Detail Section -->
+<section class="section-padding">
+    <div class="container">
+        <div class="services-grid grid grid-3">
+            <!-- 1. Solar 3D Design -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="box"></i></div>
+                <h3>Solar 3D Design</h3>
+                <p>We create highly detailed 3D models of homes, commercial complexes, and industrial sites. This allows developers to present professional, photorealistic installations to clients, securing sales faster.</p>
+            </div>
+            
+            <!-- 2. Solar 2D Layout Design -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="grid"></i></div>
+                <h3>Solar 2D Layout Design</h3>
+                <p>Accurate AutoCAD layout blueprints highlighting solar panel orientations, row pitch, setback boundary lines, walkways, and inverter station placements optimized for maintenance access.</p>
+            </div>
+            
+            <!-- 3. Shadow Analysis -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="sun-dim"></i></div>
+                <h3>Shadow Analysis</h3>
+                <p>We run full yearly solar path simulations to identify shading caused by chimneys, trees, AC units, and parapet walls. Helps determine string routing and structural setbacks to minimize performance loss.</p>
+            </div>
+            
+            <!-- 4. SLD Drawings -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="git-branch"></i></div>
+                <h3>SLD Drawings</h3>
+                <p>Electrical Single Line Diagrams detailing system specifications, string mapping, fuse/breaker ratings, wire sizes, grounding systems, and disconnect switch placements for rapid utility permit approvals.</p>
+            </div>
+            
+            <!-- 5. BOQ Preparation -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="list-checks"></i></div>
+                <h3>BOQ Preparation</h3>
+                <p>Detailed Bills of Quantities accounting for every PV module, rail, clamp, cable, connector, inverter, and combiner box needed. Prevents purchasing errors and assists in budget estimations.</p>
+            </div>
+            
+            <!-- 6. CEIG Drawings -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="shield-check"></i></div>
+                <h3>CEIG Drawings</h3>
+                <p>Approval drawings customized for Chief Electrical Inspector regulatory agencies. Includes detailed grounding grid schematics, lightning arrester layouts, and substation layouts.</p>
+            </div>
+            
+            <!-- 7. Ground Mount Solar Design -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="milestone"></i></div>
+                <h3>Ground Mount Solar Design</h3>
+                <p>Civil and structural designs for large-scale utility farms. We handle slope analysis, tracker layouts, foundation pile depth modeling, and structural load calculations for extreme wind zones.</p>
+            </div>
+            
+            <!-- 8. Rooftop Solar Design -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="home"></i></div>
+                <h3>Rooftop Solar Design</h3>
+                <p>Optimized residential and commercial rooftop solar layouts. Designs are structured to evenly distribute loads, avoid roof penetrations where possible, and maximize energy density per square foot.</p>
+            </div>
+            
+            <!-- 9. Solar Engineering Consultancy -->
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="message-square"></i></div>
+                <h3>Solar Engineering Consultancy</h3>
+                <p>Expert advisory on solar tech selection, feasibility analysis, cable loss mitigation, grid integration layouts, and cost-reduction strategies for major commercial and utility developments.</p>
+            </div>
+        </div>
+        
+        <!-- Call to Action Link -->
+        <div class="text-center" style="margin-top: 4rem; background: var(--bg-light); padding: 3rem; border-radius: var(--radius-md); border: 1px solid var(--admin-border);">
+            <h3>Need a Custom Design Package?</h3>
+            <p style="margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; margin-top: 0.5rem;">We provide customized monthly engineering retainer contracts for high-volume installers, as well as pay-per-project designs.</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Request a Custom Proposal</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us | EarthX Designs - Solar Design & Engineering{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <h1>About EarthX Designs</h1>
+        <p>A trusted technical design partner for top-tier solar developers, EPCs, and installation professionals worldwide.</p>
+    </div>
+</section>
+
+<!-- Company Background -->
+<section class="section-padding">
+    <div class="container">
+        <div class="grid grid-2" style="align-items: center; gap: 4rem;">
+            <div>
+                <span class="section-tag">Our Story</span>
+                <h2>Pioneering Solar Engineering Solutions</h2>
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">Founded by a group of passionate solar engineers, EarthX Designs has grown to become a leading drafting and technical documentation agency. We recognized that fast-growing solar installers often struggle with engineering bottlenecks, permit delays, and non-compliance drafting cycles. We set out to solve this.</p>
+                <p style="margin-bottom: 1.5rem; line-height: 1.8;">Today, we provide a full-spectrum engineering back-office for solar companies. By outsourcing drafting, electrical routing designs, and structural calculations to us, our clients speed up installation cycles, lower overhead, and increase permit approval rates.</p>
+                <p style="line-height: 1.8;">From small residential layouts to massive multi-megawatt ground-mount arrays with tracking systems, our designs are optimized for field buildability and local codes.</p>
+            </div>
+            <div>
+                <div class="about-home-image" style="aspect-ratio: 16/11;">
+                    <img src="/static/uploads/ground_mount_featured.png" alt="Utility Solar Engineering Team Work">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Values Section -->
+<section class="section-padding bg-light-sec">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">Core Principles</span>
+            <h2>Our Operational Standards</h2>
+            <p>Every engineering layout that leaves our office goes through a strict quality checklist to ensure zero errors in the field.</p>
+        </div>
+        
+        <div class="grid grid-3">
+            <div class="service-card" style="border: 1px solid var(--admin-border);">
+                <div class="service-icon" style="color: var(--accent);">
+                    <i data-lucide="shield-alert" style="width: 36px; height: 36px;"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.8rem;">Regulatory Compliance</h3>
+                <p style="font-size: 0.95rem;">We stay updated on NEC code changes, local municipal permit guidelines, and utility interconnect requirements to ensure your plans are approved on first submission.</p>
+            </div>
+            
+            <div class="service-card" style="border: 1px solid var(--admin-border);">
+                <div class="service-icon" style="color: var(--accent);">
+                    <i data-lucide="trending-up" style="width: 36px; height: 36px;"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.8rem;">Engineering Optimization</h3>
+                <p style="font-size: 0.95rem;">We don't just draft; we optimize. We analyze inverter loading ratios, string lengths, cable sizing, and structural racking configurations to optimize balance-of-system (BOS) costs.</p>
+            </div>
+            
+            <div class="service-card" style="border: 1px solid var(--admin-border);">
+                <div class="service-icon" style="color: var(--accent);">
+                    <i data-lucide="clock" style="width: 36px; height: 36px;"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; margin-bottom: 0.8rem;">Agile Turnaround</h3>
+                <p style="font-size: 0.95rem;">Solar installations operate on tight deadlines. Our design pipeline is structured to return draft files in 24 to 48 hours, keeping your installation crews active in the field.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tools & Software We Use -->
+<section class="section-padding">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">Technology Stack</span>
+            <h2>Industry-Standard Engineering Software</h2>
+            <p>We leverage premium design tools to model site conditions and generate precise CAD schematics.</p>
+        </div>
+        
+        <div class="grid grid-4 text-center">
+            <div class="why-card" style="padding: 2rem;">
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">AutoCAD</div>
+                <p style="font-size: 0.88rem;">Precision 2D drafting for layout schematics, electrical line wiring, and structure details.</p>
+            </div>
+            <div class="why-card" style="padding: 2rem;">
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">HelioScope</div>
+                <p style="font-size: 0.88rem;">Commercial layout configuration, string optimizer, and monthly yield simulation reports.</p>
+            </div>
+            <div class="why-card" style="padding: 2rem;">
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">PVsyst</div>
+                <p style="font-size: 0.88rem;">Detailed utility-scale production modeling, weather data analysis, and shading losses.</p>
+            </div>
+            <div class="why-card" style="padding: 2rem;">
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">Sketchup / V-Ray</div>
+                <p style="font-size: 0.88rem;">3D modeling of roofs, shading obstructions, and high-fidelity presentation renders.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
