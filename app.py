@@ -18,6 +18,21 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
+# Auto-initialize database if it doesn't exist
+import sqlite3
+
+def ensure_db():
+    if not os.path.exists('database.db'):
+        conn = sqlite3.connect('database.db')
+        with open('schema.sql', 'r') as f:
+            conn.executescript(f.read())
+        conn.commit()
+        conn.close()
+
+# Call it immediately
+ensure_db()
+
+
 # Helper function for allowed file types
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
