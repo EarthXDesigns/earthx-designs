@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# Database (re-generated on startup)
+database.db
+
+# Logs
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Cloudflare tunnel binary
+cloudflared.exe
+
+# Temporary scripts
+process_logo*.py
+
+# Scratch/leftover root files (not part of Flask app)
+index.html
+script.js
+style.css

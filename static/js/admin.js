@@ -52,6 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'leads-tab':
                 fetchLeads();
                 break;
+            case 'users-tab':
+                fetchUsers();
+                break;
         }
     };
 
@@ -740,6 +743,190 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(err);
         }
     };
+
+
+    // ===================================
+    // 8. USERS MANAGEMENT
+    // ===================================
+    const fetchUsers = async () => {
+        const table = document.getElementById('users-table');
+        if (!table) return;
+        const tbody = table.querySelector('tbody');
+        try {
+            const res = await fetch('/api/users');
+            if (res.status === 403) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--admin-text-light);">Access denied.</td></tr>';
+                return;
+            }
+            const users = await res.json();
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                const roleLabel = u.role === 'super_admin' ? 'Super Admin' : 'Admin';
+                const statusBadge = u.is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Disabled</span>';
+                tr.innerHTML = `
+                    <td><a href="mailto:${u.email}">${u.email}</a></td>
+                    <td>${u.name || '-'}</td>
+                    <td><span class="badge badge-info" style="font-size:0.75rem;">${roleLabel}</span></td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        <div style="display:flex;gap:6px;">
+                            <button class="btn-admin btn-admin-secondary" onclick="editUser(${u.id})" style="font-size:0.75rem;padding:0.25rem 0.5rem;">
+                                <i data-lucide="edit-3" style="width:13px;height:13px;"></i> Edit
+                            </button>
+                            <button class="btn-admin btn-admin-danger" onclick="deleteUser(${u.id}, '${u.email}')" style="font-size:0.75rem;padding:0.25rem 0.5rem;">
+                                <i data-lucide="trash-2" style="width:13px;height:13px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            initIcons();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    window.openUserModal = () => {
+        const modal = document.getElementById('user-modal');
+        if (!modal) return;
+        document.getElementById('user-modal-title').textContent = 'Add New User';
+        document.getElementById('user-id').value = '';
+        document.getElementById('user-email').value = '';
+        document.getElementById('user-email').disabled = false;
+        document.getElementById('user-name').value = '';
+        document.getElementById('user-password').value = '';
+        document.getElementById('user-password').required = true;
+        document.getElementById('user-password').placeholder = 'Min 6 characters';
+        document.getElementById('user-role').value = 'admin';
+        document.getElementById('user-active').value = '1';
+        openModal('user-modal');
+    };
+
+    window.editUser = async (id) => {
+        try {
+            const res = await fetch('/api/users');
+            const users = await res.json();
+            const user = users.find(u => u.id === id);
+            if (!user) return alert('User not found');
+
+            document.getElementById('user-modal-title').textContent = 'Edit User';
+            document.getElementById('user-id').value = user.id;
+            document.getElementById('user-email').value = user.email;
+            document.getElementById('user-email').disabled = true;
+            document.getElementById('user-name').value = user.name || '';
+            document.getElementById('user-password').value = '';
+            document.getElementById('user-password').required = false;
+            document.getElementById('user-password').placeholder = 'Leave blank to keep current';
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-active').value = String(user.is_active);
+            openModal('user-modal');
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    window.deleteUser = async (id, email) => {
+        if (!confirm(`Are you sure you want to remove ${email}?`)) return;
+        try {
+            const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (res.ok) {
+                fetchUsers();
+            } else {
+                alert(data.error || 'Failed to delete user.');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // User form submit
+    const userForm = document.getElementById('user-form');
+    if (userForm) {
+        userForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('user-id').value;
+            const email = document.getElementById('user-email').value.trim();
+            const name = document.getElementById('user-name').value.trim();
+            const password = document.getElementById('user-password').value.trim();
+            const role = document.getElementById('user-role').value;
+            const is_active = parseInt(document.getElementById('user-active').value);
+
+            if (id) {
+                // Edit user
+                const body = { name, role, is_active };
+                if (password) body.password = password;
+                try {
+                    const res = await fetch(`/api/users/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        closeModal('user-modal');
+                        fetchUsers();
+                    } else {
+                        alert(data.error || 'Failed to update user.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            } else {
+                // Create user
+                if (!email || !password) return alert('Email and password are required.');
+                try {
+                    const res = await fetch('/api/users', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, name, password, role })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        closeModal('user-modal');
+                        fetchUsers();
+                    } else {
+                        alert(data.error || 'Failed to create user.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+        });
+    }
+
+    // Change password form
+    const changePwForm = document.getElementById('change-password-form');
+    if (changePwForm) {
+        changePwForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('current-password').value.trim();
+            const newPassword = document.getElementById('new-password').value.trim();
+
+            if (!currentPassword || !newPassword) return alert('Both fields are required.');
+            if (newPassword.length < 6) return alert('New password must be at least 6 characters.');
+
+            try {
+                const res = await fetch('/api/users/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Password changed successfully!');
+                    document.getElementById('current-password').value = '';
+                    document.getElementById('new-password').value = '';
+                } else {
+                    alert(data.error || 'Failed to change password.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
 
 
     // --- INITIAL DATA LOAD ---

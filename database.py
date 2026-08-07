@@ -72,10 +72,10 @@ def init_db():
     cursor.execute("SELECT COUNT(*) FROM users")
     if cursor.fetchone()[0] == 0:
         # 1. Seed Admin User
-        admin_email = 'admin@earthxdesigns.com'
+        admin_email = 'sales.earthxd@gmail.com'
         admin_pw = 'EarthX@123'
         hashed_pw = generate_password_hash(admin_pw)
-        cursor.execute("INSERT INTO users (email, password) VALUES (?, ?)", (admin_email, hashed_pw))
+        cursor.execute("INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)", (admin_email, hashed_pw, 'EarthX Admin', 'super_admin'))
         print("Admin user seeded.")
         
         # 2. Seed Categories

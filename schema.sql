@@ -4,6 +4,11 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
+    name TEXT DEFAULT '',
+    role TEXT DEFAULT 'admin',
+    is_active INTEGER DEFAULT 1,
+    reset_token TEXT,
+    reset_token_expiry TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

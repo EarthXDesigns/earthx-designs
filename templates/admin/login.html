@@ -34,7 +34,7 @@
             <form action="{{ url_for('admin_login') }}" method="POST">
                 <div class="admin-form-group">
                     <label for="email">Admin Email</label>
-                    <input type="email" id="email" name="email" required placeholder="admin@earthxdesigns.com" style="padding: 0.85rem 1rem;">
+                    <input type="email" id="email" name="email" required placeholder="sales.earthxd@gmail.com" style="padding: 0.85rem 1rem;">
                 </div>
                 
                 <div class="admin-form-group" style="margin-bottom: 1.8rem;">
@@ -47,6 +47,12 @@
                 </button>
             </form>
             
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="{{ url_for('admin_forgot_password') }}" style="color: var(--admin-primary); text-decoration: none; font-size: 0.85rem; font-weight: 500;">
+                    Forgot Password?
+                </a>
+            </div>
+
             <div style="text-align: center; margin-top: 1.8rem;">
                 <a href="{{ url_for('home') }}" style="color: var(--admin-text-light); text-decoration: none; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
                     <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>

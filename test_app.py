@@ -59,7 +59,7 @@ class EarthXDesignsTestCase(unittest.TestCase):
     def test_admin_login_success(self):
         """Test that login works with seeded admin credentials."""
         payload = {
-            'email': 'admin@earthxdesigns.com',
+            'email': 'sales.earthxd@gmail.com',
             'password': 'EarthX@123'
         }
         response = self.app.post('/admin/login', data=payload)

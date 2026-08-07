@@ -2,8 +2,10 @@ import os
 import csv
 import io
 import datetime
+import secrets
+import string
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, make_response
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from database import get_db_connection, init_db
 
@@ -63,7 +65,7 @@ Message:
     smtp_port = os.environ.get('SMTP_PORT')
     smtp_user = os.environ.get('SMTP_USER')
     smtp_password = os.environ.get('SMTP_PASSWORD')
-    smtp_to = os.environ.get('SMTP_TO', 'admin@earthxdesigns.com')
+    smtp_to = os.environ.get('SMTP_TO', 'sales.earthxd@gmail.com')
     
     if smtp_host and smtp_user and smtp_password:
         import smtplib
@@ -290,17 +292,56 @@ def admin_login():
         password = request.form.get('password', '').strip()
         
         conn = get_db_connection()
-        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+        user = conn.execute('SELECT * FROM users WHERE email = ? AND is_active = 1', (email,)).fetchone()
         conn.close()
         
         if user and check_password_hash(user['password'], password):
             session['user_id'] = user['id']
             session['user_email'] = user['email']
+            session['user_role'] = user['role']
+            session['user_name'] = user['name'] or user['email']
             return redirect(url_for('admin_dashboard'))
         else:
             flash("Invalid email or password.", "error")
             
     return render_template('admin/login.html')
+
+@app.route('/admin/forgot-password', methods=['GET', 'POST'])
+def admin_forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        conn = get_db_connection()
+        user = conn.execute('SELECT * FROM users WHERE email = ? AND is_active = 1', (email,)).fetchone()
+        
+        if user:
+            # Generate a reset token
+            token = secrets.token_urlsafe(32)
+            expiry = (datetime.datetime.now() + datetime.timedelta(hours=1)).strftime('%Y-%m-%d %H:%M:%S')
+            conn.execute('UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?', (token, expiry, user['id']))
+            conn.commit()
+            
+            # Generate a temporary password instead (since we don't have real SMTP)
+            temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(10))
+            hashed = generate_password_hash(temp_password)
+            conn.execute('UPDATE users SET password = ? WHERE id = ?', (hashed, user['id']))
+            conn.commit()
+            
+            # Log the temp password (in production, this would be emailed)
+            log_dir = os.path.join(app.root_path, 'logs')
+            os.makedirs(log_dir, exist_ok=True)
+            log_file = os.path.join(log_dir, 'password_resets.log')
+            timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            with open(log_file, 'a', encoding='utf-8') as f:
+                f.write(f"[{timestamp}] Password reset for {email}. Temporary password: {temp_password}\n")
+            
+            flash(f"Password has been reset. Your temporary password is: {temp_password} — Please change it after logging in.", "success")
+        else:
+            flash("If this email exists in our system, a reset link has been sent.", "success")
+        
+        conn.close()
+        return redirect(url_for('admin_forgot_password'))
+    
+    return render_template('admin/forgot_password.html')
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -808,6 +849,102 @@ def api_export_inquiries():
     response.headers["Content-Disposition"] = f"attachment; filename=earthx_leads_{datetime.datetime.now().strftime('%Y%m%d')}.csv"
     response.headers["Content-type"] = "text/csv"
     return response
+
+# 6. USERS MANAGEMENT API
+@app.route('/api/users', methods=['GET', 'POST'])
+@login_required
+def api_users():
+    # Only super_admin can manage users
+    if session.get('user_role') != 'super_admin':
+        return jsonify({'error': 'Access denied. Only super admin can manage users.'}), 403
+    
+    conn = get_db_connection()
+    if request.method == 'GET':
+        users = conn.execute('SELECT id, email, name, role, is_active, created_at FROM users ORDER BY id ASC').fetchall()
+        conn.close()
+        return jsonify([dict(u) for u in users])
+    
+    elif request.method == 'POST':
+        data = request.json or {}
+        email = data.get('email', '').strip()
+        name = data.get('name', '').strip()
+        password = data.get('password', '').strip()
+        role = data.get('role', 'admin')
+        
+        if not email or not password:
+            return jsonify({'error': 'Email and password are required.'}), 400
+        
+        hashed_pw = generate_password_hash(password)
+        try:
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)', (email, hashed_pw, name, role))
+            conn.commit()
+            new_id = cursor.lastrowid
+            conn.close()
+            return jsonify({'message': 'User created successfully', 'id': new_id}), 201
+        except Exception:
+            conn.close()
+            return jsonify({'error': 'Email already exists.'}), 400
+
+@app.route('/api/users/<int:user_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_user_detail(user_id):
+    if session.get('user_role') != 'super_admin':
+        return jsonify({'error': 'Access denied.'}), 403
+    
+    conn = get_db_connection()
+    if request.method == 'PUT':
+        data = request.json or {}
+        name = data.get('name', '').strip()
+        role = data.get('role', 'admin')
+        is_active = data.get('is_active', 1)
+        new_password = data.get('password', '').strip()
+        
+        if new_password:
+            hashed_pw = generate_password_hash(new_password)
+            conn.execute('UPDATE users SET name = ?, role = ?, is_active = ?, password = ? WHERE id = ?', (name, role, is_active, hashed_pw, user_id))
+        else:
+            conn.execute('UPDATE users SET name = ?, role = ?, is_active = ? WHERE id = ?', (name, role, is_active, user_id))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'User updated successfully'})
+    
+    elif request.method == 'DELETE':
+        # Prevent deleting yourself
+        if user_id == session.get('user_id'):
+            conn.close()
+            return jsonify({'error': 'Cannot delete your own account.'}), 400
+        
+        conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'User removed successfully'})
+
+@app.route('/api/users/change-password', methods=['POST'])
+@login_required
+def api_change_password():
+    data = request.json or {}
+    current_password = data.get('current_password', '').strip()
+    new_password = data.get('new_password', '').strip()
+    
+    if not current_password or not new_password:
+        return jsonify({'error': 'Both current and new password are required.'}), 400
+    
+    if len(new_password) < 6:
+        return jsonify({'error': 'New password must be at least 6 characters.'}), 400
+    
+    conn = get_db_connection()
+    user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+    
+    if not user or not check_password_hash(user['password'], current_password):
+        conn.close()
+        return jsonify({'error': 'Current password is incorrect.'}), 400
+    
+    hashed = generate_password_hash(new_password)
+    conn.execute('UPDATE users SET password = ? WHERE id = ?', (hashed, session['user_id']))
+    conn.commit()
+    conn.close()
+    return jsonify({'message': 'Password changed successfully'})
 
 # Main entrypoint setup
 if __name__ == '__main__':

@@ -48,6 +48,14 @@
                         <span>Contact Leads</span>
                     </a>
                 </li>
+                {% if session.get('user_role') == 'super_admin' %}
+                <li class="sidebar-item" data-target="users-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="shield-check" style="width: 18px; height: 18px;"></i>
+                        <span>User Access</span>
+                    </a>
+                </li>
+                {% endif %}
             </ul>
             
             <div class="sidebar-footer">
@@ -247,6 +255,55 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- 6. USERS TAB -->
+                {% if session.get('user_role') == 'super_admin' %}
+                <section class="tab-panel" id="users-tab">
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <h3>Manage User Access</h3>
+                            <button class="btn-admin btn-admin-primary" onclick="openUserModal()">
+                                <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add User</span>
+                            </button>
+                        </div>
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="admin-card-table" style="margin-top: 2rem;">
+                        <div class="table-header">
+                            <h3>Change Your Password</h3>
+                        </div>
+                        <form id="change-password-form" style="padding: 1.5rem;">
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; max-width: 600px;">
+                                <div class="admin-form-group">
+                                    <label for="current-password">Current Password</label>
+                                    <input type="password" id="current-password" name="current_password" required placeholder="Enter current password">
+                                </div>
+                                <div class="admin-form-group">
+                                    <label for="new-password">New Password</label>
+                                    <input type="password" id="new-password" name="new_password" required placeholder="Enter new password">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-admin btn-admin-primary" style="margin-top: 1rem;">
+                                <i data-lucide="lock" style="width: 16px; height: 16px;"></i>
+                                <span>Update Password</span>
+                            </button>
+                        </form>
+                    </div>
+                </section>
+                {% endif %}
 
             </div>
         </main>
@@ -519,6 +576,59 @@
             </form>
         </div>
     </div>
+
+    <!-- User Modal -->
+    {% if session.get('user_role') == 'super_admin' %}
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Add New User</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="user-form">
+                <div class="modal-body">
+                    <input type="hidden" id="user-id" name="id">
+                    
+                    <div class="admin-form-group">
+                        <label for="user-email">Email Address *</label>
+                        <input type="email" id="user-email" name="email" required placeholder="user@company.com">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="user-name">Display Name</label>
+                        <input type="text" id="user-name" name="name" placeholder="e.g. Rahul Shah">
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="user-password">Password *</label>
+                            <input type="password" id="user-password" name="password" placeholder="Min 6 characters">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="user-role">Role</label>
+                            <select id="user-role" name="role">
+                                <option value="admin">Admin</option>
+                                <option value="super_admin">Super Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="user-active">Status</label>
+                        <select id="user-active" name="is_active">
+                            <option value="1">Active</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Admin dashboard core client-side scripting -->
     <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
