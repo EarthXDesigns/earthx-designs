@@ -227,6 +227,26 @@ a {
     gap: 4px;
 }
 
+.logo-light, .logo-dark {
+    height: 38px;
+    width: auto;
+    display: block;
+    transition: var(--transition);
+}
+
+.logo-dark {
+    display: none;
+}
+
+.navbar.scrolled .logo-light {
+    display: none;
+}
+
+.navbar.scrolled .logo-dark {
+    display: block;
+    height: 32px;
+}
+
 .logo span {
     color: var(--accent);
 }
