@@ -30,8 +30,8 @@
     <nav class="navbar" id="navbar">
         <div class="container nav-container">
             <a href="{{ url_for('home') }}" class="logo">
-                <img src="{{ url_for('static', filename='uploads/logo_white.png') }}" alt="EarthX Designs Logo" class="logo-light">
-                <img src="{{ url_for('static', filename='uploads/logo_black.png') }}" alt="EarthX Designs Logo" class="logo-dark">
+                <img src="/uploads/logo_white.png" alt="EarthX Designs Logo" class="logo-light">
+                <img src="/uploads/logo_black.png" alt="EarthX Designs Logo" class="logo-dark">
             </a>
             
             <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
@@ -75,7 +75,7 @@
                 <!-- Widget 1: Brand -->
                 <div class="footer-widget">
                     <a href="{{ url_for('home') }}" class="logo" style="color: #FFFFFF;">
-                        <img src="{{ url_for('static', filename='uploads/logo_white.png') }}" alt="EarthX Designs Logo" style="height: 38px; width: auto;">
+                        <img src="/uploads/logo_white.png" alt="EarthX Designs Logo" style="height: 38px; width: auto;">
                     </a>
                     <p>Providing high-precision solar design, electrical engineering, shadow analysis, and BOQ preparation support for solar EPC installers and developers globally.</p>
                 </div>
@@ -150,3 +150,4 @@
     {% block scripts %}{% endblock %}
 </body>
 </html>
+
