@@ -988,14 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('service-category-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('service-category-id').value;
-        
-        const data = {
-            name: document.getElementById('service-category-name').value,
-            slug: document.getElementById('service-category-slug').value,
-            hero_heading: document.getElementById('service-category-hero-heading').value,
-            hero_subtitle: document.getElementById('service-category-hero-subtitle').value,
-            full_description: document.getElementById('service-category-full-description').value
-        };
+        const formData = new FormData(e.target);
         
         const method = id ? 'PUT' : 'POST';
         const url = id ? `/api/service-categories/${id}` : '/api/service-categories';
@@ -1003,8 +996,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const res = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+                body: formData
             });
             
             if (res.ok) {
@@ -1039,6 +1031,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('service-category-hero-heading').value = cat.hero_heading || '';
                 document.getElementById('service-category-hero-subtitle').value = cat.hero_subtitle || '';
                 document.getElementById('service-category-full-description').value = cat.full_description || '';
+                if(document.getElementById('service-category-is-published')) {
+                    document.getElementById('service-category-is-published').value = cat.is_published;
+                }
                 
                 document.getElementById('service-category-modal-title').textContent = 'Edit Service Category';
                 openModal('service-category-modal');
@@ -1144,6 +1139,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('service-icon').value = s.icon;
                 document.getElementById('service-short-description').value = s.short_description;
                 document.getElementById('service-full-description').value = s.full_description || '';
+                
+                if(document.getElementById('service-features')) document.getElementById('service-features').value = s.features || '[]';
+                if(document.getElementById('service-benefits')) document.getElementById('service-benefits').value = s.benefits || '[]';
+                if(document.getElementById('service-deliverables')) document.getElementById('service-deliverables').value = s.deliverables || '[]';
+                
                 document.getElementById('service-is-published').value = s.is_published;
                 
                 document.getElementById('service-modal-title').textContent = 'Edit Service';

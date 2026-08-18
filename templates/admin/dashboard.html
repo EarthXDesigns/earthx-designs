@@ -665,6 +665,19 @@
                         <label for="service-category-full-description">Full Description</label>
                         <textarea id="service-category-full-description" name="full_description" placeholder="Description..."></textarea>
                     </div>
+                    <div class="admin-form-group">
+                        <label for="service-category-hero-image">Hero Banner Image</label>
+                        <input type="file" id="service-category-hero-image" name="hero_image" accept="image/*">
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="service-category-is-published">Status</label>
+                            <select id="service-category-is-published" name="is_published">
+                                <option value="1">Published</option>
+                                <option value="0">Draft</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
@@ -714,8 +727,28 @@
                     </div>
 
                     <div class="admin-form-group">
-                        <label for="service-full-description">Full Description</label>
+                        <label for="service-full-description">Overview / Full Description</label>
                         <textarea id="service-full-description" name="full_description"></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-image">Cover Image</label>
+                        <input type="file" id="service-image" name="image" accept="image/*">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-features">Key Features (JSON Array format)</label>
+                        <textarea id="service-features" name="features" placeholder='["Feature 1", "Feature 2"]'></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-benefits">Benefits (JSON Array format)</label>
+                        <textarea id="service-benefits" name="benefits" placeholder='["Benefit 1", "Benefit 2"]'></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-deliverables">Deliverables (JSON Array format)</label>
+                        <textarea id="service-deliverables" name="deliverables" placeholder='["Deliverable 1", "Deliverable 2"]'></textarea>
                     </div>
 
                     <div class="admin-form-group">

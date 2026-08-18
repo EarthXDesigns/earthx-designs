@@ -28,10 +28,18 @@
         
         <div class="services-grid grid grid-3">
             {% for service in services %}
-            <div class="service-card">
+            <div class="service-card" style="display:flex; flex-direction:column;">
                 <div class="service-icon"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
                 <h3>{{ service.name }}</h3>
-                <p>{{ service.short_description }}</p>
+                <p style="margin-bottom: 1rem;">{{ service.short_description }}</p>
+                
+                {% if service.features and service.features|length > 0 %}
+                <ul style="margin-top: auto; padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-muted);">
+                    {% for feature in service.features %}
+                    <li style="margin-bottom: 0.4rem;">{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
             </div>
             {% else %}
             <p>No services currently available in this category.</p>
