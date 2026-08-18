@@ -302,41 +302,14 @@ a {
 /* Hero Section */
 .hero {
     position: relative;
+    background: linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(17, 34, 64, 0.9) 100%), 
+                url('/static/uploads/ground_mount_featured.png') center/cover no-repeat;
     min-height: 90vh;
     display: flex;
     align-items: center;
     padding-top: var(--nav-height);
     color: var(--bg-white);
     overflow: hidden;
-}
-
-.hero-video-bg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: 0;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-}
-
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(10, 25, 47, 0.90) 0%, rgba(17, 34, 64, 0.85) 100%);
-    z-index: 1;
-}
-
-.hero .container {
-    position: relative;
-    z-index: 2;
-    width: 100%;
 }
 
 .hero-content {
