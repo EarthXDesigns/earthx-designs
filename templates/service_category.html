@@ -6,23 +6,20 @@
 <!-- Page Hero -->
 <section class="page-hero">
     <div class="container">
-        <!-- Breadcrumbs -->
-        <div class="breadcrumbs">
-            <a href="{{ url_for('home') }}">Home</a> / 
-            <a href="{{ url_for('services') }}">Services</a> / 
-            <span>{{ category.name }}</span>
-        </div>
-        <h1>{{ category.hero_heading or category.name }}</h1>
-        <p>{{ category.hero_subtitle or 'Professional solar engineering and design solutions.' }}</p>
+        <h1 style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+            <i data-lucide="{{ category.icon or 'briefcase' }}" style="width: 42px; height: 42px; color: var(--accent);"></i>
+            {{ category.hero_heading or category.name }}
+        </h1>
+        <p style="max-width: 800px; margin: 0 auto;">{{ category.hero_subtitle or 'Professional solar engineering and design solutions.' }}</p>
     </div>
 </section>
 
 <!-- Description & Services Detail Section -->
-<section class="section-padding">
+<section class="section-padding" style="padding-top: 4rem;">
     <div class="container">
         {% if category.full_description %}
-        <div class="service-category-description" style="margin-bottom: 3rem; max-width: 800px;">
-            <p>{{ category.full_description }}</p>
+        <div class="service-category-description" style="margin: 0 auto 4rem auto; max-width: 900px;">
+            <p style="text-align: justify; font-size: 1.15rem; line-height: 1.8; color: var(--text-dark);">{{ category.full_description }}</p>
         </div>
         {% endif %}
         
