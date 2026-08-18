@@ -5,27 +5,38 @@ import datetime
 import secrets
 import string
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, make_response
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, make_response, send_from_directory
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from database import get_db_connection, init_db
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'earthx_designs_secret_2026_super_key')
-app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+
+# --- DATA ARCHITECTURE ---
+# Use a persistent data directory for production deployments (e.g., mapped volume)
+DATA_DIR = os.environ.get('DATA_DIR', os.path.join(app.root_path, 'data'))
+os.makedirs(DATA_DIR, exist_ok=True)
+
+app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4'}
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Auto-initialize database and seed admin user if needed
-init_db()
+init_db(DATA_DIR)
 
 
 # Helper function for allowed file types
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Serve uploaded files from persistent storage
+@app.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Login decorator
 def login_required(f):
@@ -507,7 +518,7 @@ def api_projects():
             
         filename = secure_filename(f"proj_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        featured_image_url = f"/static/uploads/{filename}"
+        featured_image_url = f"/uploads/{filename}"
         
         cursor = conn.cursor()
         cursor.execute('''
@@ -523,7 +534,7 @@ def api_projects():
             if gfile and gfile.filename != '' and allowed_file(gfile.filename):
                 gfilename = secure_filename(f"gal_{project_id}_{i}_{datetime.datetime.now().strftime('%M%S')}_{gfile.filename}")
                 gfile.save(os.path.join(app.config['UPLOAD_FOLDER'], gfilename))
-                gurl = f"/static/uploads/{gfilename}"
+                gurl = f"/uploads/{gfilename}"
                 cursor.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (project_id, gurl, i))
                 
         conn.commit()
@@ -575,7 +586,7 @@ def api_project_detail(proj_id):
             if allowed_file(file.filename):
                 filename = secure_filename(f"proj_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                featured_image_url = f"/static/uploads/{filename}"
+                featured_image_url = f"/uploads/{filename}"
                 
         conn.execute('''
             UPDATE projects SET title = ?, category_id = ?, capacity = ?, location = ?, client_name = ?, description = ?, services_delivered = ?, featured_image = ?, completion_date = ?, status = ?
@@ -590,8 +601,8 @@ def api_project_detail(proj_id):
         for i, gfile in enumerate(gallery_files):
             if gfile and gfile.filename != '' and allowed_file(gfile.filename):
                 gfilename = secure_filename(f"gal_{proj_id}_{max_order + i + 1}_{datetime.datetime.now().strftime('%M%S')}_{gfile.filename}")
-                gfile.save(os.path.join(app.config['UPLOAD_FOLDER'], gfilename))
-                gurl = f"/static/uploads/{gfilename}"
+                gfile.save(os.path.join(app.config['DATA_DIR'], gfilename))
+                gurl = f"/uploads/{gfilename}"
                 conn.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (proj_id, gurl, max_order + i + 1))
                 
         conn.commit()
@@ -609,14 +620,14 @@ def api_project_detail(proj_id):
         conn.close()
         
         # Clean up files from disk
-        if project and project['featured_image'].startswith('/static/uploads/'):
+        if project and project['featured_image'].startswith('/uploads/'):
             filepath = os.path.join(app.root_path, project['featured_image'].lstrip('/'))
             if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
                 try: os.remove(filepath)
                 except Exception: pass
                 
         for img in images:
-            if img['image_path'].startswith('/static/uploads/'):
+            if img['image_path'].startswith('/uploads/'):
                 filepath = os.path.join(app.root_path, img['image_path'].lstrip('/'))
                 if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
                     try: os.remove(filepath)
@@ -639,7 +650,7 @@ def api_delete_gallery_image(img_id):
     conn.close()
     
     # Delete from file system if not a seed file
-    if img['image_path'].startswith('/static/uploads/'):
+    if img['image_path'].startswith('/uploads/'):
         filepath = os.path.join(app.root_path, img['image_path'].lstrip('/'))
         if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
             try: os.remove(filepath)
@@ -705,7 +716,7 @@ def api_blogs():
             
         filename = secure_filename(f"blog_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        featured_image_url = f"/static/uploads/{filename}"
+        featured_image_url = f"/uploads/{filename}"
         
         try:
             cursor = conn.cursor()
@@ -756,7 +767,7 @@ def api_blog_detail(post_id):
             if allowed_file(file.filename):
                 filename = secure_filename(f"blog_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                featured_image_url = f"/static/uploads/{filename}"
+                featured_image_url = f"/uploads/{filename}"
                 
         try:
             conn.execute('''
@@ -776,7 +787,7 @@ def api_blog_detail(post_id):
         conn.commit()
         conn.close()
         
-        if post and post['featured_image'].startswith('/static/uploads/'):
+        if post and post['featured_image'].startswith('/uploads/'):
             filepath = os.path.join(app.root_path, post['featured_image'].lstrip('/'))
             if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
                 try: os.remove(filepath)
@@ -934,7 +945,7 @@ def api_service_categories():
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            hero_image = f"/static/uploads/{filename}"
+            hero_image = f"/uploads/{filename}"
             
         max_order = conn.execute('SELECT MAX(display_order) FROM service_categories').fetchone()[0]
         display_order = (max_order or 0) + 1
@@ -997,7 +1008,7 @@ def api_service_category_detail(cat_id):
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            hero_image = f"/static/uploads/{filename}"
+            hero_image = f"/uploads/{filename}"
             
         try:
             conn.execute('''
@@ -1077,7 +1088,7 @@ def api_services():
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svc_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image = f"/static/uploads/{filename}"
+            image = f"/uploads/{filename}"
             
         max_order = conn.execute('SELECT MAX(display_order) FROM services WHERE category_id = ?', (category_id,)).fetchone()[0]
         display_order = (max_order or 0) + 1
@@ -1134,7 +1145,7 @@ def api_service_detail(svc_id):
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svc_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image = f"/static/uploads/{filename}"
+            image = f"/uploads/{filename}"
             
         conn.execute('''
             UPDATE services SET

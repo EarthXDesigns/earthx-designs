@@ -303,7 +303,7 @@ a {
 .hero {
     position: relative;
     background: linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(17, 34, 64, 0.9) 100%), 
-                url('/static/uploads/ground_mount_featured.png') center/cover no-repeat;
+                url('/uploads/ground_mount_featured.png') center/cover no-repeat;
     min-height: 90vh;
     display: flex;
     align-items: center;
