@@ -43,6 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'categories-tab':
                 fetchCategories();
                 break;
+            case 'services-tab':
+                fetchServiceCategories();
+                fetchServices();
+                break;
             case 'testimonials-tab':
                 fetchTestimonials();
                 break;
@@ -933,3 +937,229 @@ document.addEventListener('DOMContentLoaded', () => {
     // Default load is projects
     fetchProjects();
 });
+
+
+    // --- SERVICE CATEGORIES LOGIC ---
+    const fetchServiceCategories = async () => {
+        try {
+            const res = await fetch('/api/service-categories');
+            const data = await res.json();
+            
+            const tbody = document.getElementById('service-categories-table-body');
+            tbody.innerHTML = '';
+            
+            data.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${c.id}</td>
+                    <td><strong>${c.name}</strong></td>
+                    <td><code>/services/${c.slug}</code></td>
+                    <td>
+                        <div class="btn-action-group">
+                            <button class="btn-action edit" onclick="editServiceCategory(${c.id})">
+                                <i data-lucide="edit-3" style="width:14px; height:14px;"></i>
+                            </button>
+                            <button class="btn-action delete" onclick="deleteServiceCategory(${c.id})">
+                                <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            initIcons();
+            
+            // Populate category select list in service modal
+            const select = document.getElementById('service-category-select');
+            if (select) {
+                select.innerHTML = '<option value="">-- Select Category --</option>';
+                data.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+            }
+        } catch (err) {
+            console.error('Error fetching service categories:', err);
+        }
+    };
+
+    document.getElementById('service-category-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('service-category-id').value;
+        
+        const data = {
+            name: document.getElementById('service-category-name').value,
+            slug: document.getElementById('service-category-slug').value,
+            hero_heading: document.getElementById('service-category-hero-heading').value,
+            hero_subtitle: document.getElementById('service-category-hero-subtitle').value,
+            full_description: document.getElementById('service-category-full-description').value
+        };
+        
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/api/service-categories/${id}` : '/api/service-categories';
+        
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (res.ok) {
+                closeModal('service-category-modal');
+                fetchServiceCategories();
+            } else {
+                const error = await res.json();
+                alert(error.error || 'An error occurred.');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+
+    document.getElementById('btn-add-service-category').addEventListener('click', () => {
+        document.getElementById('service-category-form').reset();
+        document.getElementById('service-category-id').value = '';
+        document.getElementById('service-category-modal-title').textContent = 'Add Service Category';
+        openModal('service-category-modal');
+    });
+
+    window.editServiceCategory = async (id) => {
+        try {
+            const res = await fetch('/api/service-categories');
+            const categories = await res.json();
+            const cat = categories.find(c => c.id === id);
+            
+            if (cat) {
+                document.getElementById('service-category-id').value = cat.id;
+                document.getElementById('service-category-name').value = cat.name;
+                document.getElementById('service-category-slug').value = cat.slug;
+                document.getElementById('service-category-hero-heading').value = cat.hero_heading || '';
+                document.getElementById('service-category-hero-subtitle').value = cat.hero_subtitle || '';
+                document.getElementById('service-category-full-description').value = cat.full_description || '';
+                
+                document.getElementById('service-category-modal-title').textContent = 'Edit Service Category';
+                openModal('service-category-modal');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    window.deleteServiceCategory = async (id) => {
+        if (!confirm('Are you sure you want to delete this service category? This will also un-publish related services.')) return;
+        try {
+            const res = await fetch(`/api/service-categories/${id}`, { method: 'DELETE' });
+            if (res.ok) fetchServiceCategories();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // --- SERVICES LOGIC ---
+    const fetchServices = async () => {
+        try {
+            const res = await fetch('/api/services');
+            const data = await res.json();
+            
+            const tbody = document.getElementById('services-table-body');
+            tbody.innerHTML = '';
+            
+            data.forEach(s => {
+                const tr = document.createElement('tr');
+                const statusHtml = s.is_published ? 
+                    '<span class="badge" style="background-color:rgba(16,185,129,0.1); color:#10B981;">Published</span>' : 
+                    '<span class="badge" style="background-color:var(--bg-light); color:var(--text-muted);">Draft</span>';
+                
+                tr.innerHTML = `
+                    <td><i data-lucide="${s.icon || 'box'}" style="width:20px; height:20px; color:var(--primary);"></i></td>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.category_name || s.category_id}</td>
+                    <td>${statusHtml}</td>
+                    <td>
+                        <div class="btn-action-group">
+                            <button class="btn-action edit" onclick="editService(${s.id})">
+                                <i data-lucide="edit-3" style="width:14px; height:14px;"></i>
+                            </button>
+                            <button class="btn-action delete" onclick="deleteService(${s.id})">
+                                <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            initIcons();
+        } catch (err) {
+            console.error('Error fetching services:', err);
+        }
+    };
+
+    document.getElementById('service-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('service-id').value;
+        const formData = new FormData(e.target);
+        
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `/api/services/${id}` : '/api/services';
+        
+        try {
+            const res = await fetch(url, {
+                method: method,
+                body: formData
+            });
+            
+            if (res.ok) {
+                closeModal('service-modal');
+                fetchServices();
+            } else {
+                const error = await res.json();
+                alert(error.error || 'An error occurred.');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
+
+    document.getElementById('btn-add-service').addEventListener('click', () => {
+        document.getElementById('service-form').reset();
+        document.getElementById('service-id').value = '';
+        document.getElementById('service-modal-title').textContent = 'Add Service';
+        openModal('service-modal');
+    });
+
+    window.editService = async (id) => {
+        try {
+            const res = await fetch('/api/services');
+            const services = await res.json();
+            const s = services.find(item => item.id === id);
+            
+            if (s) {
+                document.getElementById('service-id').value = s.id;
+                document.getElementById('service-name').value = s.name;
+                document.getElementById('service-category-select').value = s.category_id;
+                document.getElementById('service-slug').value = s.slug;
+                document.getElementById('service-icon').value = s.icon;
+                document.getElementById('service-short-description').value = s.short_description;
+                document.getElementById('service-full-description').value = s.full_description || '';
+                document.getElementById('service-is-published').value = s.is_published;
+                
+                document.getElementById('service-modal-title').textContent = 'Edit Service';
+                openModal('service-modal');
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    window.deleteService = async (id) => {
+        if (!confirm('Are you sure you want to delete this service?')) return;
+        try {
+            const res = await fetch(`/api/services/${id}`, { method: 'DELETE' });
+            if (res.ok) fetchServices();
+        } catch (err) {
+            console.error(err);
+        }
+    };

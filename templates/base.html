@@ -41,13 +41,23 @@
             </button>
             
             <div class="nav-links" id="nav-links">
-                <a href="{{ url_for('home') }}">Home</a>
-                <a href="{{ url_for('about') }}">About Us</a>
-                <a href="{{ url_for('services') }}">Services</a>
-                <a href="{{ url_for('portfolio') }}">Portfolio</a>
-                <a href="{{ url_for('testimonials') }}">Testimonials</a>
-                <a href="{{ url_for('blog') }}">Blog</a>
-                <a href="{{ url_for('contact') }}" class="btn btn-primary" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
+                <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
+                <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
+                <div class="nav-dropdown">
+                    <button class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
+                        Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
+                    </button>
+                    <div class="nav-dropdown-menu">
+                        <a href="{{ url_for('services') }}">All Services</a>
+                        {% for cat in nav_services %}
+                            <a href="{{ url_for('service_category', slug=cat.slug) }}">{{ cat.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
+                <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
+                <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %}" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
             </div>
         </div>
     </nav>

@@ -76,3 +76,41 @@ CREATE TABLE IF NOT EXISTS contact_inquiries (
     status TEXT DEFAULT 'unread', -- 'unread', 'contacted'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS service_categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    short_description TEXT DEFAULT '',
+    full_description TEXT DEFAULT '',
+    icon TEXT DEFAULT 'briefcase',
+    hero_image TEXT DEFAULT '',
+    hero_heading TEXT DEFAULT '',
+    hero_subtitle TEXT DEFAULT '',
+    cta_heading TEXT DEFAULT 'Need Professional Solar Design Support?',
+    cta_description TEXT DEFAULT 'Share your project requirements with EarthX and get professional solar design support tailored to your project.',
+    cta_button_text TEXT DEFAULT 'Request Quote',
+    seo_title TEXT DEFAULT '',
+    seo_description TEXT DEFAULT '',
+    display_order INTEGER DEFAULT 0,
+    is_published INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS services (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    short_description TEXT DEFAULT '',
+    full_description TEXT DEFAULT '',
+    icon TEXT DEFAULT 'sun',
+    image TEXT DEFAULT '',
+    features TEXT DEFAULT '[]',
+    benefits TEXT DEFAULT '[]',
+    deliverables TEXT DEFAULT '[]',
+    display_order INTEGER DEFAULT 0,
+    is_published INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(category_id) REFERENCES service_categories(id) ON DELETE CASCADE
+);

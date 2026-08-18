@@ -30,6 +30,12 @@
                         <span>Categories</span>
                     </a>
                 </li>
+                <li class="sidebar-item" data-target="services-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="layers" style="width: 18px; height: 18px;"></i>
+                        <span>Services</span>
+                    </a>
+                </li>
                 <li class="sidebar-item" data-target="testimonials-tab">
                     <a href="javascript:void(0)">
                         <i data-lucide="message-square" style="width: 18px; height: 18px;"></i>
@@ -156,6 +162,58 @@
                                 </thead>
                                 <tbody id="categories-table-body">
                                     <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2.5 SERVICES TAB -->
+                <section class="tab-panel" id="services-tab" style="display:none;">
+                    <div class="admin-card-table" style="margin-bottom: 2rem;">
+                        <div class="table-header">
+                            <h2>Service Categories</h2>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-service-category">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add Category</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Category Name</th>
+                                        <th>Slug</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="service-categories-table-body">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <h2>Services</h2>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-service">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add Service</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Icon</th>
+                                        <th>Service Name</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="services-table-body">
                                 </tbody>
                             </table>
                         </div>
@@ -572,6 +630,105 @@
                 <div class="modal-footer">
                     <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
                     <button type="submit" class="btn-admin btn-admin-primary">Save Article</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Service Category Modal -->
+    <div class="modal" id="service-category-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="service-category-modal-title">Add Service Category</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="service-category-form">
+                <div class="modal-body">
+                    <input type="hidden" id="service-category-id" name="id">
+                    <div class="admin-form-group">
+                        <label for="service-category-name">Category Name *</label>
+                        <input type="text" id="service-category-name" name="name" required placeholder="e.g. Design Services">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="service-category-slug">Slug *</label>
+                        <input type="text" id="service-category-slug" name="slug" required placeholder="e.g. design-services">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="service-category-hero-heading">Hero Heading</label>
+                        <input type="text" id="service-category-hero-heading" name="hero_heading" placeholder="Main title for category page">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="service-category-hero-subtitle">Hero Subtitle</label>
+                        <input type="text" id="service-category-hero-subtitle" name="hero_subtitle" placeholder="Subtitle for category page">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="service-category-full-description">Full Description</label>
+                        <textarea id="service-category-full-description" name="full_description" placeholder="Description..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Service Modal -->
+    <div class="modal" id="service-modal">
+        <div class="modal-content" style="max-width: 750px;">
+            <div class="modal-header">
+                <h3 id="service-modal-title">Add Service</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="service-form" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" id="service-id" name="id">
+                    
+                    <div class="admin-form-group">
+                        <label for="service-name">Service Name *</label>
+                        <input type="text" id="service-name" name="name" required>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="service-category-select">Category *</label>
+                            <select id="service-category-select" name="category_id" required>
+                                <!-- Rendered dynamically -->
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="service-slug">Slug *</label>
+                            <input type="text" id="service-slug" name="slug" required>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="service-icon">Lucide Icon Name *</label>
+                        <input type="text" id="service-icon" name="icon" required placeholder="e.g. sun, box, grid">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-short-description">Short Description *</label>
+                        <input type="text" id="service-short-description" name="short_description" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-full-description">Full Description</label>
+                        <textarea id="service-full-description" name="full_description"></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-is-published">Status</label>
+                        <select id="service-is-published" name="is_published">
+                            <option value="1">Published</option>
+                            <option value="0">Draft</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Service</button>
                 </div>
             </form>
         </div>

@@ -223,6 +223,228 @@ def init_db():
         """, blogs)
         print("Blog posts seeded.")
         
+        # 7. Seed Service Categories
+        import json
+        
+        service_cats = [
+            {
+                'name': 'Pre Sales Design',
+                'slug': 'pre-sales-design',
+                'short_description': 'Professional solar design support for EPC companies during the pre-sales stage.',
+                'full_description': 'EarthX provides comprehensive pre-sales design services that help EPC companies present compelling solar proposals to clients. Our pre-sales designs include realistic 3D visualizations and precise 2D layouts that improve sales conversion rates.',
+                'icon': 'presentation',
+                'hero_heading': 'Pre Sales Design',
+                'hero_subtitle': 'Professional solar design support for EPC companies during the pre-sales stage. Win more projects with compelling visualizations and precise layouts.',
+                'display_order': 1
+            },
+            {
+                'name': 'Post Sales Design',
+                'slug': 'post-sales-design',
+                'short_description': 'Detailed execution-ready designs that convert approved solar concepts into installation-ready documentation.',
+                'full_description': 'Once a project is approved, EarthX converts the concept into detailed, execution-ready engineering designs. Our post-sales services cover everything from detailed rooftop and ground mount layouts to CEIG approval documentation.',
+                'icon': 'clipboard-check',
+                'hero_heading': 'Post Sales Design',
+                'hero_subtitle': 'Convert approved solar concepts into detailed, execution-ready designs with comprehensive engineering documentation.',
+                'display_order': 2
+            },
+            {
+                'name': 'Structure Design',
+                'slug': 'structure-design',
+                'short_description': 'Solar mounting structure design solutions based on project requirements and site conditions.',
+                'full_description': 'EarthX provides solar mounting structure design solutions tailored to specific project requirements, site conditions, and installation needs. From standard rooftop mounting to custom solutions for complex sites.',
+                'icon': 'warehouse',
+                'hero_heading': 'Structure Design',
+                'hero_subtitle': 'Solar mounting structure design solutions based on project requirements, site conditions, and installation requirements.',
+                'display_order': 3
+            }
+        ]
+        
+        for cat in service_cats:
+            cursor.execute("""
+                INSERT INTO service_categories (name, slug, short_description, full_description, icon, hero_heading, hero_subtitle, display_order)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (cat['name'], cat['slug'], cat['short_description'], cat['full_description'], cat['icon'], cat['hero_heading'], cat['hero_subtitle'], cat['display_order']))
+        
+        print("Service categories seeded.")
+        
+        # Get category IDs
+        cat_rows = cursor.execute("SELECT id, slug FROM service_categories").fetchall()
+        cat_ids = {row['slug']: row['id'] for row in cat_rows}
+        
+        child_services = [
+            # Pre Sales Design children
+            {
+                'category_id': cat_ids['pre-sales-design'],
+                'name': '3D Pre Sales Design',
+                'slug': '3d-pre-sales-design',
+                'short_description': 'Realistic 3D solar visualizations for client presentations and sales proposals.',
+                'full_description': 'Our 3D pre-sales design service creates photorealistic visualizations of proposed solar installations, helping EPC companies communicate their vision clearly and close deals faster.',
+                'icon': 'box',
+                'features': json.dumps([
+                    'Detailed 3D modeling of the project site',
+                    'Building and rooftop modeling',
+                    'Solar panel placement visualization',
+                    'Structure visualization',
+                    'Client presentation-ready views',
+                    'Helps EPC companies communicate proposed solar installations clearly',
+                    'Improves sales conversion with realistic visualization before installation'
+                ]),
+                'benefits': json.dumps(['Higher client conversion rates', 'Professional proposal presentations', 'Clear project visualization']),
+                'deliverables': json.dumps(['3D rendered views', 'Site model', 'Presentation-ready images']),
+                'display_order': 1
+            },
+            {
+                'category_id': cat_ids['pre-sales-design'],
+                'name': '2D GA Layout',
+                'slug': '2d-ga-layout',
+                'short_description': 'Professional 2D General Arrangement layouts for project planning and client proposals.',
+                'full_description': 'Our 2D GA layout service provides precise, professional solar layouts that are perfect for client presentations and initial project planning.',
+                'icon': 'layout-grid',
+                'features': json.dumps([
+                    'Professional 2D General Arrangement layouts',
+                    'Solar module placement optimization',
+                    'Row spacing and panel orientation',
+                    'Roof boundaries and setbacks',
+                    'Walkways and equipment placement',
+                    'Dimensioning and layout optimization',
+                    'Clear drawings for client presentations and project planning'
+                ]),
+                'benefits': json.dumps(['Optimized panel layouts', 'Professional documentation', 'Clear project planning']),
+                'deliverables': json.dumps(['2D GA layout drawings', 'Module arrangement plans', 'Dimensioned layouts']),
+                'display_order': 2
+            },
+            # Post Sales Design children
+            {
+                'category_id': cat_ids['post-sales-design'],
+                'name': '3D Post Design',
+                'slug': '3d-post-design',
+                'short_description': 'Detailed 3D solar installation models for execution-ready project documentation.',
+                'full_description': 'Our 3D post-sales design creates highly detailed, accurate models of the solar installation for construction and execution planning.',
+                'icon': 'box',
+                'features': json.dumps([
+                    'Detailed 3D solar installation model',
+                    'Accurate rooftop/site representation',
+                    'Module placement visualization',
+                    'Structure visualization',
+                    'Equipment positioning',
+                    'Client/project presentation views',
+                    'Detailed installation visualization'
+                ]),
+                'benefits': json.dumps(['Execution-ready visualization', 'Accurate site representation', 'Construction planning support']),
+                'deliverables': json.dumps(['3D installation model', 'Equipment layout views', 'Construction reference renders']),
+                'display_order': 1
+            },
+            {
+                'category_id': cat_ids['post-sales-design'],
+                'name': 'Rooftop Detailed Design',
+                'slug': 'rooftop-detailed-design',
+                'short_description': 'Comprehensive rooftop solar layouts with detailed engineering specifications.',
+                'full_description': 'Complete detailed rooftop solar design covering every aspect of the installation from module arrangement to equipment placement.',
+                'icon': 'home',
+                'features': json.dumps([
+                    'Detailed rooftop solar layout',
+                    'Module arrangement and row spacing',
+                    'Setbacks and walkways',
+                    'Roof obstacle considerations (AC units, chimneys, parapets)',
+                    'Equipment placement planning',
+                    'Detailed dimensions',
+                    'Optimized usable roof area'
+                ]),
+                'benefits': json.dumps(['Maximum roof utilization', 'Code-compliant designs', 'Installation-ready documentation']),
+                'deliverables': json.dumps(['Detailed rooftop layout', 'Module arrangement plan', 'Equipment placement drawings']),
+                'display_order': 2
+            },
+            {
+                'category_id': cat_ids['post-sales-design'],
+                'name': 'Ground Mount Detailed Design',
+                'slug': 'ground-mount-detailed-design',
+                'short_description': 'Detailed ground-mounted solar layouts with complete site engineering.',
+                'full_description': 'Comprehensive ground mount solar design covering site layout, structure arrangement, and detailed engineering documentation.',
+                'icon': 'mountain',
+                'features': json.dumps([
+                    'Ground-mounted solar layout design',
+                    'Module/table arrangement',
+                    'Row spacing optimization',
+                    'Site boundaries and access pathways',
+                    'Structure arrangement',
+                    'Inverter/equipment positioning',
+                    'Site optimization and detailed visualization'
+                ]),
+                'benefits': json.dumps(['Optimized site utilization', 'Cost-effective layouts', 'Construction-ready plans']),
+                'deliverables': json.dumps(['Ground mount layout', 'Structure arrangement drawings', 'Site plans']),
+                'display_order': 3
+            },
+            {
+                'category_id': cat_ids['post-sales-design'],
+                'name': 'CEIG Approvals',
+                'slug': 'ceig-approvals',
+                'short_description': 'CEIG approval drawing support and professional documentation for regulatory processes.',
+                'full_description': 'EarthX provides design and documentation support for CEIG approval processes, including all required electrical and layout documentation.',
+                'icon': 'file-check',
+                'features': json.dumps([
+                    'CEIG approval drawing support',
+                    'Required electrical/layout documentation',
+                    'Grounding-related drawings',
+                    'Lightning protection layouts',
+                    'Substation/equipment layouts where applicable',
+                    'Professional documentation for approval processes'
+                ]),
+                'benefits': json.dumps(['Streamlined approval process', 'Compliant documentation', 'Professional engineering drawings']),
+                'deliverables': json.dumps(['CEIG drawing package', 'Electrical documentation', 'Grounding/lightning layouts']),
+                'display_order': 4
+            },
+            # Structure Design children
+            {
+                'category_id': cat_ids['structure-design'],
+                'name': 'Standard Solar Structure',
+                'slug': 'standard-solar-structure',
+                'short_description': 'Standard rooftop solar mounting structures for common installation configurations.',
+                'full_description': 'Our standard structure designs cover common rooftop solar mounting configurations optimized for practical installation and cost-effectiveness.',
+                'icon': 'grid-3x3',
+                'features': json.dumps([
+                    'Standard rooftop solar mounting structures',
+                    'Common installation configurations',
+                    'Optimized module support',
+                    'Proper module positioning',
+                    'Practical installation approach',
+                    'Suitable for standard rooftop applications',
+                    'Design based on project requirements'
+                ]),
+                'benefits': json.dumps(['Cost-effective solutions', 'Proven designs', 'Quick turnaround']),
+                'deliverables': json.dumps(['Structure design drawings', 'Material specifications', 'Installation guidelines']),
+                'display_order': 1
+            },
+            {
+                'category_id': cat_ids['structure-design'],
+                'name': 'Custom Solar Structure',
+                'slug': 'custom-solar-structure',
+                'short_description': 'Custom mounting structure solutions for complex sites and unique project requirements.',
+                'full_description': 'Custom structure designs for projects with unique site constraints, unusual roof geometry, or specialized requirements.',
+                'icon': 'settings',
+                'features': json.dumps([
+                    'Custom mounting structure solutions',
+                    'Site-specific structure concepts',
+                    'Complex rooftop condition handling',
+                    'Customized heights and orientations',
+                    'Special roof geometry solutions',
+                    'Customized module arrangement',
+                    'Solutions for unusual site constraints',
+                    'Design optimized for the specific project'
+                ]),
+                'benefits': json.dumps(['Tailored to project needs', 'Handles complex sites', 'Optimized for constraints']),
+                'deliverables': json.dumps(['Custom structure drawings', 'Engineering calculations', 'Material specifications']),
+                'display_order': 2
+            }
+        ]
+        
+        for svc in child_services:
+            cursor.execute("""
+                INSERT INTO services (category_id, name, slug, short_description, full_description, icon, features, benefits, deliverables, display_order)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (svc['category_id'], svc['name'], svc['slug'], svc['short_description'], svc['full_description'], svc['icon'], svc['features'], svc['benefits'], svc['deliverables'], svc['display_order']))
+        
+        print("Services seeded.")
+        
         conn.commit()
     conn.close()
 

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} Services | EarthX Designs{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+            <a href="{{ url_for('home') }}">Home</a> / 
+            <a href="{{ url_for('services') }}">Services</a> / 
+            <span>{{ category.name }}</span>
+        </div>
+        <h1>{{ category.hero_heading or category.name }}</h1>
+        <p>{{ category.hero_subtitle or 'Professional solar engineering and design solutions.' }}</p>
+    </div>
+</section>
+
+<!-- Description & Services Detail Section -->
+<section class="section-padding">
+    <div class="container">
+        {% if category.full_description %}
+        <div class="service-category-description" style="margin-bottom: 3rem; max-width: 800px;">
+            <p>{{ category.full_description }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="services-grid grid grid-3">
+            {% for service in services %}
+            <div class="service-card">
+                <div class="service-icon"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
+                <h3>{{ service.name }}</h3>
+                <p>{{ service.short_description }}</p>
+            </div>
+            {% else %}
+            <p>No services currently available in this category.</p>
+            {% endfor %}
+        </div>
+        
+        <!-- Call to Action Link -->
+        <div class="text-center" style="margin-top: 4rem; background: var(--bg-light); padding: 3rem; border-radius: var(--radius-md); border: 1px solid var(--admin-border);">
+            <h3>Need a Custom Design Package?</h3>
+            <p style="margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; margin-top: 0.5rem;">We provide customized monthly engineering retainer contracts for high-volume installers, as well as pay-per-project designs.</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Request a Custom Proposal</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
