@@ -3,60 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | EarthX Designs</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <title>Secure Admin Login | EarthX Designs</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body class="admin-body">
+    <style>
+        :root {
+            --primary: #FDB813;
+            --primary-dark: #E5A300;
+            --bg-dark: #0A0A0A;
+            --bg-darker: #050505;
+            --text-light: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --input-bg: #F9FAFB;
+            --input-border: #E5E7EB;
+            --error: #EF4444;
+            --success: #10B981;
+        }
 
-    <div class="login-container">
-        <div class="login-card">
-            <div class="login-logo">
-                <img src="{{ url_for('static', filename='uploads/logo_black.png') }}" alt="EarthX Designs Logo" style="height: 42px; width: auto;">
-            </div>
-            <div class="login-subtitle">CMS Administration Portal</div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+        }
+
+        .split-layout {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Left Side: Branding & Image */
+        .branding-section {
+            flex: 1;
+            display: none;
+            background: linear-gradient(135deg, rgba(10,10,10,0.95), rgba(5,5,5,0.85)), url('/static/uploads/commercial_solar_featured.jpg') center/cover;
+            padding: 4rem;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 900px) {
+            .branding-section {
+                display: flex;
+            }
+        }
+
+        .branding-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at top right, rgba(253, 184, 19, 0.15), transparent 60%);
+            pointer-events: none;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+            z-index: 1;
+        }
+        
+        .brand-logo img {
+            height: 48px;
+            filter: brightness(0) invert(1);
+        }
+
+        .brand-logo span {
+            color: var(--primary);
+        }
+
+        .brand-messaging {
+            z-index: 1;
+        }
+
+        .brand-messaging h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .brand-messaging p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 480px;
+            line-height: 1.6;
+        }
+
+        .secure-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        /* Right Side: Login Form */
+        .form-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .form-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6B7280;
+            font-size: 0.95rem;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-error {
+            background-color: #FEF2F2;
+            color: #991B1B;
+            border: 1px solid #FECACA;
+        }
+
+        .alert-success {
+            background-color: #ECFDF5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        /* Inputs */
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            color: #9CA3AF;
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 2.8rem;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            font-size: 0.95rem;
+            color: #111827;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: white;
+            box-shadow: 0 0 0 4px rgba(253, 184, 19, 0.1);
+        }
+
+        .input-field:focus + i {
+            color: var(--primary);
+        }
+
+        .forgot-password {
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #6B7280;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .forgot-password:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background-color: #111827;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary);
+            color: #111827;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(253, 184, 19, 0.3), 0 4px 6px -2px rgba(253, 184, 19, 0.15);
+        }
+
+        .back-to-site {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 2rem;
+            color: #6B7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-to-site:hover {
+            color: #111827;
+        }
+        
+        /* Mobile Logo */
+        .mobile-logo {
+            display: none;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 899px) {
+            .mobile-logo {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-family: 'Outfit', sans-serif;
+                font-size: 1.5rem;
+                font-weight: 800;
+                color: #111827;
+                text-decoration: none;
+            }
+            .mobile-logo img {
+                height: 36px;
+            }
+            .mobile-logo span {
+                color: var(--primary-dark);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="split-layout">
+        <!-- Left Branding Section -->
+        <div class="branding-section">
+            <a href="/" class="brand-logo">
+                <img src="/static/uploads/logo_black.png" alt="EarthX">
+                EarthX<span>Designs</span>
+            </a>
             
-            <!-- Flash Alert messages -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div style="margin-bottom: 1.5rem;">
+            <div class="brand-messaging">
+                <div class="secure-badge">
+                    <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
+                    256-bit Encrypted Portal
+                </div>
+                <h1>System<br>Administration</h1>
+                <p>Welcome back to the EarthX Designs CMS. Please log in with your authorized credentials to manage projects, content, and system settings securely.</p>
+            </div>
+            
+            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.4);">
+                &copy; 2026 EarthX Designs. All rights reserved.
+            </div>
+        </div>
+
+        <!-- Right Form Section -->
+        <div class="form-section">
+            <div class="form-container">
+                <a href="/" class="mobile-logo">
+                    <img src="/static/uploads/logo_black.png" alt="EarthX">
+                    EarthX<span>Designs</span>
+                </a>
+
+                <div class="form-header">
+                    <h2>Secure Login</h2>
+                    <p>Enter your credentials to access the CMS.</p>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
                         {% for category, message in messages %}
-                            <div style="padding: 0.8rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; 
-                                        {% if category == 'error' %} background-color: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; {% else %} background-color: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; {% endif %}">
-                                {{ message }}
+                            <div class="alert {% if category == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                                <i data-lucide="{% if category == 'error' %}alert-circle{% else %}check-circle{% endif %}" style="min-width: 20px;"></i>
+                                <span>{{ message }}</span>
                             </div>
                         {% endfor %}
-                    </div>
-                {% endif %}
-            {% endwith %}
-            
-            <form action="{{ url_for('admin_login') }}" method="POST">
-                <div class="admin-form-group">
-                    <label for="email">Admin Email</label>
-                    <input type="email" id="email" name="email" required placeholder="sales.earthxd@gmail.com" style="padding: 0.85rem 1rem;">
-                </div>
-                
-                <div class="admin-form-group" style="margin-bottom: 1.8rem;">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder="••••••••" style="padding: 0.85rem 1rem;">
-                </div>
-                
-                <button type="submit" class="btn-admin btn-admin-primary" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 0.95rem; border-radius: 6px;">
-                    <span>Sign In</span>
-                </button>
-            </form>
-            
-            <div style="text-align: center; margin-top: 1rem;">
-                <a href="{{ url_for('admin_forgot_password') }}" style="color: var(--admin-primary); text-decoration: none; font-size: 0.85rem; font-weight: 500;">
-                    Forgot Password?
-                </a>
-            </div>
+                    {% endif %}
+                {% endwith %}
 
-            <div style="text-align: center; margin-top: 1.8rem;">
-                <a href="{{ url_for('home') }}" style="color: var(--admin-text-light); text-decoration: none; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
-                    <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
-                    <span>Back to Website</span>
+                <form action="{{ url_for('admin_login') }}" method="POST">
+                    <div class="input-group">
+                        <label for="email">Administrator Email</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" name="email" class="input-field" required placeholder="sales.earthxd@gmail.com">
+                            <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <a href="{{ url_for('admin_forgot_password') }}" class="forgot-password">Forgot password?</a>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" name="password" class="input-field" required placeholder="••••••••">
+                            <i data-lucide="lock" style="width: 18px; height: 18px;"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span>Authenticate</span>
+                        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                    </button>
+                </form>
+
+                <a href="{{ url_for('home') }}" class="back-to-site">
+                    <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                    Return to public website
                 </a>
             </div>
         </div>
