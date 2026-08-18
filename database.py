@@ -17,45 +17,29 @@ def get_db_connection():
     return conn
 
 def copy_generated_images(uploads_dir):
-    """Locates generated images in the brain/artifacts folder and copies them to the uploads folder."""
+    """Copies default seed images from the repository to the persistent uploads folder."""
     if not os.path.exists(uploads_dir):
         os.makedirs(uploads_dir)
 
-    # Search pattern in the brain directory (conversation ID)
-    brain_dir = r"C:\Users\NACHI\.gemini\antigravity\brain\e427ce44-dc02-491a-93f4-00ff89515e60"
+    default_images_dir = os.path.join(os.path.dirname(__file__), 'static', 'default_images')
     
-    mapping = {
-        'india_commercial_solar': 'commercial_solar_featured.png',
-        'india_ground_mount_solar': 'ground_mount_featured.png',
-        'india_residential_solar': 'residential_3d_featured.png',
-        'sld_blueprint': 'sld_blueprint.png'
-    }
+    if not os.path.exists(default_images_dir):
+        print("Default images directory not found, skipping image seed.")
+        return
 
-    # Copy files if found
-    for prefix, target_name in mapping.items():
-        target_path = os.path.join(uploads_dir, target_name)
+    # Copy all files from default_images to uploads_dir
+    for filename in os.listdir(default_images_dir):
+        source_path = os.path.join(default_images_dir, filename)
+        target_path = os.path.join(uploads_dir, filename)
         
-        # Check if already copied
-        if os.path.exists(target_path) and os.path.getsize(target_path) > 0:
-            continue
-            
-        # Try to find file in brain folder
-        matches = glob.glob(os.path.join(brain_dir, f"{prefix}_*.png"))
-        if matches:
-            # Get the latest matched file
-            latest_file = max(matches, key=os.path.getctime)
-            try:
-                shutil.copy(latest_file, target_path)
-                print(f"Copied {latest_file} to {target_path}")
-            except Exception as e:
-                print(f"Error copying {latest_file}: {e}")
-        else:
-            # Fallback empty files or copy a placeholder if not found
-            print(f"Generated image matching {prefix} not found in brain directory.")
-            # Create a simple placeholder if it doesn't exist
-            if not os.path.exists(target_path):
-                with open(target_path, 'wb') as f:
-                    f.write(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\rIDATx\x9cc`\x00\x00\x00\x02\x00\x01H\xaf\xa4q\x00\x00\x00\x00IEND\xaeB`\x82')
+        # Only copy if it's a file and doesn't exist in the target
+        if os.path.isfile(source_path):
+            if not os.path.exists(target_path) or os.path.getsize(target_path) == 0:
+                try:
+                    shutil.copy(source_path, target_path)
+                    print(f"Seeded {filename} to {target_path}")
+                except Exception as e:
+                    print(f"Error copying {filename}: {e}")
 
 def init_db(data_dir=None):
     global CONFIGURED_DATA_DIR
