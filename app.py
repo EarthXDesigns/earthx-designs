@@ -4,6 +4,7 @@ import io
 import datetime
 import secrets
 import string
+import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
@@ -1081,20 +1082,24 @@ def api_services():
         max_order = conn.execute('SELECT MAX(display_order) FROM services WHERE category_id = ?', (category_id,)).fetchone()[0]
         display_order = (max_order or 0) + 1
         
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO services (
+        try:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO services (
+                    category_id, name, slug, short_description, full_description, icon, image,
+                    features, benefits, deliverables, display_order, is_published
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
                 category_id, name, slug, short_description, full_description, icon, image,
                 features, benefits, deliverables, display_order, is_published
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            category_id, name, slug, short_description, full_description, icon, image,
-            features, benefits, deliverables, display_order, is_published
-        ))
-        conn.commit()
-        new_id = cursor.lastrowid
-        conn.close()
-        return jsonify({'message': 'Service created', 'id': new_id}), 201
+            ))
+            conn.commit()
+            new_id = cursor.lastrowid
+            conn.close()
+            return jsonify({'message': 'Service created', 'id': new_id}), 201
+        except sqlite3.IntegrityError:
+            conn.close()
+            return jsonify({'error': 'Service with this slug already exists.'}), 400
 
 @app.route('/api/services/<int:svc_id>', methods=['PUT', 'DELETE'])
 @login_required
