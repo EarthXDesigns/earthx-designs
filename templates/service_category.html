@@ -23,7 +23,7 @@
         </div>
         {% endif %}
         
-        <div class="services-grid grid grid-3">
+        <div class="services-grid grid {% if services|length is divisibleby 2 %}grid-2-forced{% else %}grid-3{% endif %}">
             {% for service in services %}
             <div class="service-card" style="display:flex; flex-direction:column;">
                 <div class="service-icon"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
