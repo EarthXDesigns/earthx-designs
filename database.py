@@ -335,13 +335,13 @@ def init_db(data_dir=None):
                 'full_description': 'Complete detailed rooftop solar design covering every aspect of the installation from module arrangement to equipment placement.',
                 'icon': 'home',
                 'features': json.dumps([
-                    'Detailed rooftop solar layout',
-                    'Module arrangement and row spacing',
-                    'Setbacks and walkways',
-                    'Roof obstacle considerations (AC units, chimneys, parapets)',
-                    'Equipment placement planning',
-                    'Detailed dimensions',
-                    'Optimized usable roof area'
+                    'Detailed Electrical layouts',
+                    'Detailed civil and structural design',
+                    'Cable routing and earthing design',
+                    'BoQ, specifications and construction documentation',
+                    'Staad report for structuure stability',
+                    'CEIG drawing for govt approvals',
+                    'Design coordination and interface management'
                 ]),
                 'benefits': json.dumps(['Maximum roof utilization', 'Code-compliant designs', 'Installation-ready documentation']),
                 'deliverables': json.dumps(['Detailed rooftop layout', 'Module arrangement plan', 'Equipment placement drawings']),
@@ -355,13 +355,15 @@ def init_db(data_dir=None):
                 'full_description': 'Comprehensive ground mount solar design covering site layout, structure arrangement, and detailed engineering documentation.',
                 'icon': 'mountain',
                 'features': json.dumps([
-                    'Ground-mounted solar layout design',
-                    'Module/table arrangement',
-                    'Row spacing optimization',
-                    'Site boundaries and access pathways',
-                    'Structure arrangement',
-                    'Inverter/equipment positioning',
-                    'Site optimization and detailed visualization'
+                    'Detailed project report',
+                    'Precise inter-row spacing calculations for maximum energy yield and minimal shading losses',
+                    'Ground-mount racking and foundation structural engineering for all soil conditions',
+                    'Site grading, drainage design, and foundation engineering for solar farm installations',
+                    'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems',
+                    'MV/HV equipment interfaces',
+                    'Electrical calculations and schedules',
+                    'Roads, drainage, foundations and trenches',
+                    'Substation and evacuation design'
                 ]),
                 'benefits': json.dumps(['Optimized site utilization', 'Cost-effective layouts', 'Construction-ready plans']),
                 'deliverables': json.dumps(['Ground mount layout', 'Structure arrangement drawings', 'Site plans']),
