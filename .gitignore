@@ -8,6 +8,7 @@ build/
 *.egg
 
 # Virtual Environment
+.venv/
 venv/
 env/
 .env
@@ -36,9 +37,9 @@ cloudflared.exe
 process_logo*.py
 
 # Scratch/leftover root files (not part of Flask app)
-index.html
-script.js
-style.css
+/index.html
+/script.js
+/style.css
 
 # Persistent Data
 /data/
