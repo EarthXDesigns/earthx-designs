@@ -241,7 +241,7 @@ def init_db(data_dir=None):
                 'display_order': 2
             },
             {
-                'name': 'Ground Mount Detailed Design',
+                'name': 'Ground Mount Detailed design',
                 'slug': 'ground-mount-detailed-design',
                 'short_description': 'Comprehensive engineering for commercial & utility-scale ground mount solar projects.',
                 'full_description': 'EarthX delivers end-to-end ground-mount solar design and engineering packages tailored for utility-scale solar farms and commercial installations. From terrain modeling and shading optimization to full substation and grid evacuation design.',
@@ -251,6 +251,96 @@ def init_db(data_dir=None):
                 'display_order': 3
             },
             {
+                'name': 'Detailed project report',
+                'slug': 'detailed-project-report',
+                'short_description': 'Bankable Detailed Project Reports covering techno-commercial feasibility, yield simulations, and financial models.',
+                'full_description': 'Comprehensive Detailed Project Reports (DPR) prepared for investors, lenders, and EPC developers covering plant sizing, energy yield simulations (P50/P90), CAPEX/OPEX modeling, and statutory roadmaps.',
+                'icon': 'file-text',
+                'hero_heading': 'Detailed Project Report (DPR)',
+                'hero_subtitle': 'Bankable techno-commercial feasibility reports, generation forecasts, and investment-grade solar documentation.',
+                'display_order': 4
+            },
+            {
+                'name': 'Precise inter-row spacing calculations for maximum energy yield and minimal shading losses',
+                'slug': 'precise-inter-row-spacing-calculations',
+                'short_description': 'Calculations for maximum energy yield and minimal shading losses across all seasons.',
+                'full_description': 'Advanced 3D mathematical shadow modeling to calculate optimal pitch, tilt angles, and Ground Coverage Ratio (GCR), completely eliminating winter shadow losses and boosting specific yield (kWh/kWp).',
+                'icon': 'sun',
+                'hero_heading': 'Precise Inter-Row Spacing Calculations',
+                'hero_subtitle': 'Optimized row spacing, tilt angle, and pitch simulations to maximize energy yield and eliminate shading losses.',
+                'display_order': 5
+            },
+            {
+                'name': 'Ground-mount racking and foundation structural engineering for all soil conditions',
+                'slug': 'ground-mount-racking-foundation-engineering',
+                'short_description': 'Structural engineering and foundation design for all soil conditions and high wind zones.',
+                'full_description': 'Structural design and STAAD Pro verification for fixed-tilt and seasonal tilt structures. Tailored foundation solutions including driven piles, concrete ballast, helical screws, and rock anchors suited for any geotechnical profile.',
+                'icon': 'warehouse',
+                'hero_heading': 'Ground-Mount Racking & Foundation Structural Engineering',
+                'hero_subtitle': 'STAAD Pro verified structural designs and geotechnical foundation engineering for all soil conditions.',
+                'display_order': 6
+            },
+            {
+                'name': 'Site grading, drainage design, and foundation engineering for solar farm installations',
+                'slug': 'site-grading-drainage-design-foundation-engineering',
+                'short_description': 'Site grading, hydrology analysis, storm-water drainage design, and earthwork planning.',
+                'full_description': 'Comprehensive civil engineering including Digital Elevation Modeling (DEM), cut-and-fill volume minimization, surface storm-water runoff drainage design, and foundation leveling for solar farm installations.',
+                'icon': 'compass',
+                'hero_heading': 'Site Grading, Drainage Design & Foundation Engineering',
+                'hero_subtitle': 'Cut-and-fill optimization, hydrological storm-water networks, and civil grading for solar farm installations.',
+                'display_order': 7
+            },
+            {
+                'name': 'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems',
+                'slug': 'dc-ac-electrical-layout-string-sizing-sld',
+                'short_description': 'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems.',
+                'full_description': 'Detailed electrical architecture design covering VOC/VMP string configuration, Inverter Loading Ratio (ILR), string combiner box mapping, inverter station layouts, and multi-page single-line schematics.',
+                'icon': 'git-commit',
+                'hero_heading': 'DC & AC Electrical Layout, String Sizing & SLD Diagrams',
+                'hero_subtitle': 'Complete electrical layouts, string optimization, and single-line schematics for ground-mount systems.',
+                'display_order': 8
+            },
+            {
+                'name': 'MV/HV equipment interfaces',
+                'slug': 'mvhv-equipment-interfaces',
+                'short_description': 'Medium & High Voltage equipment interfaces, step-up transformers, and RMU configurations.',
+                'full_description': 'Engineering design for Medium Voltage and High Voltage equipment interfaces including Inverter Duty Transformers (IDT), Compact Substations (CSS), Ring Main Units (RMU), HT switchgear panels, and grid synchronization bays.',
+                'icon': 'zap',
+                'hero_heading': 'MV/HV Equipment Interfaces',
+                'hero_subtitle': 'Transformer sizing, HT switchgear, Ring Main Units, and utility interconnect interfaces.',
+                'display_order': 9
+            },
+            {
+                'name': 'Electrical calculations and schedules',
+                'slug': 'electrical-calculations-and-schedules',
+                'short_description': 'Cable sizing, voltage drop, short circuit analysis, and comprehensive engineering schedules.',
+                'full_description': 'Rigorous engineering calculations according to IEC, IEEE, and IS standards, ensuring system safety, optimal cable sizing (<1.5% DC drop, <1% AC drop), grounding grid resistance, and complete installation schedules.',
+                'icon': 'calculator',
+                'hero_heading': 'Electrical Calculations & Schedules',
+                'hero_subtitle': 'Cable sizing, fault levels, IEEE 80 grounding calculations, and procurement schedules.',
+                'display_order': 10
+            },
+            {
+                'name': 'Roads, drainage, foundations and trenches',
+                'slug': 'roads-drainage-foundations-trenches',
+                'short_description': 'Civil design for internal plant roads, drainage networks, equipment pads, and cable trenches.',
+                'full_description': 'Complete plant civil infrastructure engineering including main access roads, perimeter pathways with turning radius for heavy cranes, reinforced concrete equipment pads, and buried/precast cable trench networks.',
+                'icon': 'map',
+                'hero_heading': 'Roads, Drainage, Foundations & Trenches',
+                'hero_subtitle': 'Internal plant access roads, heavy crane pathways, equipment pads, and cable trench engineering.',
+                'display_order': 11
+            },
+            {
+                'name': 'Substation and evacuation design',
+                'slug': 'substation-and-evacuation-design',
+                'short_description': 'Pooling substation, switchyard engineering, transmission lines, and grid evacuation design.',
+                'full_description': 'Complete engineering for solar plant pooling substations (33kV / 66kV / 132kV / 220kV), switchyard layouts, transmission line towers, gantry structures, SCADA/telemetry systems, and statutory grid evacuation clearance documentation.',
+                'icon': 'radio',
+                'hero_heading': 'Substation & Evacuation Design',
+                'hero_subtitle': 'Pooling substations, switchyards, transmission lines, and grid power evacuation documentation.',
+                'display_order': 12
+            },
+            {
                 'name': 'Structure Design',
                 'slug': 'structure-design',
                 'short_description': 'Solar mounting structure design solutions based on project requirements and site conditions.',
@@ -258,7 +348,7 @@ def init_db(data_dir=None):
                 'icon': 'warehouse',
                 'hero_heading': 'Structure Design',
                 'hero_subtitle': 'Solar mounting structure design solutions based on project requirements, site conditions, and installation requirements.',
-                'display_order': 4
+                'display_order': 13
             }
         ]
         
@@ -360,7 +450,7 @@ def init_db(data_dir=None):
             {
                 'category_id': cat_ids['post-sales-design'],
                 'name': 'Ground Mount Detailed Design',
-                'slug': 'ground-mount-detailed-design',
+                'slug': 'gm-post-sales-design',
                 'short_description': 'Detailed ground-mounted solar layouts with complete site engineering.',
                 'full_description': 'Comprehensive ground mount solar design covering site layout, structure arrangement, and detailed engineering documentation.',
                 'icon': 'mountain',
@@ -398,10 +488,10 @@ def init_db(data_dir=None):
                 'deliverables': json.dumps(['CEIG drawing package', 'Electrical documentation', 'Grounding/lightning layouts']),
                 'display_order': 4
             },
-            # Ground Mount Detailed Design Category Children (10 Distinct Engineering Services)
+            # Ground Mount Detailed Design Category Children
             {
                 'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Ground Mount Detailed Design',
+                'name': 'Ground Mount Detailed Design Package',
                 'slug': 'gm-detailed-design-package',
                 'short_description': 'Complete engineering and design package for commercial and utility-scale ground mount projects.',
                 'full_description': 'End-to-end engineering documentation for ground-mounted solar power plants, taking projects from initial site contours to execution-ready construction blueprints.',
@@ -417,10 +507,11 @@ def init_db(data_dir=None):
                 'deliverables': json.dumps(['Complete GM Drawing Set', 'Master Layout Plan', 'Design Basis Report']),
                 'display_order': 1
             },
+            # Detailed Project Report
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
+                'category_id': cat_ids['detailed-project-report'],
                 'name': 'Detailed Project Report (DPR)',
-                'slug': 'detailed-project-report',
+                'slug': 'dpr-service-detail',
                 'short_description': 'Bankable Detailed Project Reports covering techno-commercial feasibility and generation modeling.',
                 'full_description': 'Comprehensive Detailed Project Reports (DPR) prepared for investors, lenders, and EPC developers covering plant sizing, energy yield simulations (P50/P90), CAPEX/OPEX modeling, and statutory roadmaps.',
                 'icon': 'file-text',
@@ -433,12 +524,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Bankable documentation for financing', 'Accurate ROI & generation forecasts', 'De-risked project execution']),
                 'deliverables': json.dumps(['Bankable DPR PDF Report', 'PVsyst Yield Report', 'Financial Model Sheet']),
-                'display_order': 2
+                'display_order': 1
             },
+            # Precise Inter-Row Spacing Calculations
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Precise Inter-Row Spacing Calculations',
-                'slug': 'precise-inter-row-spacing-calculations',
+                'category_id': cat_ids['precise-inter-row-spacing-calculations'],
+                'name': 'Inter-Row Pitch & Spacing Optimization',
+                'slug': 'spacing-calculations-detail',
                 'short_description': 'Calculations for maximum energy yield and minimal shading losses across all seasons.',
                 'full_description': 'Advanced 3D mathematical shadow modeling to calculate optimal pitch, tilt angles, and Ground Coverage Ratio (GCR), completely eliminating winter shadow losses and boosting specific yield (kWh/kWp).',
                 'icon': 'sun',
@@ -451,12 +543,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Eliminates inter-row shade losses', 'Maximizes specific annual yield', 'Optimizes land utilization']),
                 'deliverables': json.dumps(['Pitch & Spacing Calculation Report', 'Shade Profile Diagrams', '3D Shadow Simulation']),
-                'display_order': 3
+                'display_order': 1
             },
+            # Ground-Mount Racking & Foundation Structural Engineering
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Ground-Mount Racking & Foundation Structural Engineering',
-                'slug': 'ground-mount-racking-foundation-engineering',
+                'category_id': cat_ids['ground-mount-racking-foundation-engineering'],
+                'name': 'Racking & Foundation Structural Engineering',
+                'slug': 'racking-foundation-detail',
                 'short_description': 'Structural engineering and foundation design for all soil conditions and high wind zones.',
                 'full_description': 'Structural design and STAAD Pro verification for fixed-tilt and seasonal tilt structures. Tailored foundation solutions including driven piles, concrete ballast, helical screws, and rock anchors suited for any geotechnical profile.',
                 'icon': 'warehouse',
@@ -469,12 +562,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['25+ year structural stability', 'Material weight optimization', 'Resilience in high-wind zones']),
                 'deliverables': json.dumps(['STAAD Pro Report', 'Structural Fabrication Drawings', 'Foundation Details & Pile Schedule']),
-                'display_order': 4
+                'display_order': 1
             },
+            # Site Grading, Drainage Design & Foundation Engineering
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Site Grading, Drainage Design & Foundation Engineering',
-                'slug': 'site-grading-drainage-design',
+                'category_id': cat_ids['site-grading-drainage-design-foundation-engineering'],
+                'name': 'Site Grading, Hydrology & Drainage Design',
+                'slug': 'site-grading-drainage-detail',
                 'short_description': 'Site grading, hydrology analysis, storm-water drainage design, and earthwork planning.',
                 'full_description': 'Comprehensive civil engineering including Digital Elevation Modeling (DEM), cut-and-fill volume minimization, surface storm-water runoff drainage design, and foundation leveling for solar farm installations.',
                 'icon': 'compass',
@@ -487,12 +581,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Prevents plant flooding & soil erosion', 'Minimizes costly earth moving', 'Safe civil foundation grading']),
                 'deliverables': json.dumps(['Grading & Earthwork Plan', 'Hydrology & Storm Drainage Layout', 'Civil Cross-Section Drawings']),
-                'display_order': 5
+                'display_order': 1
             },
+            # DC and AC Electrical Layout, String Sizing & SLDs
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'DC & AC Electrical Layout, String Sizing & Single-Line Diagrams',
-                'slug': 'dc-ac-electrical-layout-string-sizing-sld',
+                'category_id': cat_ids['dc-ac-electrical-layout-string-sizing-sld'],
+                'name': 'DC & AC Electrical Layout & Single Line Diagrams',
+                'slug': 'dc-ac-layout-sld-detail',
                 'short_description': 'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems.',
                 'full_description': 'Detailed electrical architecture design covering VOC/VMP string configuration, Inverter Loading Ratio (ILR), string combiner box mapping, inverter station layouts, and multi-page single-line schematics.',
                 'icon': 'git-commit',
@@ -505,12 +600,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Optimized DC/AC electrical efficiency', 'Code compliant SLD for approvals', 'Minimized electrical losses']),
                 'deliverables': json.dumps(['Full Plant SLD Schematic', 'DC & AC String Layout Plans', 'Inverter Station Electrical GA']),
-                'display_order': 6
+                'display_order': 1
             },
+            # MV/HV Equipment Interfaces
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'MV/HV Equipment Interfaces',
-                'slug': 'mvhv-equipment-interfaces',
+                'category_id': cat_ids['mvhv-equipment-interfaces'],
+                'name': 'MV/HV Equipment Interfaces & Grid Interconnection',
+                'slug': 'mvhv-interfaces-detail',
                 'short_description': 'Medium & High Voltage equipment interfaces, step-up transformers, and RMU configurations.',
                 'full_description': 'Engineering design for Medium Voltage and High Voltage equipment interfaces including Inverter Duty Transformers (IDT), Compact Substations (CSS), Ring Main Units (RMU), HT switchgear panels, and grid synchronization bays.',
                 'icon': 'zap',
@@ -523,12 +619,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Seamless grid synchronization', 'Robust HV protection', 'Compliant with utility interconnect codes']),
                 'deliverables': json.dumps(['MV/HV Interface Drawings', 'Transformer & Switchgear Layouts', 'Protection Logic Schemes']),
-                'display_order': 7
+                'display_order': 1
             },
+            # Electrical Calculations and Schedules
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Electrical Calculations and Schedules',
-                'slug': 'electrical-calculations-and-schedules',
+                'category_id': cat_ids['electrical-calculations-and-schedules'],
+                'name': 'Electrical Calculations, Sizing & Cable Schedules',
+                'slug': 'electrical-schedules-detail',
                 'short_description': 'Cable sizing, voltage drop, short circuit analysis, and comprehensive engineering schedules.',
                 'full_description': 'Rigorous engineering calculations according to IEC, IEEE, and IS standards, ensuring system safety, optimal cable sizing (<1.5% DC drop, <1% AC drop), grounding grid resistance, and complete installation schedules.',
                 'icon': 'calculator',
@@ -541,12 +638,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Zero cable undersizing risks', 'Guaranteed minimum power losses', 'Exact procurement quantities']),
                 'deliverables': json.dumps(['Electrical Design Calculation Book', 'Cable Pull Schedule', 'Earthing Calculation Sheet']),
-                'display_order': 8
+                'display_order': 1
             },
+            # Roads, Drainage, Foundations and Trenches
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Roads, Drainage, Foundations and Trenches',
-                'slug': 'roads-drainage-foundations-trenches',
+                'category_id': cat_ids['roads-drainage-foundations-trenches'],
+                'name': 'Plant Roads, Equipment Foundations & Cable Trenches',
+                'slug': 'roads-trenches-detail',
                 'short_description': 'Civil design for internal plant roads, drainage networks, equipment pads, and cable trenches.',
                 'full_description': 'Complete plant civil infrastructure engineering including main access roads, perimeter pathways with turning radius for heavy cranes, reinforced concrete equipment pads, and buried/precast cable trench networks.',
                 'icon': 'map',
@@ -559,12 +657,13 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Safe logistics and crane mobility', 'Durable civil equipment foundations', 'Clean cable management']),
                 'deliverables': json.dumps(['Plant Road & Access Plan', 'Trench Cross-Section Blueprints', 'Civil Foundation Structural Details']),
-                'display_order': 9
+                'display_order': 1
             },
+            # Substation and Evacuation Design
             {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Substation and Evacuation Design',
-                'slug': 'substation-and-evacuation-design',
+                'category_id': cat_ids['substation-and-evacuation-design'],
+                'name': 'Pooling Substation & Power Evacuation Design',
+                'slug': 'substation-evacuation-detail',
                 'short_description': 'Pooling substation, switchyard engineering, transmission lines, and grid evacuation design.',
                 'full_description': 'Complete engineering for solar plant pooling substations (33kV / 66kV / 132kV / 220kV), switchyard layouts, transmission line towers, gantry structures, SCADA/telemetry systems, and statutory grid evacuation clearance documentation.',
                 'icon': 'radio',
@@ -577,7 +676,7 @@ def init_db(data_dir=None):
                 ]),
                 'benefits': json.dumps(['Complete grid evacuation clearance', 'Utility-compliant substation design', 'Full telemetry & SCADA readiness']),
                 'deliverables': json.dumps(['Substation Key SLD & Layout', 'Switchyard GA & Elevation Plans', 'Transmission Line Route Map']),
-                'display_order': 10
+                'display_order': 1
             },
             # Structure Design children
             {
