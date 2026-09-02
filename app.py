@@ -19,8 +19,8 @@ DATA_DIR = os.environ.get('DATA_DIR', os.path.join(app.root_path, 'data'))
 os.makedirs(DATA_DIR, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4'}
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max upload size
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'mp4', 'webm', 'mov', 'ogg'}
 
 # Ensure upload directory exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -914,8 +914,15 @@ def api_service_categories():
     conn = get_db_connection()
     if request.method == 'GET':
         categories = conn.execute('SELECT * FROM service_categories ORDER BY display_order ASC').fetchall()
+        result = []
+        for c in categories:
+            c_dict = dict(c)
+            # Count services in this category
+            svc_count = conn.execute('SELECT COUNT(*) FROM services WHERE category_id = ?', (c['id'],)).fetchone()[0]
+            c_dict['service_count'] = svc_count
+            result.append(c_dict)
         conn.close()
-        return jsonify([dict(c) for c in categories])
+        return jsonify(result)
     
     elif request.method == 'POST':
         data = request.form if request.form else request.json
@@ -966,16 +973,23 @@ def api_service_categories():
             conn.commit()
             new_id = cursor.lastrowid
             conn.close()
-            return jsonify({'message': 'Service category created', 'id': new_id}), 201
+            return jsonify({'message': 'Service category created successfully', 'id': new_id}), 201
         except sqlite3.IntegrityError:
             conn.close()
             return jsonify({'error': 'Category with this slug already exists.'}), 400
 
-@app.route('/api/service-categories/<int:cat_id>', methods=['PUT', 'DELETE'])
+@app.route('/api/service-categories/<int:cat_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @login_required
 def api_service_category_detail(cat_id):
     conn = get_db_connection()
-    if request.method == 'PUT':
+    if request.method == 'GET':
+        cat = conn.execute('SELECT * FROM service_categories WHERE id = ?', (cat_id,)).fetchone()
+        conn.close()
+        if not cat:
+            return jsonify({'error': 'Category not found'}), 404
+        return jsonify(dict(cat))
+        
+    elif request.method in ['PUT', 'POST']:
         data = request.form if request.form else request.json
         if not data:
             data = {}
@@ -993,6 +1007,7 @@ def api_service_category_detail(cat_id):
         seo_title = data.get('seo_title', '').strip()
         seo_description = data.get('seo_description', '').strip()
         is_published = int(data.get('is_published', 1))
+        remove_hero_image = str(data.get('remove_hero_image', '0')).lower() in ['1', 'true']
         
         if not name or not slug:
             conn.close()
@@ -1003,7 +1018,7 @@ def api_service_category_detail(cat_id):
             conn.close()
             return jsonify({'error': 'Category not found'}), 404
             
-        hero_image = cat['hero_image']
+        hero_image = '' if remove_hero_image else cat['hero_image']
         file = request.files.get('hero_image') if hasattr(request, 'files') else None
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
@@ -1033,7 +1048,7 @@ def api_service_category_detail(cat_id):
         conn.execute('DELETE FROM service_categories WHERE id = ?', (cat_id,))
         conn.commit()
         conn.close()
-        return jsonify({'message': 'Service category deleted'})
+        return jsonify({'message': 'Service category deleted successfully'})
 
 @app.route('/api/service-categories/reorder', methods=['POST'])
 @login_required
@@ -1057,9 +1072,20 @@ def api_services():
     if request.method == 'GET':
         cat_id = request.args.get('category_id')
         if cat_id:
-            services = conn.execute('SELECT * FROM services WHERE category_id = ? ORDER BY display_order ASC', (cat_id,)).fetchall()
+            services = conn.execute('''
+                SELECT s.*, c.name as category_name 
+                FROM services s 
+                LEFT JOIN service_categories c ON s.category_id = c.id 
+                WHERE s.category_id = ? 
+                ORDER BY s.display_order ASC
+            ''', (cat_id,)).fetchall()
         else:
-            services = conn.execute('SELECT * FROM services ORDER BY display_order ASC').fetchall()
+            services = conn.execute('''
+                SELECT s.*, c.name as category_name 
+                FROM services s 
+                LEFT JOIN service_categories c ON s.category_id = c.id 
+                ORDER BY c.display_order ASC, s.display_order ASC
+            ''').fetchall()
         conn.close()
         return jsonify([dict(s) for s in services])
         
@@ -1074,14 +1100,30 @@ def api_services():
         short_description = data.get('short_description', '').strip()
         full_description = data.get('full_description', '').strip()
         icon = data.get('icon', 'sun').strip()
-        features = data.get('features', '[]')
-        benefits = data.get('benefits', '[]')
-        deliverables = data.get('deliverables', '[]')
+        
+        # Parse features, benefits, deliverables if sent as string or list
+        def format_json_field(val):
+            if not val:
+                return '[]'
+            if isinstance(val, list):
+                return json.dumps(val)
+            val = val.strip()
+            if val.startswith('[') and val.endswith(']'):
+                return val
+            # If newline or comma separated
+            items = [line.strip() for line in val.replace('\r', '').split('\n') if line.strip()]
+            if not items and ',' in val:
+                items = [item.strip() for item in val.split(',') if item.strip()]
+            return json.dumps(items)
+
+        features = format_json_field(data.get('features'))
+        benefits = format_json_field(data.get('benefits'))
+        deliverables = format_json_field(data.get('deliverables'))
         is_published = int(data.get('is_published', 1))
         
         if not name or not slug or not category_id:
             conn.close()
-            return jsonify({'error': 'Name, slug and category_id are required.'}), 400
+            return jsonify({'error': 'Name, slug and category are required.'}), 400
             
         image = ''
         file = request.files.get('image') if hasattr(request, 'files') else None
@@ -1107,40 +1149,70 @@ def api_services():
             conn.commit()
             new_id = cursor.lastrowid
             conn.close()
-            return jsonify({'message': 'Service created', 'id': new_id}), 201
+            return jsonify({'message': 'Service created successfully', 'id': new_id}), 201
         except sqlite3.IntegrityError:
             conn.close()
             return jsonify({'error': 'Service with this slug already exists.'}), 400
 
-@app.route('/api/services/<int:svc_id>', methods=['PUT', 'DELETE'])
+@app.route('/api/services/<int:svc_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 @login_required
 def api_service_detail(svc_id):
     conn = get_db_connection()
-    if request.method == 'PUT':
+    if request.method == 'GET':
+        svc = conn.execute('''
+            SELECT s.*, c.name as category_name 
+            FROM services s 
+            LEFT JOIN service_categories c ON s.category_id = c.id 
+            WHERE s.id = ?
+        ''', (svc_id,)).fetchone()
+        conn.close()
+        if not svc:
+            return jsonify({'error': 'Service not found'}), 404
+        return jsonify(dict(svc))
+
+    elif request.method in ['PUT', 'POST']:
         data = request.form if request.form else request.json
         if not data:
             data = {}
             
+        category_id = data.get('category_id')
         name = data.get('name', '').strip()
         slug = data.get('slug', '').strip()
         short_description = data.get('short_description', '').strip()
         full_description = data.get('full_description', '').strip()
         icon = data.get('icon', 'sun').strip()
-        features = data.get('features', '[]')
-        benefits = data.get('benefits', '[]')
-        deliverables = data.get('deliverables', '[]')
+        
+        def format_json_field(val):
+            if not val:
+                return '[]'
+            if isinstance(val, list):
+                return json.dumps(val)
+            val = val.strip()
+            if val.startswith('[') and val.endswith(']'):
+                return val
+            items = [line.strip() for line in val.replace('\r', '').split('\n') if line.strip()]
+            if not items and ',' in val:
+                items = [item.strip() for item in val.split(',') if item.strip()]
+            return json.dumps(items)
+
+        features = format_json_field(data.get('features'))
+        benefits = format_json_field(data.get('benefits'))
+        deliverables = format_json_field(data.get('deliverables'))
         is_published = int(data.get('is_published', 1))
+        remove_image = str(data.get('remove_image', '0')).lower() in ['1', 'true']
         
         if not name or not slug:
             conn.close()
             return jsonify({'error': 'Name and slug are required.'}), 400
             
-        svc = conn.execute('SELECT image FROM services WHERE id = ?', (svc_id,)).fetchone()
+        svc = conn.execute('SELECT image, category_id FROM services WHERE id = ?', (svc_id,)).fetchone()
         if not svc:
             conn.close()
             return jsonify({'error': 'Service not found'}), 404
             
-        image = svc['image']
+        target_cat_id = category_id if category_id else svc['category_id']
+        image = '' if remove_image else svc['image']
+        
         file = request.files.get('image') if hasattr(request, 'files') else None
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svc_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
@@ -1149,11 +1221,11 @@ def api_service_detail(svc_id):
             
         conn.execute('''
             UPDATE services SET
-                name = ?, slug = ?, short_description = ?, full_description = ?, icon = ?, image = ?,
+                category_id = ?, name = ?, slug = ?, short_description = ?, full_description = ?, icon = ?, image = ?,
                 features = ?, benefits = ?, deliverables = ?, is_published = ?
             WHERE id = ?
         ''', (
-            name, slug, short_description, full_description, icon, image,
+            target_cat_id, name, slug, short_description, full_description, icon, image,
             features, benefits, deliverables, is_published, svc_id
         ))
         conn.commit()
@@ -1164,7 +1236,7 @@ def api_service_detail(svc_id):
         conn.execute('DELETE FROM services WHERE id = ?', (svc_id,))
         conn.commit()
         conn.close()
-        return jsonify({'message': 'Service deleted'})
+        return jsonify({'message': 'Service deleted successfully'})
 
 @app.route('/api/services/reorder', methods=['POST'])
 @login_required

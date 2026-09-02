@@ -24,10 +24,22 @@
                         <span>Projects</span>
                     </a>
                 </li>
+                <li class="sidebar-item" data-target="services-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="layers" style="width: 18px; height: 18px;"></i>
+                        <span>Services</span>
+                    </a>
+                </li>
+                <li class="sidebar-item" data-target="service-categories-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="layout-grid" style="width: 18px; height: 18px;"></i>
+                        <span>Service Categories</span>
+                    </a>
+                </li>
                 <li class="sidebar-item" data-target="categories-tab">
                     <a href="javascript:void(0)">
                         <i data-lucide="tag" style="width: 18px; height: 18px;"></i>
-                        <span>Categories</span>
+                        <span>Project Categories</span>
                     </a>
                 </li>
 
@@ -128,6 +140,78 @@
                                     </tr>
                                 </thead>
                                 <tbody id="projects-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SERVICES TAB -->
+                <section class="tab-panel" id="services-tab" style="display:none;">
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <div>
+                                <h2>Services & Design Options</h2>
+                                <p style="font-size: 0.85rem; color: var(--admin-text-light); margin-top: 4px;">Manage custom images or videos, features, and details for each service option.</p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <select id="filter-service-category" style="padding: 0.45rem 0.8rem; border-radius: 6px; border: 1px solid var(--admin-border); font-size: 0.85rem; outline: none;">
+                                    <option value="">All Categories</option>
+                                </select>
+                                <button class="btn-admin btn-admin-primary" id="btn-add-service">
+                                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                    <span>Add Service Option</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Media (Image / Video)</th>
+                                        <th>Service Option Name</th>
+                                        <th>Category</th>
+                                        <th>Short Description</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="services-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SERVICE CATEGORIES TAB -->
+                <section class="tab-panel" id="service-categories-tab" style="display:none;">
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <div>
+                                <h2>Service Categories (Services Nav Dropdown)</h2>
+                                <p style="font-size: 0.85rem; color: var(--admin-text-light); margin-top: 4px;">Manage category pages, hero media, and dropdown menu options.</p>
+                            </div>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-service-category">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add Category</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Hero Media</th>
+                                        <th>Category Name</th>
+                                        <th>URL Slug</th>
+                                        <th>Icon</th>
+                                        <th>Services</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="service-categories-table-body">
                                     <!-- Rendered dynamically -->
                                 </tbody>
                             </table>
@@ -315,6 +399,192 @@
     <!-- ==========================================
          MODALS FOR CRUD ACTIONS
          ========================================== -->
+
+    <!-- Service Option Modal -->
+    <div class="modal" id="service-modal">
+        <div class="modal-content" style="max-width: 780px;">
+            <div class="modal-header">
+                <h3 id="service-modal-title">Add Service Option</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="service-form" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" id="service-id" name="id">
+                    <input type="hidden" id="service-remove-image" name="remove_image" value="0">
+                    
+                    <div style="display:grid; grid-template-columns: 1.2fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="service-category">Parent Service Category *</label>
+                            <select id="service-category" name="category_id" required>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="service-status">Status *</label>
+                            <select id="service-status" name="is_published">
+                                <option value="1">Published</option>
+                                <option value="0">Draft (Hidden)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="service-name">Service Option Name *</label>
+                            <input type="text" id="service-name" name="name" required placeholder="e.g. 3D Pre Sales Visualization">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="service-slug">URL Slug *</label>
+                            <input type="text" id="service-slug" name="slug" required placeholder="e.g. 3d-pre-sales-visualization">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="service-icon">Lucide Icon Name</label>
+                            <input type="text" id="service-icon" name="icon" placeholder="e.g. box, sun, layout-grid, compass, calculator">
+                        </div>
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="service-short-desc">Short Description (Card Summary) *</label>
+                        <textarea id="service-short-desc" name="short_description" rows="2" required placeholder="Brief description shown on the services cards..."></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-full-desc">Full Detailed Description</label>
+                        <textarea id="service-full-desc" name="full_description" rows="3" placeholder="Full comprehensive description of this service..."></textarea>
+                    </div>
+
+                    <!-- Custom Image / Video Upload & Preview -->
+                    <div class="admin-form-group" style="background: var(--admin-bg); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--admin-border);">
+                        <label style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>Custom Media (Image or Video)</span>
+                            <span style="font-weight: 400; font-size: 0.8rem; color: var(--admin-text-light);">Supports JPG, PNG, WEBP, MP4, WEBM</span>
+                        </label>
+                        
+                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+                            <input type="file" id="service-image-file" name="image" accept="image/*,video/mp4,video/webm,video/quicktime,video/*">
+                            
+                            <div id="service-media-preview-container" style="display: none; margin-top: 5px; padding: 10px; background: #FFFFFF; border-radius: 6px; border: 1px solid var(--admin-border); max-width: 320px;">
+                                <!-- Image or Video preview rendered here -->
+                            </div>
+                            
+                            <div>
+                                <button type="button" class="btn-admin btn-admin-danger" id="btn-remove-service-media" style="display:none; font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+                                    <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
+                                    <span>Remove Current Image/Video</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-features">Features & Scope (One per line)</label>
+                        <textarea id="service-features" name="features" rows="3" placeholder="Enter key features, one per line..."></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="service-deliverables">Deliverables (One per line)</label>
+                        <textarea id="service-deliverables" name="deliverables" rows="2" placeholder="e.g. 3D Renderings, Layout Plans (one per line)..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Service Option</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Service Category Modal -->
+    <div class="modal" id="service-category-modal">
+        <div class="modal-content" style="max-width: 750px;">
+            <div class="modal-header">
+                <h3 id="service-category-modal-title">Add Service Category</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="service-category-form" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <input type="hidden" id="svccat-id" name="id">
+                    <input type="hidden" id="svccat-remove-hero-image" name="remove_hero_image" value="0">
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="svccat-name">Category Name *</label>
+                            <input type="text" id="svccat-name" name="name" required placeholder="e.g. Pre Sales Design">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="svccat-slug">URL Slug *</label>
+                            <input type="text" id="svccat-slug" name="slug" required placeholder="e.g. pre-sales-design">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="svccat-icon">Lucide Icon Name</label>
+                            <input type="text" id="svccat-icon" name="icon" placeholder="e.g. presentation, box, compass">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="svccat-status">Status *</label>
+                            <select id="svccat-status" name="is_published">
+                                <option value="1">Published (Visible in Navbar & Dropdown)</option>
+                                <option value="0">Draft (Hidden)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="admin-form-group">
+                            <label for="svccat-hero-heading">Hero Title</label>
+                            <input type="text" id="svccat-hero-heading" name="hero_heading" placeholder="e.g. Pre Sales Design">
+                        </div>
+                        <div class="admin-form-group">
+                            <label for="svccat-hero-subtitle">Hero Subtitle</label>
+                            <input type="text" id="svccat-hero-subtitle" name="hero_subtitle" placeholder="e.g. Compelling 3D proposals for EPC developers">
+                        </div>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="svccat-short-desc">Short Description</label>
+                        <textarea id="svccat-short-desc" name="short_description" rows="2" placeholder="Brief summary of category..."></textarea>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="svccat-full-desc">Full Category Description</label>
+                        <textarea id="svccat-full-desc" name="full_description" rows="3" placeholder="Full descriptive text on the category page..."></textarea>
+                    </div>
+
+                    <!-- Category Hero Media Upload & Preview -->
+                    <div class="admin-form-group" style="background: var(--admin-bg); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--admin-border);">
+                        <label style="display: flex; align-items: center; justify-content: space-between;">
+                            <span>Category Banner / Hero Media (Image or Video)</span>
+                            <span style="font-weight: 400; font-size: 0.8rem; color: var(--admin-text-light);">Supports JPG, PNG, WEBP, MP4, WEBM</span>
+                        </label>
+                        
+                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+                            <input type="file" id="svccat-media-file" name="hero_image" accept="image/*,video/mp4,video/webm,video/quicktime,video/*">
+                            
+                            <div id="svccat-media-preview-container" style="display: none; margin-top: 5px; padding: 10px; background: #FFFFFF; border-radius: 6px; border: 1px solid var(--admin-border); max-width: 320px;">
+                                <!-- Image or Video preview rendered here -->
+                            </div>
+                            
+                            <div>
+                                <button type="button" class="btn-admin btn-admin-danger" id="btn-remove-svccat-media" style="display:none; font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+                                    <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
+                                    <span>Remove Category Media</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Category Modal -->
     <div class="modal" id="category-modal">

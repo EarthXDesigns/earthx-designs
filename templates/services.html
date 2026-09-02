@@ -16,16 +16,32 @@
     <div class="container">
         {% for cat in categories %}
         <div class="category-section" style="margin-bottom: 4rem;">
-            <div style="margin-bottom: 2rem;">
-                <h2>{{ cat.name }}</h2>
-                {% if cat.hero_subtitle %}<p>{{ cat.hero_subtitle }}</p>{% endif %}
+            <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2>{{ cat.name }}</h2>
+                    {% if cat.hero_subtitle %}<p style="color: var(--text-muted); margin-top: 0.25rem;">{{ cat.hero_subtitle }}</p>{% endif %}
+                </div>
+                <a href="{{ url_for('service_category', slug=cat.slug) }}" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.45rem 1rem;">View Details &rarr;</a>
             </div>
             <div class="services-grid grid grid-3">
                 {% for service in services_by_cat[cat.id] %}
-                <div class="service-card">
-                    <div class="service-icon"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
-                    <h3>{{ service.name }}</h3>
-                    <p>{{ service.short_description }}</p>
+                <div class="service-card" style="display:flex; flex-direction:column;">
+                    {% if service.image %}
+                    <div class="service-card-media" style="margin: -2.2rem -2.2rem 1.5rem -2.2rem; overflow: hidden; border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); background: #0F172A; position: relative;">
+                        {% if service.image.endswith('.mp4') or service.image.endswith('.webm') or service.image.endswith('.mov') or service.image.endswith('.ogg') %}
+                        <video autoplay loop muted playsinline class="service-media-video" style="width: 100%; height: 200px; object-fit: cover; display: block;">
+                            <source src="{{ service.image }}" type="video/mp4">
+                        </video>
+                        {% else %}
+                        <img src="{{ service.image }}" alt="{{ service.name }}" class="service-media-img" style="width: 100%; height: 200px; object-fit: cover; display: block;" loading="lazy">
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.8rem;">
+                        <div class="service-icon" style="margin-bottom: 0; font-size: 1.8rem;"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
+                        <h3 style="margin-bottom: 0;">{{ service.name }}</h3>
+                    </div>
+                    <p style="margin-top: 0.5rem;">{{ service.short_description }}</p>
                 </div>
                 {% else %}
                 <p>No services currently available in this category.</p>

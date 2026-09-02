@@ -40,6 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'projects-tab':
                 fetchProjects();
                 break;
+            case 'services-tab':
+                fetchServices();
+                fetchServiceCategories();
+                break;
+            case 'service-categories-tab':
+                fetchServiceCategories();
+                break;
             case 'categories-tab':
                 fetchCategories();
                 break;
@@ -221,13 +228,511 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Auto-generate category slug from name
-    document.getElementById('category-name').addEventListener('input', (e) => {
-        const nameVal = e.target.value;
-        document.getElementById('category-slug').value = nameVal.toLowerCase()
-            .replace(/[^a-z0-9 -]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-');
-    });
+    const catNameInput = document.getElementById('category-name');
+    if (catNameInput) {
+        catNameInput.addEventListener('input', (e) => {
+            const nameVal = e.target.value;
+            document.getElementById('category-slug').value = nameVal.toLowerCase()
+                .replace(/[^a-z0-9 -]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+        });
+    }
+
+    // ==========================================
+    // SERVICES & SERVICE CATEGORIES MANAGEMENT
+    // ==========================================
+
+    const isVideoFile = (url) => {
+        if (!url) return false;
+        const ext = url.split('.').pop().toLowerCase().split('?')[0];
+        return ['mp4', 'webm', 'mov', 'ogg'].includes(ext);
+    };
+
+    // --- SERVICE CATEGORIES LOGIC ---
+    let globalServiceCategories = [];
+
+    const fetchServiceCategories = async () => {
+        try {
+            const res = await fetch('/api/service-categories');
+            const data = await res.json();
+            globalServiceCategories = data;
+
+            // 1. Populate Service Categories table in admin
+            const tbody = document.getElementById('service-categories-table-body');
+            if (tbody) {
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--admin-text-light);">No service categories found.</td></tr>';
+                } else {
+                    data.forEach(cat => {
+                        const tr = document.createElement('tr');
+                        let mediaThumb = '<span style="color:var(--admin-text-light); font-size:0.8rem;">None</span>';
+                        if (cat.hero_image) {
+                            if (isVideoFile(cat.hero_image)) {
+                                mediaThumb = `<div style="position:relative; width:55px; height:38px; border-radius:4px; overflow:hidden; background:#0F172A; display:inline-flex; align-items:center; justify-content:center;">
+                                    <video src="${cat.hero_image}" style="width:100%; height:100%; object-fit:cover;"></video>
+                                    <span style="position:absolute; background:rgba(0,0,0,0.6); color:#FFF; font-size:9px; padding:1px 3px; border-radius:2px;">VIDEO</span>
+                                </div>`;
+                            } else {
+                                mediaThumb = `<img src="${cat.hero_image}" style="width:55px; height:38px; object-fit:cover; border-radius:4px; display:inline-block;">`;
+                            }
+                        }
+
+                        tr.innerHTML = `
+                            <td>${mediaThumb}</td>
+                            <td><strong>${cat.name}</strong></td>
+                            <td><code>/services/${cat.slug}</code></td>
+                            <td><i data-lucide="${cat.icon || 'briefcase'}" style="width:16px; height:16px;"></i> ${cat.icon || '-'}</td>
+                            <td><span class="badge badge-info">${cat.service_count || 0} services</span></td>
+                            <td><span class="badge ${cat.is_published ? 'badge-success' : 'badge-warning'}">${cat.is_published ? 'Published' : 'Draft'}</span></td>
+                            <td>
+                                <div class="btn-action-group">
+                                    <button class="btn-action edit" onclick="editServiceCategory(${cat.id})" title="Edit">
+                                        <i data-lucide="edit-3" style="width:14px; height:14px;"></i>
+                                    </button>
+                                    <button class="btn-action delete" onclick="deleteServiceCategory(${cat.id})" title="Delete">
+                                        <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            }
+
+            // 2. Populate category filters and select dropdowns
+            const filterSelect = document.getElementById('filter-service-category');
+            if (filterSelect) {
+                const currentVal = filterSelect.value;
+                filterSelect.innerHTML = '<option value="">All Categories</option>';
+                data.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.id;
+                    opt.textContent = cat.name;
+                    if (String(cat.id) === String(currentVal)) opt.selected = true;
+                    filterSelect.appendChild(opt);
+                });
+            }
+
+            const modalCatSelect = document.getElementById('service-category');
+            if (modalCatSelect) {
+                const currentVal = modalCatSelect.value;
+                modalCatSelect.innerHTML = '<option value="">-- Select Parent Category --</option>';
+                data.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.id;
+                    opt.textContent = cat.name;
+                    if (String(cat.id) === String(currentVal)) opt.selected = true;
+                    modalCatSelect.appendChild(opt);
+                });
+            }
+
+            initIcons();
+        } catch (err) {
+            console.error('Error fetching service categories:', err);
+        }
+    };
+
+    // Auto-generate service category slug from name
+    const svccatNameInput = document.getElementById('svccat-name');
+    if (svccatNameInput) {
+        svccatNameInput.addEventListener('input', (e) => {
+            const nameVal = e.target.value;
+            document.getElementById('svccat-slug').value = nameVal.toLowerCase()
+                .replace(/[^a-z0-9 -]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+        });
+    }
+
+    // Media preview handler for Service Category
+    const svccatMediaFileInput = document.getElementById('svccat-media-file');
+    const svccatPreviewContainer = document.getElementById('svccat-media-preview-container');
+    const svccatRemoveBtn = document.getElementById('btn-remove-svccat-media');
+    const svccatRemoveFlag = document.getElementById('svccat-remove-hero-image');
+
+    if (svccatMediaFileInput && svccatPreviewContainer) {
+        svccatMediaFileInput.addEventListener('change', () => {
+            const file = svccatMediaFileInput.files[0];
+            if (file) {
+                svccatRemoveFlag.value = '0';
+                const fileUrl = URL.createObjectURL(file);
+                if (file.type.startsWith('video/')) {
+                    svccatPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Video Preview:</div>
+                        <video src="${fileUrl}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
+                    `;
+                } else {
+                    svccatPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Image Preview:</div>
+                        <img src="${fileUrl}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
+                    `;
+                }
+                svccatPreviewContainer.style.display = 'block';
+                if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
+                initIcons();
+            }
+        });
+    }
+
+    if (svccatRemoveBtn) {
+        svccatRemoveBtn.addEventListener('click', () => {
+            svccatMediaFileInput.value = '';
+            svccatPreviewContainer.innerHTML = '';
+            svccatPreviewContainer.style.display = 'none';
+            svccatRemoveBtn.style.display = 'none';
+            svccatRemoveFlag.value = '1';
+        });
+    }
+
+    const btnAddServiceCategory = document.getElementById('btn-add-service-category');
+    if (btnAddServiceCategory) {
+        btnAddServiceCategory.addEventListener('click', () => {
+            document.getElementById('service-category-form').reset();
+            document.getElementById('svccat-id').value = '';
+            svccatRemoveFlag.value = '0';
+            svccatPreviewContainer.innerHTML = '';
+            svccatPreviewContainer.style.display = 'none';
+            if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'none';
+            document.getElementById('service-category-modal-title').textContent = 'Add Service Category';
+            openModal('service-category-modal');
+        });
+    }
+
+    window.editServiceCategory = async (id) => {
+        try {
+            const res = await fetch(`/api/service-categories/${id}`);
+            const cat = await res.json();
+            if (!res.ok) return alert(cat.error || 'Failed to fetch category');
+
+            document.getElementById('service-category-form').reset();
+            document.getElementById('svccat-id').value = cat.id;
+            document.getElementById('svccat-name').value = cat.name;
+            document.getElementById('svccat-slug').value = cat.slug;
+            document.getElementById('svccat-icon').value = cat.icon || '';
+            document.getElementById('svccat-status').value = String(cat.is_published);
+            document.getElementById('svccat-hero-heading').value = cat.hero_heading || '';
+            document.getElementById('svccat-hero-subtitle').value = cat.hero_subtitle || '';
+            document.getElementById('svccat-short-desc').value = cat.short_description || '';
+            document.getElementById('svccat-full-desc').value = cat.full_description || '';
+            svccatRemoveFlag.value = '0';
+
+            if (cat.hero_image) {
+                if (isVideoFile(cat.hero_image)) {
+                    svccatPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Video:</div>
+                        <video src="${cat.hero_image}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
+                    `;
+                } else {
+                    svccatPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Image:</div>
+                        <img src="${cat.hero_image}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
+                    `;
+                }
+                svccatPreviewContainer.style.display = 'block';
+                if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
+            } else {
+                svccatPreviewContainer.innerHTML = '';
+                svccatPreviewContainer.style.display = 'none';
+                if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'none';
+            }
+
+            document.getElementById('service-category-modal-title').textContent = 'Edit Service Category';
+            openModal('service-category-modal');
+            initIcons();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    window.deleteServiceCategory = async (id) => {
+        if (confirm('Delete this service category? All child services under it will be deleted.')) {
+            try {
+                const res = await fetch(`/api/service-categories/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    fetchServiceCategories();
+                    fetchServices();
+                } else {
+                    alert(data.error || 'Failed to delete service category.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const serviceCategoryForm = document.getElementById('service-category-form');
+    if (serviceCategoryForm) {
+        serviceCategoryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('svccat-id').value;
+            const formData = new FormData(serviceCategoryForm);
+            const url = id ? `/api/service-categories/${id}` : '/api/service-categories';
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeModal('service-category-modal');
+                    fetchServiceCategories();
+                } else {
+                    alert(data.error || 'Failed to save service category.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
+
+    // --- SERVICES / SERVICE OPTIONS LOGIC ---
+    const fetchServices = async (filterCatId = '') => {
+        try {
+            let url = '/api/services';
+            if (filterCatId) {
+                url += `?category_id=${filterCatId}`;
+            }
+            const res = await fetch(url);
+            const data = await res.json();
+
+            const tbody = document.getElementById('services-table-body');
+            if (tbody) {
+                tbody.innerHTML = '';
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--admin-text-light);">No services found. Click "Add Service Option" to create one.</td></tr>';
+                } else {
+                    data.forEach(svc => {
+                        const tr = document.createElement('tr');
+                        let mediaHtml = '<span style="color:var(--admin-text-light); font-size:0.8rem;">No media</span>';
+                        
+                        if (svc.image) {
+                            if (isVideoFile(svc.image)) {
+                                mediaHtml = `
+                                    <div style="position:relative; width:65px; height:45px; border-radius:4px; overflow:hidden; background:#0F172A; display:inline-flex; align-items:center; justify-content:center;">
+                                        <video src="${svc.image}" style="width:100%; height:100%; object-fit:cover;"></video>
+                                        <span style="position:absolute; background:rgba(0,0,0,0.65); color:#FFF; font-size:9px; padding:1px 3px; border-radius:2px;">VIDEO</span>
+                                    </div>
+                                `;
+                            } else {
+                                mediaHtml = `<img src="${svc.image}" style="width:65px; height:45px; object-fit:cover; border-radius:4px; display:inline-block;">`;
+                            }
+                        }
+
+                        tr.innerHTML = `
+                            <td>${mediaHtml}</td>
+                            <td>
+                                <strong>${svc.name}</strong>
+                                <div style="font-size:0.78rem; color:var(--admin-text-light);"><code>${svc.slug}</code></div>
+                            </td>
+                            <td><span class="badge badge-info">${svc.category_name || 'Unassigned'}</span></td>
+                            <td><span style="font-size:0.82rem; color:var(--admin-text); display:block; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${svc.short_description || ''}">${svc.short_description || '-'}</span></td>
+                            <td><span class="badge ${svc.is_published ? 'badge-success' : 'badge-warning'}">${svc.is_published ? 'Published' : 'Draft'}</span></td>
+                            <td>
+                                <div class="btn-action-group">
+                                    <button class="btn-action edit" onclick="editService(${svc.id})" title="Edit Service">
+                                        <i data-lucide="edit-3" style="width:14px; height:14px;"></i>
+                                    </button>
+                                    <button class="btn-action delete" onclick="deleteService(${svc.id})" title="Delete Service">
+                                        <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+                initIcons();
+            }
+        } catch (err) {
+            console.error('Error fetching services:', err);
+        }
+    };
+
+    // Category filter in Services tab
+    const filterCatDropdown = document.getElementById('filter-service-category');
+    if (filterCatDropdown) {
+        filterCatDropdown.addEventListener('change', (e) => {
+            fetchServices(e.target.value);
+        });
+    }
+
+    // Auto-generate service slug from name
+    const serviceNameInput = document.getElementById('service-name');
+    if (serviceNameInput) {
+        serviceNameInput.addEventListener('input', (e) => {
+            const nameVal = e.target.value;
+            document.getElementById('service-slug').value = nameVal.toLowerCase()
+                .replace(/[^a-z0-9 -]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/-+/g, '-');
+        });
+    }
+
+    // Media preview handler for Service Option
+    const serviceImageFileInput = document.getElementById('service-image-file');
+    const serviceMediaPreviewContainer = document.getElementById('service-media-preview-container');
+    const serviceRemoveMediaBtn = document.getElementById('btn-remove-service-media');
+    const serviceRemoveFlag = document.getElementById('service-remove-image');
+
+    if (serviceImageFileInput && serviceMediaPreviewContainer) {
+        serviceImageFileInput.addEventListener('change', () => {
+            const file = serviceImageFileInput.files[0];
+            if (file) {
+                serviceRemoveFlag.value = '0';
+                const fileUrl = URL.createObjectURL(file);
+                if (file.type.startsWith('video/')) {
+                    serviceMediaPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Video Preview:</div>
+                        <video src="${fileUrl}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
+                    `;
+                } else {
+                    serviceMediaPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Image Preview:</div>
+                        <img src="${fileUrl}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
+                    `;
+                }
+                serviceMediaPreviewContainer.style.display = 'block';
+                if (serviceRemoveMediaBtn) serviceRemoveMediaBtn.style.display = 'inline-flex';
+                initIcons();
+            }
+        });
+    }
+
+    if (serviceRemoveMediaBtn) {
+        serviceRemoveMediaBtn.addEventListener('click', () => {
+            serviceImageFileInput.value = '';
+            serviceMediaPreviewContainer.innerHTML = '';
+            serviceMediaPreviewContainer.style.display = 'none';
+            serviceRemoveMediaBtn.style.display = 'none';
+            serviceRemoveFlag.value = '1';
+        });
+    }
+
+    const btnAddService = document.getElementById('btn-add-service');
+    if (btnAddService) {
+        btnAddService.addEventListener('click', async () => {
+            await fetchServiceCategories();
+            document.getElementById('service-form').reset();
+            document.getElementById('service-id').value = '';
+            serviceRemoveFlag.value = '0';
+            serviceMediaPreviewContainer.innerHTML = '';
+            serviceMediaPreviewContainer.style.display = 'none';
+            if (serviceRemoveMediaBtn) serviceRemoveMediaBtn.style.display = 'none';
+            document.getElementById('service-modal-title').textContent = 'Add Service Option';
+            openModal('service-modal');
+        });
+    }
+
+    window.editService = async (id) => {
+        try {
+            await fetchServiceCategories();
+            const res = await fetch(`/api/services/${id}`);
+            const svc = await res.json();
+            if (!res.ok) return alert(svc.error || 'Failed to fetch service details');
+
+            document.getElementById('service-form').reset();
+            document.getElementById('service-id').value = svc.id;
+            document.getElementById('service-category').value = svc.category_id || '';
+            document.getElementById('service-name').value = svc.name;
+            document.getElementById('service-slug').value = svc.slug;
+            document.getElementById('service-icon').value = svc.icon || '';
+            document.getElementById('service-status').value = String(svc.is_published);
+            document.getElementById('service-short-desc').value = svc.short_description || '';
+            document.getElementById('service-full-desc').value = svc.full_description || '';
+            serviceRemoveFlag.value = '0';
+
+            // Parse features & deliverables from JSON string if needed
+            let featuresStr = '';
+            try {
+                const fArray = typeof svc.features === 'string' ? JSON.parse(svc.features || '[]') : svc.features;
+                featuresStr = Array.isArray(fArray) ? fArray.join('\n') : '';
+            } catch (e) { featuresStr = svc.features || ''; }
+            document.getElementById('service-features').value = featuresStr;
+
+            let deliverablesStr = '';
+            try {
+                const dArray = typeof svc.deliverables === 'string' ? JSON.parse(svc.deliverables || '[]') : svc.deliverables;
+                deliverablesStr = Array.isArray(dArray) ? dArray.join('\n') : '';
+            } catch (e) { deliverablesStr = svc.deliverables || ''; }
+            document.getElementById('service-deliverables').value = deliverablesStr;
+
+            // Media display
+            if (svc.image) {
+                if (isVideoFile(svc.image)) {
+                    serviceMediaPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Custom Video:</div>
+                        <video src="${svc.image}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
+                    `;
+                } else {
+                    serviceMediaPreviewContainer.innerHTML = `
+                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Custom Image:</div>
+                        <img src="${svc.image}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
+                    `;
+                }
+                serviceMediaPreviewContainer.style.display = 'block';
+                if (serviceRemoveMediaBtn) serviceRemoveMediaBtn.style.display = 'inline-flex';
+            } else {
+                serviceMediaPreviewContainer.innerHTML = '';
+                serviceMediaPreviewContainer.style.display = 'none';
+                if (serviceRemoveMediaBtn) serviceRemoveMediaBtn.style.display = 'none';
+            }
+
+            document.getElementById('service-modal-title').textContent = 'Edit Service Option';
+            openModal('service-modal');
+            initIcons();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    window.deleteService = async (id) => {
+        if (confirm('Are you sure you want to delete this service option?')) {
+            try {
+                const res = await fetch(`/api/services/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    const activeCatFilter = document.getElementById('filter-service-category').value;
+                    fetchServices(activeCatFilter);
+                } else {
+                    alert(data.error || 'Failed to delete service.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const serviceForm = document.getElementById('service-form');
+    if (serviceForm) {
+        serviceForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('service-id').value;
+            const formData = new FormData(serviceForm);
+            const url = id ? `/api/services/${id}` : '/api/services';
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeModal('service-modal');
+                    const activeCatFilter = document.getElementById('filter-service-category').value;
+                    fetchServices(activeCatFilter);
+                } else {
+                    alert(data.error || 'Failed to save service.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
 
 
     // --- PROJECTS LOGIC ---

@@ -15,8 +15,20 @@
 </section>
 
 <!-- Description & Services Detail Section -->
-<section class="section-padding" style="padding-top: 4rem;">
+<section class="section-padding" style="padding-top: 3.5rem;">
     <div class="container">
+        {% if category.hero_image %}
+        <div class="category-hero-media" style="margin: 0 auto 3rem auto; max-width: 960px; border-radius: var(--radius-md); overflow: hidden; max-height: 400px; box-shadow: var(--shadow-md); background: #0F172A;">
+            {% if category.hero_image.endswith('.mp4') or category.hero_image.endswith('.webm') or category.hero_image.endswith('.mov') or category.hero_image.endswith('.ogg') %}
+            <video autoplay loop muted playsinline style="width: 100%; height: 100%; max-height: 400px; object-fit: cover; display: block;">
+                <source src="{{ category.hero_image }}" type="video/mp4">
+            </video>
+            {% else %}
+            <img src="{{ category.hero_image }}" alt="{{ category.name }}" style="width: 100%; height: 100%; max-height: 400px; object-fit: cover; display: block;">
+            {% endif %}
+        </div>
+        {% endif %}
+
         {% if category.full_description %}
         <div class="service-category-description" style="margin: 0 auto 4rem auto; max-width: 900px;">
             <p style="text-align: justify; font-size: 1.15rem; line-height: 1.8; color: var(--text-dark);">{{ category.full_description }}</p>
@@ -26,8 +38,22 @@
         <div class="services-grid grid {% if services|length is divisibleby 2 %}grid-2-forced{% else %}grid-3{% endif %}">
             {% for service in services %}
             <div class="service-card" style="display:flex; flex-direction:column;">
-                <div class="service-icon"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
-                <h3>{{ service.name }}</h3>
+                {% if service.image %}
+                <div class="service-card-media" style="margin: -2.2rem -2.2rem 1.5rem -2.2rem; overflow: hidden; border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); background: #0F172A; position: relative;">
+                    {% if service.image.endswith('.mp4') or service.image.endswith('.webm') or service.image.endswith('.mov') or service.image.endswith('.ogg') %}
+                    <video autoplay loop muted playsinline class="service-media-video" style="width: 100%; height: 210px; object-fit: cover; display: block;">
+                        <source src="{{ service.image }}" type="video/mp4">
+                    </video>
+                    {% else %}
+                    <img src="{{ service.image }}" alt="{{ service.name }}" class="service-media-img" style="width: 100%; height: 210px; object-fit: cover; display: block;" loading="lazy">
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.8rem;">
+                    <div class="service-icon" style="margin-bottom: 0; font-size: 1.8rem;"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
+                    <h3 style="margin-bottom: 0;">{{ service.name }}</h3>
+                </div>
                 <p style="margin-bottom: 1rem;">{{ service.short_description }}</p>
                 
                 {% if service.features and service.features|length > 0 %}
