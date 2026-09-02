@@ -231,124 +231,74 @@ def init_db(data_dir=None):
                 'display_order': 1
             },
             {
-                'name': 'Post Sales Design',
-                'slug': 'post-sales-design',
-                'short_description': 'Detailed execution-ready designs that convert approved solar concepts into installation-ready documentation.',
-                'full_description': 'Once a project is approved, EarthX converts the concept into detailed, execution-ready engineering designs. Our post-sales services cover everything from detailed rooftop and ground mount layouts to CEIG approval documentation.',
-                'icon': 'clipboard-check',
-                'hero_heading': 'Post Sales Design',
-                'hero_subtitle': 'Convert approved solar concepts into detailed, execution-ready designs with comprehensive engineering documentation.',
+                'name': '3D Post Sales Design',
+                'slug': '3d-post-sales-design',
+                'short_description': 'Detailed 3D solar installation models for execution-ready project documentation.',
+                'full_description': 'Our 3D post-sales design creates highly detailed, accurate models of the solar installation for construction and execution planning, providing exact visual references for installers and developers.',
+                'icon': 'box',
+                'hero_heading': '3D Post Sales Design',
+                'hero_subtitle': 'Convert approved solar concepts into detailed, execution-ready 3D designs with comprehensive engineering documentation.',
                 'display_order': 2
             },
             {
-                'name': 'Ground Mount Detailed design',
-                'slug': 'ground-mount-detailed-design',
-                'short_description': 'Comprehensive engineering for commercial & utility-scale ground mount solar projects.',
-                'full_description': 'EarthX delivers end-to-end ground-mount solar design and engineering packages tailored for utility-scale solar farms and commercial installations. From terrain modeling and shading optimization to full substation and grid evacuation design.',
-                'icon': 'mountain',
-                'hero_heading': 'Ground Mount Detailed Design',
-                'hero_subtitle': 'End-to-end civil, structural, and electrical engineering for utility-scale solar farms and commercial ground-mount installations.',
+                'name': 'Detailed Plan Design , Engineering & Consultancy',
+                'slug': 'detailed-plan-design-engineering-consultancy',
+                'short_description': 'Comprehensive solar engineering consultancy, detailed project planning, and technical advisory.',
+                'full_description': 'Complete engineering consultancy and detailed design planning for commercial, industrial, and utility-scale solar installations, ensuring compliance with international engineering standards and site optimization.',
+                'icon': 'compass',
+                'hero_heading': 'Detailed Plan Design , Engineering & Consultancy',
+                'hero_subtitle': 'Comprehensive solar design planning, detailed engineering specifications, and technical consultancy.',
                 'display_order': 3
             },
             {
-                'name': 'Detailed project report',
-                'slug': 'detailed-project-report',
-                'short_description': 'Bankable Detailed Project Reports covering techno-commercial feasibility, yield simulations, and financial models.',
-                'full_description': 'Comprehensive Detailed Project Reports (DPR) prepared for investors, lenders, and EPC developers covering plant sizing, energy yield simulations (P50/P90), CAPEX/OPEX modeling, and statutory roadmaps.',
-                'icon': 'file-text',
-                'hero_heading': 'Detailed Project Report (DPR)',
-                'hero_subtitle': 'Bankable techno-commercial feasibility reports, generation forecasts, and investment-grade solar documentation.',
+                'name': 'CEIG Drawing Services',
+                'slug': 'ceig-drawing-services',
+                'short_description': 'CEIG approval drawing support and professional documentation for regulatory processes.',
+                'full_description': 'EarthX provides design and documentation support for Chief Electrical Inspector to Government (CEIG) approval processes, including single-line diagrams, earthing layouts, and lightning protection.',
+                'icon': 'file-check',
+                'hero_heading': 'CEIG Drawing Services',
+                'hero_subtitle': 'Government and electrical inspector approval drawings, compliance documentation, and grounding schematics.',
                 'display_order': 4
             },
             {
-                'name': 'Precise inter-row spacing calculations for maximum energy yield and minimal shading losses',
-                'slug': 'precise-inter-row-spacing-calculations',
-                'short_description': 'Calculations for maximum energy yield and minimal shading losses across all seasons.',
-                'full_description': 'Advanced 3D mathematical shadow modeling to calculate optimal pitch, tilt angles, and Ground Coverage Ratio (GCR), completely eliminating winter shadow losses and boosting specific yield (kWh/kWp).',
-                'icon': 'sun',
-                'hero_heading': 'Precise Inter-Row Spacing Calculations',
-                'hero_subtitle': 'Optimized row spacing, tilt angle, and pitch simulations to maximize energy yield and eliminate shading losses.',
+                'name': 'Ground Mounted Detailed Design',
+                'slug': 'ground-mounted-detailed-design',
+                'short_description': 'Comprehensive civil, structural, and electrical engineering for ground mount solar projects.',
+                'full_description': 'EarthX delivers end-to-end ground-mounted solar design and engineering packages for commercial and utility-scale installations, covering site grading, inter-row spacing, racking, and evacuation.',
+                'icon': 'mountain',
+                'hero_heading': 'Ground Mounted Detailed Design',
+                'hero_subtitle': 'End-to-end civil, structural, and electrical engineering for utility-scale and commercial ground mount installations.',
                 'display_order': 5
             },
             {
-                'name': 'Ground-mount racking and foundation structural engineering for all soil conditions',
-                'slug': 'ground-mount-racking-foundation-engineering',
-                'short_description': 'Structural engineering and foundation design for all soil conditions and high wind zones.',
-                'full_description': 'Structural design and STAAD Pro verification for fixed-tilt and seasonal tilt structures. Tailored foundation solutions including driven piles, concrete ballast, helical screws, and rock anchors suited for any geotechnical profile.',
-                'icon': 'warehouse',
-                'hero_heading': 'Ground-Mount Racking & Foundation Structural Engineering',
-                'hero_subtitle': 'STAAD Pro verified structural designs and geotechnical foundation engineering for all soil conditions.',
+                'name': 'Electrical Calculation and Schedules',
+                'slug': 'electrical-calculation-and-schedules',
+                'short_description': 'Cable sizing, voltage drop, short circuit analysis, and comprehensive engineering schedules.',
+                'full_description': 'Rigorous electrical calculations adhering to IEC, IEEE, and IS standards, ensuring safety, optimal cable sizing, earthing grid design, and complete BOQ schedules.',
+                'icon': 'calculator',
+                'hero_heading': 'Electrical Calculation and Schedules',
+                'hero_subtitle': 'DC and AC cable sizing, voltage drop calculations, fault analysis, and procurement schedules.',
                 'display_order': 6
             },
             {
-                'name': 'Site grading, drainage design, and foundation engineering for solar farm installations',
-                'slug': 'site-grading-drainage-design-foundation-engineering',
-                'short_description': 'Site grading, hydrology analysis, storm-water drainage design, and earthwork planning.',
-                'full_description': 'Comprehensive civil engineering including Digital Elevation Modeling (DEM), cut-and-fill volume minimization, surface storm-water runoff drainage design, and foundation leveling for solar farm installations.',
-                'icon': 'compass',
-                'hero_heading': 'Site Grading, Drainage Design & Foundation Engineering',
-                'hero_subtitle': 'Cut-and-fill optimization, hydrological storm-water networks, and civil grading for solar farm installations.',
+                'name': 'Substation and Evacuation Design',
+                'slug': 'substation-and-evacuation-design',
+                'short_description': 'Plant pooling substations, switchyard engineering, transmission lines, and grid evacuation design.',
+                'full_description': 'Complete engineering for solar plant pooling substations (33kV to 220kV), switchyard layouts, transmission line routing, SCADA/telemetry architecture, and statutory evacuation clearance.',
+                'icon': 'radio',
+                'hero_heading': 'Substation and Evacuation Design',
+                'hero_subtitle': 'Pooling substations, switchyards, transmission lines, and grid power evacuation documentation.',
                 'display_order': 7
             },
             {
-                'name': 'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems',
-                'slug': 'dc-ac-electrical-layout-string-sizing-sld',
-                'short_description': 'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems.',
-                'full_description': 'Detailed electrical architecture design covering VOC/VMP string configuration, Inverter Loading Ratio (ILR), string combiner box mapping, inverter station layouts, and multi-page single-line schematics.',
-                'icon': 'git-commit',
-                'hero_heading': 'DC & AC Electrical Layout, String Sizing & SLD Diagrams',
-                'hero_subtitle': 'Complete electrical layouts, string optimization, and single-line schematics for ground-mount systems.',
+                'name': 'Shadow Analysis Report & Structure Stability Report',
+                'slug': 'shadow-analysis-structure-stability-report',
+                'short_description': 'Advanced 3D shadow analysis, solar path modeling, and STAAD Pro structural stability reports.',
+                'full_description': 'Precise 3D solar shade simulations across seasonal sun trajectories combined with STAAD Pro structural stability calculations and wind load verification under extreme weather conditions.',
+                'icon': 'sun',
+                'hero_heading': 'Shadow Analysis Report & Structure Stability Report',
+                'hero_subtitle': '3D yearly shadow profile simulations and STAAD Pro structural stability reports for maximum yield and safety.',
                 'display_order': 8
-            },
-            {
-                'name': 'MV/HV equipment interfaces',
-                'slug': 'mvhv-equipment-interfaces',
-                'short_description': 'Medium & High Voltage equipment interfaces, step-up transformers, and RMU configurations.',
-                'full_description': 'Engineering design for Medium Voltage and High Voltage equipment interfaces including Inverter Duty Transformers (IDT), Compact Substations (CSS), Ring Main Units (RMU), HT switchgear panels, and grid synchronization bays.',
-                'icon': 'zap',
-                'hero_heading': 'MV/HV Equipment Interfaces',
-                'hero_subtitle': 'Transformer sizing, HT switchgear, Ring Main Units, and utility interconnect interfaces.',
-                'display_order': 9
-            },
-            {
-                'name': 'Electrical calculations and schedules',
-                'slug': 'electrical-calculations-and-schedules',
-                'short_description': 'Cable sizing, voltage drop, short circuit analysis, and comprehensive engineering schedules.',
-                'full_description': 'Rigorous engineering calculations according to IEC, IEEE, and IS standards, ensuring system safety, optimal cable sizing (<1.5% DC drop, <1% AC drop), grounding grid resistance, and complete installation schedules.',
-                'icon': 'calculator',
-                'hero_heading': 'Electrical Calculations & Schedules',
-                'hero_subtitle': 'Cable sizing, fault levels, IEEE 80 grounding calculations, and procurement schedules.',
-                'display_order': 10
-            },
-            {
-                'name': 'Roads, drainage, foundations and trenches',
-                'slug': 'roads-drainage-foundations-trenches',
-                'short_description': 'Civil design for internal plant roads, drainage networks, equipment pads, and cable trenches.',
-                'full_description': 'Complete plant civil infrastructure engineering including main access roads, perimeter pathways with turning radius for heavy cranes, reinforced concrete equipment pads, and buried/precast cable trench networks.',
-                'icon': 'map',
-                'hero_heading': 'Roads, Drainage, Foundations & Trenches',
-                'hero_subtitle': 'Internal plant access roads, heavy crane pathways, equipment pads, and cable trench engineering.',
-                'display_order': 11
-            },
-            {
-                'name': 'Substation and evacuation design',
-                'slug': 'substation-and-evacuation-design',
-                'short_description': 'Pooling substation, switchyard engineering, transmission lines, and grid evacuation design.',
-                'full_description': 'Complete engineering for solar plant pooling substations (33kV / 66kV / 132kV / 220kV), switchyard layouts, transmission line towers, gantry structures, SCADA/telemetry systems, and statutory grid evacuation clearance documentation.',
-                'icon': 'radio',
-                'hero_heading': 'Substation & Evacuation Design',
-                'hero_subtitle': 'Pooling substations, switchyards, transmission lines, and grid power evacuation documentation.',
-                'display_order': 12
-            },
-            {
-                'name': 'Structure Design',
-                'slug': 'structure-design',
-                'short_description': 'Solar mounting structure design solutions based on project requirements and site conditions.',
-                'full_description': 'EarthX provides solar mounting structure design solutions tailored to specific project requirements, site conditions, and installation needs. From standard rooftop mounting to custom solutions for complex sites.',
-                'icon': 'warehouse',
-                'hero_heading': 'Structure Design',
-                'hero_subtitle': 'Solar mounting structure design solutions based on project requirements, site conditions, and installation requirements.',
-                'display_order': 13
             }
         ]
         
@@ -365,22 +315,20 @@ def init_db(data_dir=None):
         cat_ids = {row['slug']: row['id'] for row in cat_rows}
         
         child_services = [
-            # Pre Sales Design children
+            # 1. Pre Sales Design children
             {
                 'category_id': cat_ids['pre-sales-design'],
-                'name': '3D Pre Sales Design',
-                'slug': '3d-pre-sales-design',
+                'name': '3D Pre Sales Visualization',
+                'slug': '3d-pre-sales-visualization',
                 'short_description': 'Realistic 3D solar visualizations for client presentations and sales proposals.',
                 'full_description': 'Our 3D pre-sales design service creates photorealistic visualizations of proposed solar installations, helping EPC companies communicate their vision clearly and close deals faster.',
                 'icon': 'box',
                 'features': json.dumps([
                     'Detailed 3D modeling of the project site',
-                    'Building and rooftop modeling',
+                    'Building and rooftop modeling with realistic textures',
                     'Solar panel placement visualization',
-                    'Structure visualization',
-                    'Client presentation-ready views',
-                    'Helps EPC companies communicate proposed solar installations clearly',
-                    'Improves sales conversion with realistic visualization before installation'
+                    'Mounting structure rendering',
+                    'Client presentation-ready views & renderings'
                 ]),
                 'benefits': json.dumps(['Higher client conversion rates', 'Professional proposal presentations', 'Clear project visualization']),
                 'deliverables': json.dumps(['3D rendered views', 'Site model', 'Presentation-ready images']),
@@ -388,8 +336,8 @@ def init_db(data_dir=None):
             },
             {
                 'category_id': cat_ids['pre-sales-design'],
-                'name': '2D GA Layout',
-                'slug': '2d-ga-layout',
+                'name': '2D GA Layout Design',
+                'slug': '2d-ga-layout-design',
                 'short_description': 'Professional 2D General Arrangement layouts for project planning and client proposals.',
                 'full_description': 'Our 2D GA layout service provides precise, professional solar layouts that are perfect for client presentations and initial project planning.',
                 'icon': 'layout-grid',
@@ -397,121 +345,54 @@ def init_db(data_dir=None):
                     'Professional 2D General Arrangement layouts',
                     'Solar module placement optimization',
                     'Row spacing and panel orientation',
-                    'Roof boundaries and setbacks',
-                    'Walkways and equipment placement',
-                    'Dimensioning and layout optimization',
+                    'Roof boundaries, setbacks, and walkway allocations',
                     'Clear drawings for client presentations and project planning'
                 ]),
                 'benefits': json.dumps(['Optimized panel layouts', 'Professional documentation', 'Clear project planning']),
                 'deliverables': json.dumps(['2D GA layout drawings', 'Module arrangement plans', 'Dimensioned layouts']),
                 'display_order': 2
             },
-            # Post Sales Design children
+            # 2. 3D Post Sales Design children
             {
-                'category_id': cat_ids['post-sales-design'],
-                'name': '3D Post Design',
-                'slug': '3d-post-design',
+                'category_id': cat_ids['3d-post-sales-design'],
+                'name': 'Execution-Ready 3D Solar Model',
+                'slug': 'execution-ready-3d-model',
                 'short_description': 'Detailed 3D solar installation models for execution-ready project documentation.',
                 'full_description': 'Our 3D post-sales design creates highly detailed, accurate models of the solar installation for construction and execution planning.',
                 'icon': 'box',
                 'features': json.dumps([
                     'Detailed 3D solar installation model',
-                    'Accurate rooftop/site representation',
-                    'Module placement visualization',
-                    'Structure visualization',
-                    'Equipment positioning',
-                    'Client/project presentation views',
-                    'Detailed installation visualization'
+                    'Accurate rooftop/site geometry representation',
+                    'Module placement and string grouping visualization',
+                    'Inverter and DC combiner equipment positioning',
+                    'Construction reference renders'
                 ]),
                 'benefits': json.dumps(['Execution-ready visualization', 'Accurate site representation', 'Construction planning support']),
                 'deliverables': json.dumps(['3D installation model', 'Equipment layout views', 'Construction reference renders']),
                 'display_order': 1
             },
             {
-                'category_id': cat_ids['post-sales-design'],
+                'category_id': cat_ids['3d-post-sales-design'],
                 'name': 'Rooftop Detailed Design',
                 'slug': 'rooftop-detailed-design',
                 'short_description': 'Comprehensive rooftop solar layouts with detailed engineering specifications.',
                 'full_description': 'Complete detailed rooftop solar design covering every aspect of the installation from module arrangement to equipment placement.',
                 'icon': 'home',
                 'features': json.dumps([
-                    'Detailed Electrical layouts',
+                    'Detailed Electrical layouts and cable routing',
                     'Detailed civil and structural design',
-                    'Cable routing and earthing design',
                     'BoQ, specifications and construction documentation',
-                    'Staad report for structuure stability',
-                    'CEIG drawing for govt approvals',
                     'Design coordination and interface management'
                 ]),
                 'benefits': json.dumps(['Maximum roof utilization', 'Code-compliant designs', 'Installation-ready documentation']),
                 'deliverables': json.dumps(['Detailed rooftop layout', 'Module arrangement plan', 'Equipment placement drawings']),
                 'display_order': 2
             },
+            # 3. Detailed Plan Design , Engineering & Consultancy children
             {
-                'category_id': cat_ids['post-sales-design'],
-                'name': 'Ground Mount Detailed Design',
-                'slug': 'gm-post-sales-design',
-                'short_description': 'Detailed ground-mounted solar layouts with complete site engineering.',
-                'full_description': 'Comprehensive ground mount solar design covering site layout, structure arrangement, and detailed engineering documentation.',
-                'icon': 'mountain',
-                'features': json.dumps([
-                    'Detailed project report',
-                    'Precise inter-row spacing calculations for maximum energy yield and minimal shading losses',
-                    'Ground-mount racking and foundation structural engineering for all soil conditions',
-                    'Site grading, drainage design, and foundation engineering for solar farm installations',
-                    'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems',
-                    'MV/HV equipment interfaces',
-                    'Electrical calculations and schedules',
-                    'Roads, drainage, foundations and trenches',
-                    'Substation and evacuation design'
-                ]),
-                'benefits': json.dumps(['Optimized site utilization', 'Cost-effective layouts', 'Construction-ready plans']),
-                'deliverables': json.dumps(['Ground mount layout', 'Structure arrangement drawings', 'Site plans']),
-                'display_order': 3
-            },
-            {
-                'category_id': cat_ids['post-sales-design'],
-                'name': 'CEIG Approvals',
-                'slug': 'ceig-approvals',
-                'short_description': 'CEIG approval drawing support and professional documentation for regulatory processes.',
-                'full_description': 'EarthX provides design and documentation support for CEIG approval processes, including all required electrical and layout documentation.',
-                'icon': 'file-check',
-                'features': json.dumps([
-                    'CEIG approval drawing support',
-                    'Required electrical/layout documentation',
-                    'Grounding-related drawings',
-                    'Lightning protection layouts',
-                    'Substation/equipment layouts where applicable',
-                    'Professional documentation for approval processes'
-                ]),
-                'benefits': json.dumps(['Streamlined approval process', 'Compliant documentation', 'Professional engineering drawings']),
-                'deliverables': json.dumps(['CEIG drawing package', 'Electrical documentation', 'Grounding/lightning layouts']),
-                'display_order': 4
-            },
-            # Ground Mount Detailed Design Category Children
-            {
-                'category_id': cat_ids['ground-mount-detailed-design'],
-                'name': 'Ground Mount Detailed Design Package',
-                'slug': 'gm-detailed-design-package',
-                'short_description': 'Complete engineering and design package for commercial and utility-scale ground mount projects.',
-                'full_description': 'End-to-end engineering documentation for ground-mounted solar power plants, taking projects from initial site contours to execution-ready construction blueprints.',
-                'icon': 'mountain',
-                'features': json.dumps([
-                    'End-to-end solar farm layout and engineering',
-                    'Site topography and contour 3D modeling',
-                    'Optimized module placement and MWp capacity density',
-                    'Comprehensive civil, structural, and electrical integration',
-                    'Execution-ready construction drawing package'
-                ]),
-                'benefits': json.dumps(['Turnkey engineering clarity', 'Maximized MWp capacity', 'Reduced installation timelines']),
-                'deliverables': json.dumps(['Complete GM Drawing Set', 'Master Layout Plan', 'Design Basis Report']),
-                'display_order': 1
-            },
-            # Detailed Project Report
-            {
-                'category_id': cat_ids['detailed-project-report'],
+                'category_id': cat_ids['detailed-plan-design-engineering-consultancy'],
                 'name': 'Detailed Project Report (DPR)',
-                'slug': 'dpr-service-detail',
+                'slug': 'detailed-project-report',
                 'short_description': 'Bankable Detailed Project Reports covering techno-commercial feasibility and generation modeling.',
                 'full_description': 'Comprehensive Detailed Project Reports (DPR) prepared for investors, lenders, and EPC developers covering plant sizing, energy yield simulations (P50/P90), CAPEX/OPEX modeling, and statutory roadmaps.',
                 'icon': 'file-text',
@@ -526,149 +407,86 @@ def init_db(data_dir=None):
                 'deliverables': json.dumps(['Bankable DPR PDF Report', 'PVsyst Yield Report', 'Financial Model Sheet']),
                 'display_order': 1
             },
-            # Precise Inter-Row Spacing Calculations
             {
-                'category_id': cat_ids['precise-inter-row-spacing-calculations'],
-                'name': 'Inter-Row Pitch & Spacing Optimization',
-                'slug': 'spacing-calculations-detail',
-                'short_description': 'Calculations for maximum energy yield and minimal shading losses across all seasons.',
-                'full_description': 'Advanced 3D mathematical shadow modeling to calculate optimal pitch, tilt angles, and Ground Coverage Ratio (GCR), completely eliminating winter shadow losses and boosting specific yield (kWh/kWp).',
-                'icon': 'sun',
-                'features': json.dumps([
-                    'Precise inter-row spacing calculations for maximum energy yield and minimal shading losses',
-                    'Winter solstice (Dec 21) 9 AM to 3 PM unshaded window optimization',
-                    'Ground Coverage Ratio (GCR) optimization for terrain slopes',
-                    'Fixed tilt pitch vs. single-axis tracker backtracking simulation',
-                    'Near-shading 3D loss diagrams and string grouping analysis'
-                ]),
-                'benefits': json.dumps(['Eliminates inter-row shade losses', 'Maximizes specific annual yield', 'Optimizes land utilization']),
-                'deliverables': json.dumps(['Pitch & Spacing Calculation Report', 'Shade Profile Diagrams', '3D Shadow Simulation']),
-                'display_order': 1
-            },
-            # Ground-Mount Racking & Foundation Structural Engineering
-            {
-                'category_id': cat_ids['ground-mount-racking-foundation-engineering'],
-                'name': 'Racking & Foundation Structural Engineering',
-                'slug': 'racking-foundation-detail',
-                'short_description': 'Structural engineering and foundation design for all soil conditions and high wind zones.',
-                'full_description': 'Structural design and STAAD Pro verification for fixed-tilt and seasonal tilt structures. Tailored foundation solutions including driven piles, concrete ballast, helical screws, and rock anchors suited for any geotechnical profile.',
-                'icon': 'warehouse',
-                'features': json.dumps([
-                    'Ground-mount racking and foundation structural engineering for all soil conditions',
-                    'Driven pile, concrete pedestal, and ground screw foundation designs',
-                    'STAAD Pro 3D structural analysis under IS 875 / ASCE 7-16 wind codes',
-                    'Geotechnical report interpretation and pile pullout/lateral load verification',
-                    'Hot-dip galvanized steel / PosMAC member specification and fabrication drawings'
-                ]),
-                'benefits': json.dumps(['25+ year structural stability', 'Material weight optimization', 'Resilience in high-wind zones']),
-                'deliverables': json.dumps(['STAAD Pro Report', 'Structural Fabrication Drawings', 'Foundation Details & Pile Schedule']),
-                'display_order': 1
-            },
-            # Site Grading, Drainage Design & Foundation Engineering
-            {
-                'category_id': cat_ids['site-grading-drainage-design-foundation-engineering'],
-                'name': 'Site Grading, Hydrology & Drainage Design',
-                'slug': 'site-grading-drainage-detail',
+                'category_id': cat_ids['detailed-plan-design-engineering-consultancy'],
+                'name': 'Site Grading, Drainage & Civil Engineering',
+                'slug': 'site-grading-drainage-civil',
                 'short_description': 'Site grading, hydrology analysis, storm-water drainage design, and earthwork planning.',
-                'full_description': 'Comprehensive civil engineering including Digital Elevation Modeling (DEM), cut-and-fill volume minimization, surface storm-water runoff drainage design, and foundation leveling for solar farm installations.',
+                'full_description': 'Comprehensive civil engineering including Digital Elevation Modeling (DEM), cut-and-fill volume minimization, surface storm-water runoff drainage design, and foundation leveling.',
                 'icon': 'compass',
                 'features': json.dumps([
-                    'Site grading, drainage design, and foundation engineering for solar farm installations',
-                    'Cut-and-fill optimization to minimize earth-moving and grading costs',
-                    'Hydrological watershed analysis and peak storm-water discharge calculations',
-                    'Peripheral and inter-block trapezoidal drainage ditch design',
-                    'Culvert sizing and soil erosion prevention retaining structures'
+                    'Site grading, drainage design, and foundation leveling',
+                    'Cut-and-fill optimization to minimize earth-moving costs',
+                    'Hydrological watershed analysis and peak discharge calculations',
+                    'Peripheral and inter-block drainage channels and culverts'
                 ]),
                 'benefits': json.dumps(['Prevents plant flooding & soil erosion', 'Minimizes costly earth moving', 'Safe civil foundation grading']),
                 'deliverables': json.dumps(['Grading & Earthwork Plan', 'Hydrology & Storm Drainage Layout', 'Civil Cross-Section Drawings']),
-                'display_order': 1
+                'display_order': 2
             },
-            # DC and AC Electrical Layout, String Sizing & SLDs
+            # 4. CEIG Drawing Services children
             {
-                'category_id': cat_ids['dc-ac-electrical-layout-string-sizing-sld'],
-                'name': 'DC & AC Electrical Layout & Single Line Diagrams',
-                'slug': 'dc-ac-layout-sld-detail',
-                'short_description': 'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems.',
-                'full_description': 'Detailed electrical architecture design covering VOC/VMP string configuration, Inverter Loading Ratio (ILR), string combiner box mapping, inverter station layouts, and multi-page single-line schematics.',
-                'icon': 'git-commit',
+                'category_id': cat_ids['ceig-drawing-services'],
+                'name': 'CEIG Approval Drawing Package',
+                'slug': 'ceig-drawing-package',
+                'short_description': 'CEIG approval drawing support and professional documentation for regulatory processes.',
+                'full_description': 'EarthX provides design and documentation support for CEIG approval processes, including all required electrical and layout documentation.',
+                'icon': 'file-check',
                 'features': json.dumps([
-                    'DC and AC electrical layout, string sizing, and single-line diagrams for ground-mount systems',
-                    'String length optimization based on extreme temperature ranges (1500V/1000V DC)',
-                    'DC cable routing, combiner box (SCB) grouping, and busbar design',
-                    'Comprehensive Single Line Diagrams (SLD) covering PV strings to grid point',
-                    'Protection coordination, DC/AC switchgear, and surge suppression design'
+                    'Chief Electrical Inspector to Government (CEIG) compliant SLDs',
+                    'Earthing layouts and lightning protection calculations',
+                    'Transformer and switchyard layout drawings',
+                    'Cable sizing, voltage drop, and protection coordination'
                 ]),
-                'benefits': json.dumps(['Optimized DC/AC electrical efficiency', 'Code compliant SLD for approvals', 'Minimized electrical losses']),
-                'deliverables': json.dumps(['Full Plant SLD Schematic', 'DC & AC String Layout Plans', 'Inverter Station Electrical GA']),
+                'benefits': json.dumps(['Streamlined approval process', 'Compliant documentation', 'First-time approval success']),
+                'deliverables': json.dumps(['CEIG drawing package', 'Electrical documentation', 'Grounding/lightning layouts']),
                 'display_order': 1
             },
-            # MV/HV Equipment Interfaces
+            # 5. Ground Mounted Detailed Design children
             {
-                'category_id': cat_ids['mvhv-equipment-interfaces'],
-                'name': 'MV/HV Equipment Interfaces & Grid Interconnection',
-                'slug': 'mvhv-interfaces-detail',
-                'short_description': 'Medium & High Voltage equipment interfaces, step-up transformers, and RMU configurations.',
-                'full_description': 'Engineering design for Medium Voltage and High Voltage equipment interfaces including Inverter Duty Transformers (IDT), Compact Substations (CSS), Ring Main Units (RMU), HT switchgear panels, and grid synchronization bays.',
-                'icon': 'zap',
+                'category_id': cat_ids['ground-mounted-detailed-design'],
+                'name': 'Ground Mount Layout & Spacing Design',
+                'slug': 'gm-layout-spacing-design',
+                'short_description': 'Detailed ground-mounted solar layouts with complete site engineering.',
+                'full_description': 'Comprehensive ground mount solar design covering site layout, structure arrangement, precise row pitch, and detailed engineering documentation.',
+                'icon': 'mountain',
                 'features': json.dumps([
-                    'MV/HV equipment interfaces',
-                    'Inverter Duty Transformer (IDT) sizing and impedance optimization',
-                    '11kV / 33kV / 66kV HT switchgear and vacuum circuit breaker (VCB) interface',
-                    'Ring Main Unit (RMU) loop configuration and protection relays',
-                    'CT/PT selection, tariff metering cubicle, and utility interface engineering'
+                    'End-to-end solar farm layout and topography modeling',
+                    'Precise inter-row spacing calculations for maximum energy yield',
+                    'Ground-mount racking and foundation structural engineering for all soil conditions',
+                    'Plant access roads, internal drainage, and trench cross-sections'
                 ]),
-                'benefits': json.dumps(['Seamless grid synchronization', 'Robust HV protection', 'Compliant with utility interconnect codes']),
-                'deliverables': json.dumps(['MV/HV Interface Drawings', 'Transformer & Switchgear Layouts', 'Protection Logic Schemes']),
+                'benefits': json.dumps(['Optimized site utilization', 'Cost-effective layouts', 'Construction-ready plans']),
+                'deliverables': json.dumps(['Ground mount master layout', 'Structure arrangement drawings', 'Site civil plans']),
                 'display_order': 1
             },
-            # Electrical Calculations and Schedules
+            # 6. Electrical Calculation and Schedules children
             {
-                'category_id': cat_ids['electrical-calculations-and-schedules'],
-                'name': 'Electrical Calculations, Sizing & Cable Schedules',
-                'slug': 'electrical-schedules-detail',
+                'category_id': cat_ids['electrical-calculation-and-schedules'],
+                'name': 'Electrical Calculations & Sizing Book',
+                'slug': 'electrical-calculations-sizing-book',
                 'short_description': 'Cable sizing, voltage drop, short circuit analysis, and comprehensive engineering schedules.',
                 'full_description': 'Rigorous engineering calculations according to IEC, IEEE, and IS standards, ensuring system safety, optimal cable sizing (<1.5% DC drop, <1% AC drop), grounding grid resistance, and complete installation schedules.',
                 'icon': 'calculator',
                 'features': json.dumps([
-                    'Electrical calculations and schedules',
-                    'DC string, main DC, and HT/LT AC cable sizing & voltage drop calculations',
-                    'Short circuit fault level analysis and symmetrical/asymmetrical breaking capacity',
+                    'DC string, main DC, and HT/LT AC cable sizing & schedule',
+                    'Short circuit fault level analysis and breaking capacity',
                     'Earthing grid design & mesh resistance calculations (IEEE 80 / IS 3043)',
-                    'Complete Cable Schedule, Drum Schedule, and Bill of Quantities (BOQ)'
+                    'Comprehensive Cable Pull Schedule, Drum Schedule, and BOQ'
                 ]),
                 'benefits': json.dumps(['Zero cable undersizing risks', 'Guaranteed minimum power losses', 'Exact procurement quantities']),
                 'deliverables': json.dumps(['Electrical Design Calculation Book', 'Cable Pull Schedule', 'Earthing Calculation Sheet']),
                 'display_order': 1
             },
-            # Roads, Drainage, Foundations and Trenches
-            {
-                'category_id': cat_ids['roads-drainage-foundations-trenches'],
-                'name': 'Plant Roads, Equipment Foundations & Cable Trenches',
-                'slug': 'roads-trenches-detail',
-                'short_description': 'Civil design for internal plant roads, drainage networks, equipment pads, and cable trenches.',
-                'full_description': 'Complete plant civil infrastructure engineering including main access roads, perimeter pathways with turning radius for heavy cranes, reinforced concrete equipment pads, and buried/precast cable trench networks.',
-                'icon': 'map',
-                'features': json.dumps([
-                    'Roads, drainage, foundations and trenches',
-                    'Internal WBM/paved road design with heavy vehicle turning radiuses',
-                    'Reinforced concrete pad foundations for IDTs, inverters, and control rooms',
-                    'Direct-buried and precast concrete cable trench routing and cross-sections',
-                    'Perimeter fencing, security gate, and water supply network design'
-                ]),
-                'benefits': json.dumps(['Safe logistics and crane mobility', 'Durable civil equipment foundations', 'Clean cable management']),
-                'deliverables': json.dumps(['Plant Road & Access Plan', 'Trench Cross-Section Blueprints', 'Civil Foundation Structural Details']),
-                'display_order': 1
-            },
-            # Substation and Evacuation Design
+            # 7. Substation and Evacuation Design children
             {
                 'category_id': cat_ids['substation-and-evacuation-design'],
-                'name': 'Pooling Substation & Power Evacuation Design',
-                'slug': 'substation-evacuation-detail',
+                'name': 'Substation & Power Evacuation Scheme',
+                'slug': 'substation-evacuation-scheme',
                 'short_description': 'Pooling substation, switchyard engineering, transmission lines, and grid evacuation design.',
-                'full_description': 'Complete engineering for solar plant pooling substations (33kV / 66kV / 132kV / 220kV), switchyard layouts, transmission line towers, gantry structures, SCADA/telemetry systems, and statutory grid evacuation clearance documentation.',
+                'full_description': 'Complete engineering for solar plant pooling substations (33kV to 220kV), switchyard layouts, transmission line towers, gantry structures, SCADA/telemetry systems, and statutory grid evacuation clearance documentation.',
                 'icon': 'radio',
                 'features': json.dumps([
-                    'Substation and evacuation design',
                     'Pooling Substation (PSS) electrical layout, elevations, and clearance diagrams',
                     'Switchyard gantry structures, busbar arrangements, and isolators',
                     'Overhead transmission line routing, tower spotting, and sag-tension engineering',
@@ -678,47 +496,23 @@ def init_db(data_dir=None):
                 'deliverables': json.dumps(['Substation Key SLD & Layout', 'Switchyard GA & Elevation Plans', 'Transmission Line Route Map']),
                 'display_order': 1
             },
-            # Structure Design children
+            # 8. Shadow Analysis Report & Structure Stability Report children
             {
-                'category_id': cat_ids['structure-design'],
-                'name': 'Standard Solar Structure',
-                'slug': 'standard-solar-structure',
-                'short_description': 'Standard rooftop solar mounting structures for common installation configurations.',
-                'full_description': 'Our standard structure designs cover common rooftop solar mounting configurations optimized for practical installation and cost-effectiveness.',
-                'icon': 'grid-3x3',
+                'category_id': cat_ids['shadow-analysis-structure-stability-report'],
+                'name': 'Shadow Analysis & Structural Stability Package',
+                'slug': 'shadow-analysis-structural-stability-package',
+                'short_description': 'Advanced 3D shadow analysis, solar path modeling, and STAAD Pro structural stability reports.',
+                'full_description': 'Precise 3D solar shade simulations across seasonal sun trajectories combined with STAAD Pro structural stability calculations and wind load verification under extreme weather conditions.',
+                'icon': 'sun',
                 'features': json.dumps([
-                    'Standard rooftop solar mounting structures',
-                    'Common installation configurations',
-                    'Optimized module support',
-                    'Proper module positioning',
-                    'Practical installation approach',
-                    'Suitable for standard rooftop applications',
-                    'Design based on project requirements'
+                    '3D yearly solar path & shadow profile analysis',
+                    'STAAD Pro 3D structural analysis under IS 875 / ASCE 7-16 wind codes',
+                    'Geotechnical load verification and pile depth optimization',
+                    'Near-shading 3D loss diagrams and string grouping analysis'
                 ]),
-                'benefits': json.dumps(['Cost-effective solutions', 'Proven designs', 'Quick turnaround']),
-                'deliverables': json.dumps(['Structure design drawings', 'Material specifications', 'Installation guidelines']),
+                'benefits': json.dumps(['Eliminates inter-row shade losses', '25+ year structural stability', 'Optimized steel material weight']),
+                'deliverables': json.dumps(['Shadow Analysis Report', 'STAAD Pro Stability Report', 'Structural Fabrication Drawings']),
                 'display_order': 1
-            },
-            {
-                'category_id': cat_ids['structure-design'],
-                'name': 'Custom Solar Structure',
-                'slug': 'custom-solar-structure',
-                'short_description': 'Custom mounting structure solutions for complex sites and unique project requirements.',
-                'full_description': 'Custom structure designs for projects with unique site constraints, unusual roof geometry, or specialized requirements.',
-                'icon': 'settings',
-                'features': json.dumps([
-                    'Custom mounting structure solutions',
-                    'Site-specific structure concepts',
-                    'Complex rooftop condition handling',
-                    'Customized heights and orientations',
-                    'Special roof geometry solutions',
-                    'Customized module arrangement',
-                    'Solutions for unusual site constraints',
-                    'Design optimized for the specific project'
-                ]),
-                'benefits': json.dumps(['Tailored to project needs', 'Handles complex sites', 'Optimized for constraints']),
-                'deliverables': json.dumps(['Custom structure drawings', 'Engineering calculations', 'Material specifications']),
-                'display_order': 2
             }
         ]
         
