@@ -13,10 +13,28 @@ from database import get_db_connection, init_db
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'earthx_designs_secret_2026_super_key')
 
+import shutil
+
 # --- DATA ARCHITECTURE ---
-# Use a persistent data directory for production deployments (e.g., mapped volume)
-DATA_DIR = os.environ.get('DATA_DIR', os.path.join(app.root_path, 'data'))
-os.makedirs(DATA_DIR, exist_ok=True)
+# Use /tmp on serverless environments like Vercel where root filesystem is read-only
+IS_VERCEL = bool(os.environ.get('VERCEL'))
+if IS_VERCEL:
+    DATA_DIR = os.environ.get('DATA_DIR', '/tmp/data')
+    os.makedirs(DATA_DIR, exist_ok=True)
+    src_data_dir = os.path.join(app.root_path, 'data')
+    if os.path.exists(src_data_dir):
+        for item in os.listdir(src_data_dir):
+            s = os.path.join(src_data_dir, item)
+            d = os.path.join(DATA_DIR, item)
+            if os.path.isdir(s) and not os.path.exists(d):
+                try: shutil.copytree(s, d)
+                except Exception: pass
+            elif os.path.isfile(s) and not os.path.exists(d):
+                try: shutil.copy2(s, d)
+                except Exception: pass
+else:
+    DATA_DIR = os.environ.get('DATA_DIR', os.path.join(app.root_path, 'data'))
+    os.makedirs(DATA_DIR, exist_ok=True)
 
 app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max upload size
