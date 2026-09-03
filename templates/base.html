@@ -26,72 +26,41 @@
 </head>
 <body>
 
-    <!-- Header & Navigation with Topbar (Inspired by Jupisol) -->
-    <header class="site-header" id="site-header">
-        <div class="topbar">
-            <div class="container topbar-container">
-                <div class="topbar-left">
-                    <a href="mailto:sales.earthxd@gmail.com" class="topbar-item">
-                        <i data-lucide="mail"></i>
-                        <span>sales.earthxd@gmail.com</span>
+    <!-- Header & Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('home') }}" class="logo">
+                <img src="/uploads/logo_white.png" alt="EarthX Designs Logo" class="logo-light">
+                <img src="/uploads/logo_black.png" alt="EarthX Designs Logo" class="logo-dark">
+            </a>
+            
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="nav-links" id="nav-links">
+                <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
+                <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
+                <div class="nav-dropdown">
+                    <a href="javascript:void(0)" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
+                        Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
                     </a>
-                    <a href="tel:+919978841256" class="topbar-item">
-                        <i data-lucide="phone"></i>
-                        <span>+91 9978841256</span>
-                    </a>
-                    <div class="topbar-item topbar-item-hide-sm">
-                        <i data-lucide="map-pin"></i>
-                        <span>Ahmedabad, Gujarat, India</span>
+                    <div class="nav-dropdown-menu">
+                        <a href="{{ url_for('services') }}">All Services</a>
+                        {% for cat in nav_services %}
+                            <a href="{{ url_for('service_category', slug=cat.slug) }}">{{ cat.name }}</a>
+                        {% endfor %}
                     </div>
                 </div>
-                <div class="topbar-right">
-                    <div class="topbar-item topbar-item-hide-sm">
-                        <i data-lucide="clock"></i>
-                        <span>Mon - Sat: 9:00 AM - 7:00 PM IST</span>
-                    </div>
-                    <div class="topbar-social">
-                        <a href="https://wa.me/919978841256" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="social-link"><i data-lucide="message-circle"></i></a>
-                        <a href="mailto:sales.earthxd@gmail.com" aria-label="Email" class="social-link"><i data-lucide="send"></i></a>
-                    </div>
-                </div>
+                <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
+                <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
+                <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %}" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
             </div>
         </div>
-
-        <nav class="navbar" id="navbar">
-            <div class="container nav-container">
-                <a href="{{ url_for('home') }}" class="logo">
-                    <img src="/uploads/logo_white.png" alt="EarthX Designs Logo" class="logo-light">
-                    <img src="/uploads/logo_black.png" alt="EarthX Designs Logo" class="logo-dark">
-                </a>
-                
-                <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-                
-                <div class="nav-links" id="nav-links">
-                    <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
-                    <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
-                    <div class="nav-dropdown">
-                        <a href="javascript:void(0)" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
-                            Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
-                        </a>
-                        <div class="nav-dropdown-menu">
-                            <a href="{{ url_for('services') }}">All Services</a>
-                            {% for cat in nav_services %}
-                                <a href="{{ url_for('service_category', slug=cat.slug) }}">{{ cat.name }}</a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
-                    <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
-                    <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
-                    <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %}" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    </nav>
 
     <!-- Main Content Area -->
     <main>

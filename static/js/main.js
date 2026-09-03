@@ -6,41 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
     }
 
-    // 2. Header & Navbar Scroll Behavior
-    const siteHeader = document.getElementById('site-header');
+    // 2. Navbar Scroll Behavior
     const navbar = document.getElementById('navbar');
-    
-    const handleScroll = () => {
-        const isScrolled = window.scrollY > 25;
-        if (siteHeader) {
-            siteHeader.classList.toggle('scrolled', isScrolled);
-        }
-        if (navbar) {
-            navbar.classList.toggle('scrolled', isScrolled);
-        }
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    // 2b. Modern Scroll Reveal Observer
-    const revealElements = document.querySelectorAll('.reveal-on-scroll');
-    if ('IntersectionObserver' in window && revealElements.length > 0) {
-        const revealObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('revealed');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.12,
-            rootMargin: '0px 0px -40px 0px'
-        });
-
-        revealElements.forEach(el => revealObserver.observe(el));
-    } else {
-        // Fallback for older browsers
-        revealElements.forEach(el => el.classList.add('revealed'));
+    if (navbar) {
+        const handleScroll = () => {
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        };
+        // Initial check and scroll event
+        handleScroll();
+        window.addEventListener('scroll', handleScroll);
     }
 
     // 3. Mobile Navigation Toggle Menu
