@@ -267,27 +267,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     data.forEach(cat => {
                         const tr = document.createElement('tr');
+                        
+                        // Hero Background thumbnail
+                        const bgSrc = cat.hero_bg_image || '/uploads/commercial_solar_featured.png';
+                        const heroBgThumb = `<div style="width:58px; height:38px; border-radius:4px; overflow:hidden; background:#071815; border:1px solid var(--admin-border);">
+                            <img src="${bgSrc}" style="width:100%; height:100%; object-fit:cover;" title="Hero Background Image">
+                        </div>`;
+
+                        // Overview Media thumbnail
                         let mediaThumb = '<span style="color:var(--admin-text-light); font-size:0.8rem;">None</span>';
                         if (cat.hero_image) {
                             if (isVideoFile(cat.hero_image)) {
-                                mediaThumb = `<div style="position:relative; width:55px; height:38px; border-radius:4px; overflow:hidden; background:#0F172A; display:inline-flex; align-items:center; justify-content:center;">
+                                mediaThumb = `<div style="position:relative; width:58px; height:38px; border-radius:4px; overflow:hidden; background:#0F172A; display:inline-flex; align-items:center; justify-content:center;">
                                     <video src="${cat.hero_image}" style="width:100%; height:100%; object-fit:cover;"></video>
-                                    <span style="position:absolute; background:rgba(0,0,0,0.6); color:#FFF; font-size:9px; padding:1px 3px; border-radius:2px;">VIDEO</span>
+                                    <span style="position:absolute; background:rgba(0,0,0,0.65); color:#FFF; font-size:9px; padding:1px 3px; border-radius:2px; font-weight:700;">VIDEO</span>
                                 </div>`;
                             } else {
-                                mediaThumb = `<img src="${cat.hero_image}" style="width:55px; height:38px; object-fit:cover; border-radius:4px; display:inline-block;">`;
+                                mediaThumb = `<img src="${cat.hero_image}" style="width:58px; height:38px; object-fit:cover; border-radius:4px; border:1px solid var(--admin-border); display:inline-block;" title="Overview Media">`;
                             }
                         }
 
                         tr.innerHTML = `
+                            <td>${heroBgThumb}</td>
                             <td>${mediaThumb}</td>
                             <td><strong>${cat.name}</strong></td>
                             <td><code>/services/${cat.slug}</code></td>
-                            <td><i data-lucide="${cat.icon || 'briefcase'}" style="width:16px; height:16px;"></i> ${cat.icon || '-'}</td>
-                            <td><span class="badge badge-info">${cat.service_count || 0} services</span></td>
+                            <td><span class="badge badge-info">${cat.service_count || 0} options</span></td>
                             <td><span class="badge ${cat.is_published ? 'badge-success' : 'badge-warning'}">${cat.is_published ? 'Published' : 'Draft'}</span></td>
                             <td>
                                 <div class="btn-action-group">
+                                    <a href="/services/${cat.slug}" target="_blank" class="btn-action" title="View on Site" style="color:var(--accent);">
+                                        <i data-lucide="external-link" style="width:14px; height:14px;"></i>
+                                    </a>
                                     <button class="btn-action edit" onclick="editServiceCategory(${cat.id})" title="Edit">
                                         <i data-lucide="edit-3" style="width:14px; height:14px;"></i>
                                     </button>
@@ -347,7 +358,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Media preview handler for Service Category
+    // --- Hero Background Image Controls ---
+    const svccatHeroBgFileInput = document.getElementById('svccat-hero-bg-file');
+    const svccatPresetHeroBgInput = document.getElementById('svccat-preset-hero-bg');
+    const svccatBgPreviewContainer = document.getElementById('svccat-bg-preview-container');
+    const svccatRemoveBgBtn = document.getElementById('btn-remove-svccat-bg');
+    const svccatRemoveBgFlag = document.getElementById('svccat-remove-hero-bg');
+
+    const setHeroBgPreview = (src, label = 'Background Image Selected:') => {
+        if (!svccatBgPreviewContainer) return;
+        svccatBgPreviewContainer.innerHTML = `
+            <div style="font-size:0.75rem; color:rgba(255,255,255,0.7); margin-bottom:4px;">${label}</div>
+            <img src="${src}" style="max-width:100%; max-height:140px; border-radius:4px; object-fit:cover; display:block;">
+        `;
+        svccatBgPreviewContainer.style.display = 'block';
+        if (svccatRemoveBgBtn) svccatRemoveBgBtn.style.display = 'inline-flex';
+        initIcons();
+    };
+
+    if (svccatHeroBgFileInput) {
+        svccatHeroBgFileInput.addEventListener('change', () => {
+            const file = svccatHeroBgFileInput.files[0];
+            if (file) {
+                svccatRemoveBgFlag.value = '0';
+                if (svccatPresetHeroBgInput) svccatPresetHeroBgInput.value = '';
+                const fileUrl = URL.createObjectURL(file);
+                setHeroBgPreview(fileUrl, 'Custom Upload Preview:');
+            }
+        });
+    }
+
+    const wireBgPresetBtn = (btnId, presetPath) => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                if (svccatHeroBgFileInput) svccatHeroBgFileInput.value = '';
+                if (svccatPresetHeroBgInput) svccatPresetHeroBgInput.value = presetPath;
+                svccatRemoveBgFlag.value = '0';
+                setHeroBgPreview(presetPath, 'Preset Selected:');
+            });
+        }
+    };
+
+    wireBgPresetBtn('btn-preset-bg-commercial', '/uploads/commercial_solar_featured.png');
+    wireBgPresetBtn('btn-preset-bg-residential', '/uploads/residential_3d_featured.png');
+    wireBgPresetBtn('btn-preset-bg-ground', '/uploads/ground_mount_featured.png');
+    wireBgPresetBtn('btn-preset-bg-sld', '/uploads/sld_blueprint.png');
+
+    if (svccatRemoveBgBtn) {
+        svccatRemoveBgBtn.addEventListener('click', () => {
+            if (svccatHeroBgFileInput) svccatHeroBgFileInput.value = '';
+            if (svccatPresetHeroBgInput) svccatPresetHeroBgInput.value = '';
+            if (svccatBgPreviewContainer) {
+                svccatBgPreviewContainer.innerHTML = '';
+                svccatBgPreviewContainer.style.display = 'none';
+            }
+            svccatRemoveBgBtn.style.display = 'none';
+            svccatRemoveBgFlag.value = '1';
+        });
+    }
+
+    // --- Overview Showcase Media Controls (Image or Video) ---
     const svccatMediaFileInput = document.getElementById('svccat-media-file');
     const svccatPresetMediaInput = document.getElementById('svccat-preset-media');
     const svccatPreviewContainer = document.getElementById('svccat-media-preview-container');
@@ -356,6 +427,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnPresetSvccatImg = document.getElementById('btn-preset-svccat-img');
     const btnPresetSvccatVid = document.getElementById('btn-preset-svccat-vid');
 
+    const setOverviewMediaPreview = (src, isVideo = false, label = 'Media Selected:') => {
+        if (!svccatPreviewContainer) return;
+        if (isVideo) {
+            svccatPreviewContainer.innerHTML = `
+                <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">${label}</div>
+                <video src="${src}" controls autoplay muted loop style="max-width:100%; max-height:150px; border-radius:4px; display:block;"></video>
+            `;
+        } else {
+            svccatPreviewContainer.innerHTML = `
+                <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">${label}</div>
+                <img src="${src}" style="max-width:100%; max-height:150px; border-radius:4px; object-fit:cover; display:block;">
+            `;
+        }
+        svccatPreviewContainer.style.display = 'block';
+        if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
+        initIcons();
+    };
+
     if (svccatMediaFileInput && svccatPreviewContainer) {
         svccatMediaFileInput.addEventListener('change', () => {
             const file = svccatMediaFileInput.files[0];
@@ -363,20 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 svccatRemoveFlag.value = '0';
                 if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
                 const fileUrl = URL.createObjectURL(file);
-                if (file.type.startsWith('video/')) {
-                    svccatPreviewContainer.innerHTML = `
-                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Video Preview:</div>
-                        <video src="${fileUrl}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
-                    `;
-                } else {
-                    svccatPreviewContainer.innerHTML = `
-                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Image Preview:</div>
-                        <img src="${fileUrl}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
-                    `;
-                }
-                svccatPreviewContainer.style.display = 'block';
-                if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
-                initIcons();
+                setOverviewMediaPreview(fileUrl, file.type.startsWith('video/'), 'Custom File Preview:');
             }
         });
     }
@@ -386,13 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (svccatMediaFileInput) svccatMediaFileInput.value = '';
             if (svccatPresetMediaInput) svccatPresetMediaInput.value = '/uploads/residential_3d_featured.png';
             svccatRemoveFlag.value = '0';
-            svccatPreviewContainer.innerHTML = `
-                <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Preset Image Selected:</div>
-                <img src="/uploads/residential_3d_featured.png" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
-            `;
-            svccatPreviewContainer.style.display = 'block';
-            if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
-            initIcons();
+            setOverviewMediaPreview('/uploads/residential_3d_featured.png', false, 'Preset 3D Render Image:');
         });
     }
 
@@ -401,13 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (svccatMediaFileInput) svccatMediaFileInput.value = '';
             if (svccatPresetMediaInput) svccatPresetMediaInput.value = '/uploads/hero_video.mp4';
             svccatRemoveFlag.value = '0';
-            svccatPreviewContainer.innerHTML = `
-                <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Preset Video Selected:</div>
-                <video src="/uploads/hero_video.mp4" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
-            `;
-            svccatPreviewContainer.style.display = 'block';
-            if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
-            initIcons();
+            setOverviewMediaPreview('/uploads/hero_video.mp4', true, 'Preset Drone Video:');
         });
     }
 
@@ -427,10 +491,19 @@ document.addEventListener('DOMContentLoaded', () => {
         btnAddServiceCategory.addEventListener('click', () => {
             document.getElementById('service-category-form').reset();
             document.getElementById('svccat-id').value = '';
+            svccatRemoveBgFlag.value = '0';
             svccatRemoveFlag.value = '0';
+            if (svccatPresetHeroBgInput) svccatPresetHeroBgInput.value = '';
             if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
-            svccatPreviewContainer.innerHTML = '';
-            svccatPreviewContainer.style.display = 'none';
+            if (svccatBgPreviewContainer) {
+                svccatBgPreviewContainer.innerHTML = '';
+                svccatBgPreviewContainer.style.display = 'none';
+            }
+            if (svccatRemoveBgBtn) svccatRemoveBgBtn.style.display = 'none';
+            if (svccatPreviewContainer) {
+                svccatPreviewContainer.innerHTML = '';
+                svccatPreviewContainer.style.display = 'none';
+            }
             if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'none';
             document.getElementById('service-category-modal-title').textContent = 'Add Service Category';
             openModal('service-category-modal');
@@ -453,30 +526,35 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('svccat-hero-subtitle').value = cat.hero_subtitle || '';
             document.getElementById('svccat-short-desc').value = cat.short_description || '';
             document.getElementById('svccat-full-desc').value = cat.full_description || '';
+            
+            svccatRemoveBgFlag.value = '0';
             svccatRemoveFlag.value = '0';
+            if (svccatPresetHeroBgInput) svccatPresetHeroBgInput.value = '';
             if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
 
-            if (cat.hero_image) {
-                if (isVideoFile(cat.hero_image)) {
-                    svccatPreviewContainer.innerHTML = `
-                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Video:</div>
-                        <video src="${cat.hero_image}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
-                    `;
-                } else {
-                    svccatPreviewContainer.innerHTML = `
-                        <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Image:</div>
-                        <img src="${cat.hero_image}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
-                    `;
-                }
-                svccatPreviewContainer.style.display = 'block';
-                if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
+            // Hero Background Preview
+            if (cat.hero_bg_image) {
+                setHeroBgPreview(cat.hero_bg_image, 'Current Hero Background:');
             } else {
-                svccatPreviewContainer.innerHTML = '';
-                svccatPreviewContainer.style.display = 'none';
+                if (svccatBgPreviewContainer) {
+                    svccatBgPreviewContainer.innerHTML = '';
+                    svccatBgPreviewContainer.style.display = 'none';
+                }
+                if (svccatRemoveBgBtn) svccatRemoveBgBtn.style.display = 'none';
+            }
+
+            // Overview Media Preview
+            if (cat.hero_image) {
+                setOverviewMediaPreview(cat.hero_image, isVideoFile(cat.hero_image), isVideoFile(cat.hero_image) ? 'Current Video:' : 'Current Image:');
+            } else {
+                if (svccatPreviewContainer) {
+                    svccatPreviewContainer.innerHTML = '';
+                    svccatPreviewContainer.style.display = 'none';
+                }
                 if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'none';
             }
 
-            document.getElementById('service-category-modal-title').textContent = 'Edit Service Category';
+            document.getElementById('service-category-modal-title').textContent = `Edit Service: ${cat.name}`;
             openModal('service-category-modal');
             initIcons();
         } catch (err) {

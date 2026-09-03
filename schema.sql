@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS service_categories (
     full_description TEXT DEFAULT '',
     icon TEXT DEFAULT 'briefcase',
     hero_image TEXT DEFAULT '',
+    hero_bg_image TEXT DEFAULT '',
     hero_heading TEXT DEFAULT '',
     hero_subtitle TEXT DEFAULT '',
     cta_heading TEXT DEFAULT 'Need Professional Solar Design Support?',

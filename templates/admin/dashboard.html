@@ -202,10 +202,10 @@
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Hero Media</th>
+                                        <th>Hero BG</th>
+                                        <th>Overview Media</th>
                                         <th>Category Name</th>
                                         <th>URL Slug</th>
-                                        <th>Icon</th>
                                         <th>Services</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -499,96 +499,151 @@
 
     <!-- Service Category Modal -->
     <div class="modal" id="service-category-modal">
-        <div class="modal-content" style="max-width: 750px;">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h3 id="service-category-modal-title">Add Service Category</h3>
+                <h3 id="service-category-modal-title">Edit Service Category</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <form id="service-category-form" enctype="multipart/form-data">
-                <div class="modal-body">
+                <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
                     <input type="hidden" id="svccat-id" name="id">
+                    <input type="hidden" id="svccat-remove-hero-bg" name="remove_hero_bg" value="0">
                     <input type="hidden" id="svccat-remove-hero-image" name="remove_hero_image" value="0">
+                    <input type="hidden" id="svccat-preset-hero-bg" name="preset_hero_bg" value="">
+                    <input type="hidden" id="svccat-preset-media" name="preset_media" value="">
                     
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                        <div class="admin-form-group">
-                            <label for="svccat-name">Category Name *</label>
-                            <input type="text" id="svccat-name" name="name" required placeholder="e.g. Pre Sales Design">
-                        </div>
-                        <div class="admin-form-group">
-                            <label for="svccat-slug">URL Slug *</label>
-                            <input type="text" id="svccat-slug" name="slug" required placeholder="e.g. pre-sales-design">
-                        </div>
-                    </div>
+                    <!-- SECTION 1: HERO BANNER SETTINGS -->
+                    <div style="background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: #047857; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="layout-template" style="width: 16px; height: 16px;"></i>
+                            1. Hero Banner Settings (Top of Page)
+                        </h4>
 
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                        <div class="admin-form-group">
-                            <label for="svccat-icon">Lucide Icon Name</label>
-                            <input type="text" id="svccat-icon" name="icon" placeholder="e.g. presentation, box, compass">
-                        </div>
-                        <div class="admin-form-group">
-                            <label for="svccat-status">Status *</label>
-                            <select id="svccat-status" name="is_published">
-                                <option value="1">Published (Visible in Navbar & Dropdown)</option>
-                                <option value="0">Draft (Hidden)</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                        <div class="admin-form-group">
-                            <label for="svccat-hero-heading">Hero Title</label>
-                            <input type="text" id="svccat-hero-heading" name="hero_heading" placeholder="e.g. Pre Sales Design">
-                        </div>
-                        <div class="admin-form-group">
-                            <label for="svccat-hero-subtitle">Hero Subtitle</label>
-                            <input type="text" id="svccat-hero-subtitle" name="hero_subtitle" placeholder="e.g. Compelling 3D proposals for EPC developers">
-                        </div>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="svccat-short-desc">Short Description</label>
-                        <textarea id="svccat-short-desc" name="short_description" rows="2" placeholder="Brief summary of category..."></textarea>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="svccat-full-desc">Full Category Description</label>
-                        <textarea id="svccat-full-desc" name="full_description" rows="3" placeholder="Full descriptive text on the category page..."></textarea>
-                    </div>
-
-                    <!-- Pre-Sales / Category Media Upload & Preview -->
-                    <div class="admin-form-group" style="background: var(--admin-bg); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--admin-border);">
-                        <label style="display: flex; align-items: center; justify-content: space-between;">
-                            <span style="font-weight: 600; color: var(--admin-text-dark); display: flex; align-items: center; gap: 6px;">
-                                <i data-lucide="video" style="width: 15px; height: 15px; color: var(--accent);"></i>
-                                Overview Media (Image or Video)
-                            </span>
-                            <span style="font-weight: 400; font-size: 0.8rem; color: var(--admin-text-light);">JPG, PNG, WEBP, MP4, WEBM</span>
-                        </label>
-                        <p style="font-size: 0.8rem; color: var(--admin-text-light); margin-top: 4px; margin-bottom: 10px; line-height: 1.4;">
-                            For <strong>Pre Sales Design</strong>, this image or video appears right next to the overview paragraph. You can upload any file, choose a preset, or remove it completely to display text only.
-                        </p>
-                        
-                        <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
-                            <input type="file" id="svccat-media-file" name="hero_image" accept="image/*,video/mp4,video/webm,video/quicktime,video/*">
-                            <input type="hidden" id="svccat-preset-media" name="preset_media" value="">
+                        <!-- Hero Background Image (Behind Text) -->
+                        <div class="admin-form-group" style="background: #FFFFFF; padding: 1.15rem; border-radius: 6px; border: 1px solid var(--admin-border); margin-bottom: 1rem;">
+                            <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                <span style="font-weight: 600; color: var(--admin-text-dark); display: flex; align-items: center; gap: 6px;">
+                                    <i data-lucide="image" style="width: 15px; height: 15px; color: var(--accent);"></i>
+                                    Hero Banner Background Image
+                                </span>
+                                <span style="font-weight: 400; font-size: 0.78rem; color: var(--admin-text-light);">JPG, PNG, WEBP</span>
+                            </label>
+                            <p style="font-size: 0.8rem; color: var(--admin-text-light); margin-bottom: 10px; line-height: 1.4;">
+                                This background image appears behind the title, breadcrumbs, and consultation button with a dark-green tint overlay.
+                            </p>
                             
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px;">
-                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-svccat-img" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
-                                    <i data-lucide="image" style="width: 13px; height: 13px;"></i>
+                            <input type="file" id="svccat-hero-bg-file" name="hero_bg_image" accept="image/*">
+                            
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-bg-commercial" style="font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <span>Commercial CAD</span>
+                                </button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-bg-residential" style="font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <span>Residential 3D</span>
+                                </button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-bg-ground" style="font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <span>Ground Mount</span>
+                                </button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-bg-sld" style="font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <span>SLD Blueprint</span>
+                                </button>
+                                <button type="button" class="btn-admin btn-admin-danger" id="btn-remove-svccat-bg" style="display:none; font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+                                    <span>Reset to Default</span>
+                                </button>
+                            </div>
+
+                            <div id="svccat-bg-preview-container" style="display: none; margin-top: 10px; padding: 8px; background: #071815; border-radius: 6px; border: 1px solid var(--admin-border); max-width: 320px;">
+                                <!-- Live BG thumbnail preview -->
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                            <div class="admin-form-group" style="margin-bottom: 0;">
+                                <label for="svccat-hero-heading">Hero Title (Heading)</label>
+                                <input type="text" id="svccat-hero-heading" name="hero_heading" placeholder="e.g. Pre Sales Design">
+                            </div>
+                            <div class="admin-form-group" style="margin-bottom: 0;">
+                                <label for="svccat-hero-subtitle">Hero Subtitle</label>
+                                <input type="text" id="svccat-hero-subtitle" name="hero_subtitle" placeholder="e.g. Compelling 3D proposals for EPC developers">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: CATEGORY IDENTITY & OVERVIEW -->
+                    <div style="background: var(--admin-bg); border: 1px solid var(--admin-border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--admin-text-dark); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                            2. Service Content & Overview Media
+                        </h4>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                            <div class="admin-form-group">
+                                <label for="svccat-name">Category Name *</label>
+                                <input type="text" id="svccat-name" name="name" required placeholder="e.g. Pre Sales Design">
+                            </div>
+                            <div class="admin-form-group">
+                                <label for="svccat-slug">URL Slug *</label>
+                                <input type="text" id="svccat-slug" name="slug" required placeholder="e.g. pre-sales-design">
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                            <div class="admin-form-group">
+                                <label for="svccat-icon">Lucide Icon Name</label>
+                                <input type="text" id="svccat-icon" name="icon" placeholder="e.g. presentation, box, compass, mountain">
+                            </div>
+                            <div class="admin-form-group">
+                                <label for="svccat-status">Status *</label>
+                                <select id="svccat-status" name="is_published">
+                                    <option value="1">Published (Live on Website & Dropdown)</option>
+                                    <option value="0">Draft (Hidden)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="svccat-short-desc">Short Description (Cards & Snippets)</label>
+                            <textarea id="svccat-short-desc" name="short_description" rows="2" placeholder="Brief 1-line summary..."></textarea>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label for="svccat-full-desc">Full Category Overview Text (Body Section)</label>
+                            <textarea id="svccat-full-desc" name="full_description" rows="4" placeholder="Detailed multi-paragraph description of engineering scope..."></textarea>
+                        </div>
+
+                        <!-- Overview Section Media (Image or Video beside paragraph) -->
+                        <div class="admin-form-group" style="background: #FFFFFF; padding: 1.15rem; border-radius: 6px; border: 1px solid var(--admin-border); margin-bottom: 0;">
+                            <label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                <span style="font-weight: 600; color: var(--admin-text-dark); display: flex; align-items: center; gap: 6px;">
+                                    <i data-lucide="film" style="width: 15px; height: 15px; color: var(--accent);"></i>
+                                    Overview Showcase Media (Image or Video)
+                                </span>
+                                <span style="font-weight: 400; font-size: 0.78rem; color: var(--admin-text-light);">JPG, PNG, WEBP, MP4, WEBM</span>
+                            </label>
+                            <p style="font-size: 0.8rem; color: var(--admin-text-light); margin-bottom: 10px; line-height: 1.4;">
+                                Appears directly next to the overview paragraph on the live page. Upload your file, select a preset, or click Remove to show full-width text.
+                            </p>
+                            
+                            <input type="file" id="svccat-media-file" name="hero_image" accept="image/*,video/mp4,video/webm,video/quicktime,video/*">
+                            
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-svccat-img" style="font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <i data-lucide="image" style="width: 12px; height: 12px;"></i>
                                     <span>Use 3D Render Image</span>
                                 </button>
-                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-svccat-vid" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
-                                    <i data-lucide="video" style="width: 13px; height: 13px;"></i>
-                                    <span>Use Solar Drone Video</span>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-svccat-vid" style="font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <i data-lucide="video" style="width: 12px; height: 12px;"></i>
+                                    <span>Use Drone Video</span>
                                 </button>
-                                <button type="button" class="btn-admin btn-admin-danger" id="btn-remove-svccat-media" style="display:none; font-size: 0.78rem; padding: 0.35rem 0.75rem;">
-                                    <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
+                                <button type="button" class="btn-admin btn-admin-danger" id="btn-remove-svccat-media" style="display:none; font-size: 0.76rem; padding: 0.3rem 0.65rem;">
+                                    <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
                                     <span>Remove Media</span>
                                 </button>
                             </div>
 
-                            <div id="svccat-media-preview-container" style="display: none; margin-top: 5px; padding: 10px; background: #FFFFFF; border-radius: 6px; border: 1px solid var(--admin-border); max-width: 320px;">
-                                <!-- Image or Video preview rendered here -->
+                            <div id="svccat-media-preview-container" style="display: none; margin-top: 10px; padding: 8px; background: #FFFFFF; border-radius: 6px; border: 1px solid var(--admin-border); max-width: 320px;">
+                                <!-- Live Media preview rendered here -->
                             </div>
                         </div>
                     </div>

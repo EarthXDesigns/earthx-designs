@@ -3,48 +3,25 @@
 {% block title %}{{ category.name }} Services | EarthX Designs{% endblock %}
 
 {% block content %}
-<!-- Page Hero Banner (Engineered background image behind text with dark-green overlay as per ref image) -->
-<section class="service-page-hero" style="background-image: linear-gradient(135deg, rgba(7, 24, 18, 0.88) 0%, rgba(11, 28, 38, 0.90) 100%), url('{{ category.hero_image or "/uploads/commercial_solar_featured.png" }}');">
+<!-- Page Hero Banner (Configurable background image behind text with dark-green overlay) -->
+<section class="service-page-hero" style="background-image: linear-gradient(135deg, rgba(7, 24, 18, 0.88) 0%, rgba(11, 28, 38, 0.90) 100%), url('{{ category.hero_bg_image or category.hero_image or "/uploads/commercial_solar_featured.png" }}');">
     <div class="container">
-        <div class="service-hero-grid">
-            <div class="service-hero-main">
-                <!-- Upper Path / Breadcrumbs -->
-                <nav class="service-breadcrumbs" aria-label="Breadcrumb">
-                    <a href="{{ url_for('home') }}">HOME</a>
-                    <span class="bc-sep">/</span>
-                    <a href="{{ url_for('services') }}">SERVICES</a>
-                    <span class="bc-sep">/</span>
-                    <span class="bc-current">{{ category.name|upper }}</span>
-                </nav>
+        <div class="service-hero-main">
+            <!-- Upper Path / Breadcrumbs -->
+            <nav class="service-breadcrumbs" aria-label="Breadcrumb">
+                <a href="{{ url_for('home') }}">HOME</a>
+                <span class="bc-sep">/</span>
+                <a href="{{ url_for('services') }}">SERVICES</a>
+                <span class="bc-sep">/</span>
+                <span class="bc-current">{{ category.name|upper }}</span>
+            </nav>
 
-                <h1 class="service-hero-title">{{ category.hero_heading or category.name }}</h1>
-                <p class="service-hero-subtitle">{{ category.hero_subtitle or category.short_description }}</p>
+            <h1 class="service-hero-title">{{ category.hero_heading or category.name }}</h1>
+            <p class="service-hero-subtitle">{{ category.hero_subtitle or category.short_description }}</p>
 
-                <!-- Hero Action Buttons (as per ref image) -->
-                <div class="service-hero-actions">
-                    <a href="{{ url_for('contact') }}" class="btn-hero-consultation">Request a Consultation</a>
-                    <a href="{{ url_for('contact') }}" class="btn-hero-rfp">Submit an RFP &rarr;</a>
-                </div>
-            </div>
-
-            <!-- Hero Engineering Scope Checklist (as per ref image) -->
-            <div class="service-hero-checklist">
-                <div class="hero-check-item">
-                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
-                    <span>Electrical Design</span>
-                </div>
-                <div class="hero-check-item">
-                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
-                    <span>Structural Engineering</span>
-                </div>
-                <div class="hero-check-item">
-                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
-                    <span>BIM & 3D Modeling</span>
-                </div>
-                <div class="hero-check-item">
-                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
-                    <span>Design & Grid Validation</span>
-                </div>
+            <!-- Hero Action Button -->
+            <div class="service-hero-actions">
+                <a href="{{ url_for('contact') }}" class="btn-hero-consultation">Request a Consultation</a>
             </div>
         </div>
     </div>

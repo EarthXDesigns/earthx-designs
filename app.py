@@ -971,6 +971,18 @@ def api_service_categories():
             conn.close()
             return jsonify({'error': 'Name and slug are required.'}), 400
             
+        # Hero Background Image handling
+        preset_hero_bg = data.get('preset_hero_bg', '').strip()
+        hero_bg_image = ''
+        file_bg = request.files.get('hero_bg_image') if hasattr(request, 'files') else None
+        if file_bg and file_bg.filename != '' and allowed_file(file_bg.filename):
+            filename_bg = secure_filename(f"svccat_bg_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file_bg.filename}")
+            file_bg.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_bg))
+            hero_bg_image = f"/uploads/{filename_bg}"
+        elif preset_hero_bg:
+            hero_bg_image = preset_hero_bg
+
+        # Overview Section Media handling
         preset_media = data.get('preset_media', '').strip()
         hero_image = ''
         file = request.files.get('hero_image') if hasattr(request, 'files') else None
@@ -988,12 +1000,12 @@ def api_service_categories():
             cursor = conn.cursor()
             cursor.execute('''
                 INSERT INTO service_categories (
-                    name, slug, short_description, full_description, icon, hero_image,
+                    name, slug, short_description, full_description, icon, hero_image, hero_bg_image,
                     hero_heading, hero_subtitle, cta_heading, cta_description, cta_button_text,
                     seo_title, seo_description, display_order, is_published
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
-                name, slug, short_description, full_description, icon, hero_image,
+                name, slug, short_description, full_description, icon, hero_image, hero_bg_image,
                 hero_heading, hero_subtitle, cta_heading, cta_description, cta_button_text,
                 seo_title, seo_description, display_order, is_published
             ))
@@ -1035,18 +1047,33 @@ def api_service_category_detail(cat_id):
         seo_description = data.get('seo_description', '').strip()
         is_published = int(data.get('is_published', 1))
         remove_hero_image = str(data.get('remove_hero_image', '0')).lower() in ['1', 'true']
+        remove_hero_bg = str(data.get('remove_hero_bg', '0')).lower() in ['1', 'true']
         
         if not name or not slug:
             conn.close()
             return jsonify({'error': 'Name and slug are required.'}), 400
             
-        cat = conn.execute('SELECT hero_image FROM service_categories WHERE id = ?', (cat_id,)).fetchone()
+        cat = conn.execute('SELECT * FROM service_categories WHERE id = ?', (cat_id,)).fetchone()
         if not cat:
             conn.close()
             return jsonify({'error': 'Category not found'}), 404
             
+        cat_dict = dict(cat)
+        
+        # Hero Background Image
+        preset_hero_bg = data.get('preset_hero_bg', '').strip()
+        hero_bg_image = '' if remove_hero_bg else cat_dict.get('hero_bg_image', '')
+        file_bg = request.files.get('hero_bg_image') if hasattr(request, 'files') else None
+        if file_bg and file_bg.filename != '' and allowed_file(file_bg.filename):
+            filename_bg = secure_filename(f"svccat_bg_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file_bg.filename}")
+            file_bg.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_bg))
+            hero_bg_image = f"/uploads/{filename_bg}"
+        elif preset_hero_bg and not remove_hero_bg:
+            hero_bg_image = preset_hero_bg
+
+        # Overview Section Media
         preset_media = data.get('preset_media', '').strip()
-        hero_image = '' if remove_hero_image else cat['hero_image']
+        hero_image = '' if remove_hero_image else cat_dict.get('hero_image', '')
         file = request.files.get('hero_image') if hasattr(request, 'files') else None
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
@@ -1058,12 +1085,12 @@ def api_service_category_detail(cat_id):
         try:
             conn.execute('''
                 UPDATE service_categories SET
-                    name = ?, slug = ?, short_description = ?, full_description = ?, icon = ?, hero_image = ?,
+                    name = ?, slug = ?, short_description = ?, full_description = ?, icon = ?, hero_image = ?, hero_bg_image = ?,
                     hero_heading = ?, hero_subtitle = ?, cta_heading = ?, cta_description = ?, cta_button_text = ?,
                     seo_title = ?, seo_description = ?, is_published = ?
                 WHERE id = ?
             ''', (
-                name, slug, short_description, full_description, icon, hero_image,
+                name, slug, short_description, full_description, icon, hero_image, hero_bg_image,
                 hero_heading, hero_subtitle, cta_heading, cta_description, cta_button_text,
                 seo_title, seo_description, is_published, cat_id
             ))
