@@ -3,51 +3,71 @@
 {% block title %}{{ category.name }} Services | EarthX Designs{% endblock %}
 
 {% block content %}
-<!-- Page Hero Banner (Styled like Ref Image with Green Gradient, Breadcrumbs & Angled Cut) -->
-<section class="service-page-hero">
+<!-- Page Hero Banner (Engineered background image behind text with dark-green overlay as per ref image) -->
+<section class="service-page-hero" style="background-image: linear-gradient(135deg, rgba(7, 24, 18, 0.88) 0%, rgba(11, 28, 38, 0.90) 100%), url('{{ category.hero_image or "/uploads/commercial_solar_featured.png" }}');">
     <div class="container">
-        <!-- Upper Path / Breadcrumbs -->
-        <nav class="service-breadcrumbs" aria-label="Breadcrumb">
-            <a href="{{ url_for('home') }}">Home</a>
-            <span class="bc-sep">&rsaquo;</span>
-            <a href="{{ url_for('services') }}">Our Services</a>
-            <span class="bc-sep">&rsaquo;</span>
-            <span class="bc-current">{{ category.hero_heading or category.name }}</span>
-        </nav>
+        <div class="service-hero-grid">
+            <div class="service-hero-main">
+                <!-- Upper Path / Breadcrumbs -->
+                <nav class="service-breadcrumbs" aria-label="Breadcrumb">
+                    <a href="{{ url_for('home') }}">HOME</a>
+                    <span class="bc-sep">/</span>
+                    <a href="{{ url_for('services') }}">SERVICES</a>
+                    <span class="bc-sep">/</span>
+                    <span class="bc-current">{{ category.name|upper }}</span>
+                </nav>
 
-        <div class="service-hero-content">
-            <h1 class="service-hero-title">{{ category.hero_heading or category.name }}</h1>
-            <p class="service-hero-subtitle">{{ category.hero_subtitle or 'Accurate 3D solar layouts with shading analysis, PVsyst reports, and ROI projections for EPC companies worldwide.' }}</p>
+                <h1 class="service-hero-title">{{ category.hero_heading or category.name }}</h1>
+                <p class="service-hero-subtitle">{{ category.hero_subtitle or category.short_description }}</p>
+
+                <!-- Hero Action Buttons (as per ref image) -->
+                <div class="service-hero-actions">
+                    <a href="{{ url_for('contact') }}" class="btn-hero-consultation">Request a Consultation</a>
+                    <a href="{{ url_for('contact') }}" class="btn-hero-rfp">Submit an RFP &rarr;</a>
+                </div>
+            </div>
+
+            <!-- Hero Engineering Scope Checklist (as per ref image) -->
+            <div class="service-hero-checklist">
+                <div class="hero-check-item">
+                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                    <span>Electrical Design</span>
+                </div>
+                <div class="hero-check-item">
+                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                    <span>Structural Engineering</span>
+                </div>
+                <div class="hero-check-item">
+                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                    <span>BIM & 3D Modeling</span>
+                </div>
+                <div class="hero-check-item">
+                    <i data-lucide="check" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                    <span>Design & Grid Validation</span>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Basic Intro & Detailed Overview Section (Styled as per Ref Image) -->
-<section class="section-padding service-overview-section" style="padding-top: 3.5rem; padding-bottom: 3.5rem;">
+<!-- Basic Intro & Detailed Overview Section -->
+<section class="section-padding service-overview-section" style="padding-top: 4rem; padding-bottom: 4rem;">
     <div class="container">
         <div class="service-detail-grid {% if category.hero_image %}has-hero-media{% else %}no-hero-media{% endif %}">
-            <!-- Left Column: Basic Intro & Detailed Content -->
+            <!-- Left Column: Detailed Content -->
             <div class="service-detail-content">
                 <div class="service-subtag">
-                    <span class="subtag-accent">,</span> SOLAR DESIGN
+                    <span class="subtag-accent">•</span> {{ category.name|upper }}
                 </div>
-                <h2 class="service-intro-heading">What is {{ category.name }}?</h2>
+                <h2 class="service-intro-heading">Engineering & Design Overview</h2>
                 
                 <div class="service-body-paragraphs">
-                    {% if category.full_description %}
-                        {% for paragraph in category.full_description.split('\n\n') %}
-                            {% if paragraph.strip() %}
-                            <p class="service-body-p">{{ paragraph.strip() }}</p>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <p class="service-body-p">{{ category.short_description }}</p>
-                    {% endif %}
+                    <p class="service-body-p">{{ category.full_description }}</p>
                 </div>
 
                 <!-- Get a Free Quote Button (Below Detailed Content) -->
                 <div class="service-cta-btn-wrapper">
-                    <a href="{{ url_for('contact') }}" class="btn-free-quote">Get a Free Quote</a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary" style="padding: 0.75rem 1.8rem;">Get a Free Quote</a>
                 </div>
             </div>
 
