@@ -20,22 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 2. Theme Toggle (Dark / Light Mode)
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-            const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', nextTheme);
-            localStorage.setItem('earthx-theme', nextTheme);
-            
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        });
-    }
-
-    // 3. Navbar Scroll Behavior
+    // 2. Navbar Scroll Behavior
     const navbar = document.getElementById('navbar');
     if (navbar) {
         const handleScroll = () => {
@@ -45,80 +30,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 navbar.classList.remove('scrolled');
             }
         };
+        // Initial check and scroll event
         handleScroll();
         window.addEventListener('scroll', handleScroll);
     }
 
-    // 4. Mobile Navigation Drawer & Touch Usability
+    // 3. Mobile Navigation Toggle Menu
     const navToggle = document.getElementById('nav-toggle');
     const navLinks = document.getElementById('nav-links');
-    const navBackdrop = document.getElementById('nav-backdrop');
-    const mobileCloseBtn = document.getElementById('mobile-drawer-close');
-
-    const openMobileMenu = () => {
-        if (navToggle) navToggle.classList.add('active');
-        if (navLinks) navLinks.classList.add('active');
-        if (navBackdrop) navBackdrop.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    };
-
-    const closeMobileMenu = () => {
-        if (navToggle) navToggle.classList.remove('active');
-        if (navLinks) navLinks.classList.remove('active');
-        if (navBackdrop) navBackdrop.classList.remove('active');
-        document.body.style.overflow = '';
-    };
-
-    if (navToggle) {
-        navToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (navLinks && navLinks.classList.contains('active')) {
-                closeMobileMenu();
-            } else {
-                openMobileMenu();
+    if (navToggle && navLinks) {
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+        
+        // Close menu when clicking outside or on links
+        document.addEventListener('click', (e) => {
+            if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                navToggle.classList.remove('active');
+                navLinks.classList.remove('active');
             }
         });
-    }
-
-    if (mobileCloseBtn) {
-        mobileCloseBtn.addEventListener('click', closeMobileMenu);
-    }
-
-    if (navBackdrop) {
-        navBackdrop.addEventListener('click', closeMobileMenu);
-    }
-
-    // Close menu with Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && navLinks && navLinks.classList.contains('active')) {
-            closeMobileMenu();
-        }
-    });
-
-    // Close menu when tapping internal links (except accordion dropdowns)
-    if (navLinks) {
-        const directLinks = navLinks.querySelectorAll('a:not(.dropdown-toggle)');
-        directLinks.forEach(link => {
-            link.addEventListener('click', closeMobileMenu);
+        
+        const links = navLinks.querySelectorAll('a:not(.dropdown-toggle)');
+        links.forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navLinks.classList.remove('active');
+            });
         });
-    }
 
-    // Mobile Dropdown Accordion for Services (screen width <= 992px)
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    dropdownToggles.forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
-            if (window.innerWidth <= 992) {
-                e.preventDefault();
-                e.stopPropagation();
-                const parent = toggle.closest('.nav-dropdown');
-                if (parent) {
+        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+        dropdownToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    const parent = toggle.closest('.nav-dropdown');
                     parent.classList.toggle('expanded');
+                    
                     const isExpanded = parent.classList.contains('expanded');
                     toggle.setAttribute('aria-expanded', isExpanded);
                 }
-            }
+            });
         });
-    });
+    }
 
     // 4. Testimonials Slideshow/Carousel
     const track = document.querySelector('.testimonial-track');
