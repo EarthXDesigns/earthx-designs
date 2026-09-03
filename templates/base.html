@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Immediate Theme Initialization (Prevents FOUC) -->
+    <script>
+        (function() {
+            var stored = localStorage.getItem('earthx-theme');
+            var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = stored ? stored : (systemDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    
     <!-- Primary SEO Metadata -->
     <title>{% block title %}EarthX Designs | Solar Design & Engineering Solutions{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Professional Solar 3D Design, Shadow Analysis, SLDs, BOQs, and Engineering Consultancy for EPC companies, solar developers, and installers worldwide.{% endblock %}">
@@ -39,19 +49,34 @@
                 <img src="/uploads/logo_black.png" alt="EarthX Designs Logo" class="logo-dark">
             </a>
             
-            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <div class="nav-right-actions">
+                <!-- Theme Toggle Button -->
+                <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Dark/Light Mode" title="Toggle Theme">
+                    <i data-lucide="moon" class="theme-icon-moon"></i>
+                    <i data-lucide="sun" class="theme-icon-sun"></i>
+                </button>
+
+                <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
             
             <div class="nav-links" id="nav-links">
+                <div class="mobile-drawer-header">
+                    <span class="mobile-drawer-title">Navigation</span>
+                    <button class="mobile-drawer-close" id="mobile-drawer-close" aria-label="Close menu">
+                        <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                    </button>
+                </div>
                 <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
                 <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
                 <div class="nav-dropdown">
-                    <a href="javascript:void(0)" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
-                        Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
-                    </a>
+                    <button type="button" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
+                        <span>Services</span>
+                        <i data-lucide="chevron-down" class="dropdown-arrow" style="width: 16px; height: 16px; margin-left: 6px; vertical-align: middle;"></i>
+                    </button>
                     <div class="nav-dropdown-menu">
                         <a href="{{ url_for('services') }}">All Services</a>
                         {% for cat in nav_services %}
@@ -66,6 +91,7 @@
             </div>
         </div>
     </nav>
+    <div class="nav-backdrop" id="nav-backdrop"></div>
 
     <!-- Main Content Area -->
     <main>
