@@ -80,15 +80,13 @@
                     <p>Providing high-precision solar design, electrical engineering, shadow analysis, and BOQ preparation support for solar EPC installers and developers globally.</p>
                 </div>
                 
-                <!-- Widget 2: Services -->
+                <!-- Widget 2: Services (Synchronized with Upper Navigation) -->
                 <div class="footer-widget">
                     <h3>Our Services</h3>
                     <ul class="footer-links">
-                        <li><a href="{{ url_for('services') }}">Solar 3D Design & Rendering</a></li>
-                        <li><a href="{{ url_for('services') }}">2D Solar Layout Design</a></li>
-                        <li><a href="{{ url_for('services') }}">Shadow Analysis Modeling</a></li>
-                        <li><a href="{{ url_for('services') }}">Single Line Diagrams (SLD)</a></li>
-                        <li><a href="{{ url_for('services') }}">BOQ & Technical Drawings</a></li>
+                        {% for cat in nav_services %}
+                        <li><a href="{{ url_for('service_category', slug=cat.slug) }}">{{ cat.name }}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
                 
@@ -109,15 +107,15 @@
                     <h3>Get in Touch</h3>
                     <ul class="footer-contact">
                         <li>
-                            <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
-                            <span>sales.earthxd@gmail.com</span>
+                            <i data-lucide="mail"></i>
+                            <a href="mailto:sales.earthxd@gmail.com" style="color: inherit; text-decoration: none;">sales.earthxd@gmail.com</a>
                         </li>
                         <li>
-                            <i data-lucide="phone" style="width: 16px; height: 16px;"></i>
-                            <span>9978841256</span>
+                            <i data-lucide="phone"></i>
+                            <a href="tel:+919978841256" style="color: inherit; text-decoration: none;">+91 9978841256</a>
                         </li>
                         <li>
-                            <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+                            <i data-lucide="map-pin"></i>
                             <span>317, Devashish Business Park, Premchand Nagar Rd, opposite Krishna Complex, Bodakdev, Ahmedabad, Gujarat 380015</span>
                         </li>
                     </ul>
