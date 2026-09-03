@@ -555,25 +555,40 @@
                         <textarea id="svccat-full-desc" name="full_description" rows="3" placeholder="Full descriptive text on the category page..."></textarea>
                     </div>
 
-                    <!-- Category Hero Media Upload & Preview -->
+                    <!-- Pre-Sales / Category Media Upload & Preview -->
                     <div class="admin-form-group" style="background: var(--admin-bg); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--admin-border);">
                         <label style="display: flex; align-items: center; justify-content: space-between;">
-                            <span>Category Banner / Hero Media (Image or Video)</span>
-                            <span style="font-weight: 400; font-size: 0.8rem; color: var(--admin-text-light);">Supports JPG, PNG, WEBP, MP4, WEBM</span>
+                            <span style="font-weight: 600; color: var(--admin-text-dark); display: flex; align-items: center; gap: 6px;">
+                                <i data-lucide="video" style="width: 15px; height: 15px; color: var(--accent);"></i>
+                                Overview Media (Image or Video)
+                            </span>
+                            <span style="font-weight: 400; font-size: 0.8rem; color: var(--admin-text-light);">JPG, PNG, WEBP, MP4, WEBM</span>
                         </label>
+                        <p style="font-size: 0.8rem; color: var(--admin-text-light); margin-top: 4px; margin-bottom: 10px; line-height: 1.4;">
+                            For <strong>Pre Sales Design</strong>, this image or video appears right next to the overview paragraph. You can upload any file, choose a preset, or remove it completely to display text only.
+                        </p>
                         
                         <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
                             <input type="file" id="svccat-media-file" name="hero_image" accept="image/*,video/mp4,video/webm,video/quicktime,video/*">
+                            <input type="hidden" id="svccat-preset-media" name="preset_media" value="">
                             
-                            <div id="svccat-media-preview-container" style="display: none; margin-top: 5px; padding: 10px; background: #FFFFFF; border-radius: 6px; border: 1px solid var(--admin-border); max-width: 320px;">
-                                <!-- Image or Video preview rendered here -->
-                            </div>
-                            
-                            <div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px;">
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-svccat-img" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+                                    <i data-lucide="image" style="width: 13px; height: 13px;"></i>
+                                    <span>Use 3D Render Image</span>
+                                </button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-svccat-vid" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+                                    <i data-lucide="video" style="width: 13px; height: 13px;"></i>
+                                    <span>Use Solar Drone Video</span>
+                                </button>
                                 <button type="button" class="btn-admin btn-admin-danger" id="btn-remove-svccat-media" style="display:none; font-size: 0.78rem; padding: 0.35rem 0.75rem;">
                                     <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i>
-                                    <span>Remove Category Media</span>
+                                    <span>Remove Media</span>
                                 </button>
+                            </div>
+
+                            <div id="svccat-media-preview-container" style="display: none; margin-top: 5px; padding: 10px; background: #FFFFFF; border-radius: 6px; border: 1px solid var(--admin-border); max-width: 320px;">
+                                <!-- Image or Video preview rendered here -->
                             </div>
                         </div>
                     </div>

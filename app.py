@@ -51,9 +51,15 @@ init_db(DATA_DIR)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Serve uploaded files from persistent storage
+# Serve uploaded files from persistent storage (with fallback to default images)
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(file_path):
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    default_path = os.path.join(app.root_path, 'static', 'default_images', filename)
+    if os.path.exists(default_path):
+        return send_from_directory(os.path.join(app.root_path, 'static', 'default_images'), filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 # Login decorator
@@ -965,12 +971,15 @@ def api_service_categories():
             conn.close()
             return jsonify({'error': 'Name and slug are required.'}), 400
             
+        preset_media = data.get('preset_media', '').strip()
         hero_image = ''
         file = request.files.get('hero_image') if hasattr(request, 'files') else None
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             hero_image = f"/uploads/{filename}"
+        elif preset_media:
+            hero_image = preset_media
             
         max_order = conn.execute('SELECT MAX(display_order) FROM service_categories').fetchone()[0]
         display_order = (max_order or 0) + 1
@@ -1036,12 +1045,15 @@ def api_service_category_detail(cat_id):
             conn.close()
             return jsonify({'error': 'Category not found'}), 404
             
+        preset_media = data.get('preset_media', '').strip()
         hero_image = '' if remove_hero_image else cat['hero_image']
         file = request.files.get('hero_image') if hasattr(request, 'files') else None
         if file and file.filename != '' and allowed_file(file.filename):
             filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             hero_image = f"/uploads/{filename}"
+        elif preset_media and not remove_hero_image:
+            hero_image = preset_media
             
         try:
             conn.execute('''

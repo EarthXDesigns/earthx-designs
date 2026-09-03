@@ -349,15 +349,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Media preview handler for Service Category
     const svccatMediaFileInput = document.getElementById('svccat-media-file');
+    const svccatPresetMediaInput = document.getElementById('svccat-preset-media');
     const svccatPreviewContainer = document.getElementById('svccat-media-preview-container');
     const svccatRemoveBtn = document.getElementById('btn-remove-svccat-media');
     const svccatRemoveFlag = document.getElementById('svccat-remove-hero-image');
+    const btnPresetSvccatImg = document.getElementById('btn-preset-svccat-img');
+    const btnPresetSvccatVid = document.getElementById('btn-preset-svccat-vid');
 
     if (svccatMediaFileInput && svccatPreviewContainer) {
         svccatMediaFileInput.addEventListener('change', () => {
             const file = svccatMediaFileInput.files[0];
             if (file) {
                 svccatRemoveFlag.value = '0';
+                if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
                 const fileUrl = URL.createObjectURL(file);
                 if (file.type.startsWith('video/')) {
                     svccatPreviewContainer.innerHTML = `
@@ -377,9 +381,40 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (btnPresetSvccatImg) {
+        btnPresetSvccatImg.addEventListener('click', () => {
+            if (svccatMediaFileInput) svccatMediaFileInput.value = '';
+            if (svccatPresetMediaInput) svccatPresetMediaInput.value = '/uploads/residential_3d_featured.png';
+            svccatRemoveFlag.value = '0';
+            svccatPreviewContainer.innerHTML = `
+                <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Preset Image Selected:</div>
+                <img src="/uploads/residential_3d_featured.png" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
+            `;
+            svccatPreviewContainer.style.display = 'block';
+            if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
+            initIcons();
+        });
+    }
+
+    if (btnPresetSvccatVid) {
+        btnPresetSvccatVid.addEventListener('click', () => {
+            if (svccatMediaFileInput) svccatMediaFileInput.value = '';
+            if (svccatPresetMediaInput) svccatPresetMediaInput.value = '/uploads/hero_video.mp4';
+            svccatRemoveFlag.value = '0';
+            svccatPreviewContainer.innerHTML = `
+                <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Preset Video Selected:</div>
+                <video src="/uploads/hero_video.mp4" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
+            `;
+            svccatPreviewContainer.style.display = 'block';
+            if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'inline-flex';
+            initIcons();
+        });
+    }
+
     if (svccatRemoveBtn) {
         svccatRemoveBtn.addEventListener('click', () => {
-            svccatMediaFileInput.value = '';
+            if (svccatMediaFileInput) svccatMediaFileInput.value = '';
+            if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
             svccatPreviewContainer.innerHTML = '';
             svccatPreviewContainer.style.display = 'none';
             svccatRemoveBtn.style.display = 'none';
@@ -393,6 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('service-category-form').reset();
             document.getElementById('svccat-id').value = '';
             svccatRemoveFlag.value = '0';
+            if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
             svccatPreviewContainer.innerHTML = '';
             svccatPreviewContainer.style.display = 'none';
             if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'none';
@@ -418,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('svccat-short-desc').value = cat.short_description || '';
             document.getElementById('svccat-full-desc').value = cat.full_description || '';
             svccatRemoveFlag.value = '0';
+            if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
 
             if (cat.hero_image) {
                 if (isVideoFile(cat.hero_image)) {

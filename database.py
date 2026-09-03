@@ -228,6 +228,7 @@ def init_db(data_dir=None):
                 'icon': 'presentation',
                 'hero_heading': 'Pre Sales Design',
                 'hero_subtitle': 'Professional solar design support for EPC companies during the pre-sales stage. Win more projects with compelling visualizations and precise layouts.',
+                'hero_image': '/uploads/residential_3d_featured.png',
                 'display_order': 1
             },
             {
@@ -304,9 +305,9 @@ def init_db(data_dir=None):
         
         for cat in service_cats:
             cursor.execute("""
-                INSERT INTO service_categories (name, slug, short_description, full_description, icon, hero_heading, hero_subtitle, display_order)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (cat['name'], cat['slug'], cat['short_description'], cat['full_description'], cat['icon'], cat['hero_heading'], cat['hero_subtitle'], cat['display_order']))
+                INSERT INTO service_categories (name, slug, short_description, full_description, icon, hero_heading, hero_subtitle, display_order, hero_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (cat['name'], cat['slug'], cat['short_description'], cat['full_description'], cat['icon'], cat['hero_heading'], cat['hero_subtitle'], cat['display_order'], cat.get('hero_image', '')))
         
         print("Service categories seeded.")
         

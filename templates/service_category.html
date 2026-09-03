@@ -17,22 +17,62 @@
 <!-- Description & Services Detail Section -->
 <section class="section-padding" style="padding-top: 3.5rem;">
     <div class="container">
-        {% if category.hero_image %}
-        <div class="category-hero-media" style="margin: 0 auto 3rem auto; max-width: 960px; border-radius: var(--radius-md); overflow: hidden; max-height: 400px; box-shadow: var(--shadow-md); background: #0F172A;">
-            {% if category.hero_image.endswith('.mp4') or category.hero_image.endswith('.webm') or category.hero_image.endswith('.mov') or category.hero_image.endswith('.ogg') %}
-            <video autoplay loop muted playsinline style="width: 100%; height: 100%; max-height: 400px; object-fit: cover; display: block;">
-                <source src="{{ category.hero_image }}" type="video/mp4">
-            </video>
-            {% else %}
-            <img src="{{ category.hero_image }}" alt="{{ category.name }}" style="width: 100%; height: 100%; max-height: 400px; object-fit: cover; display: block;">
-            {% endif %}
-        </div>
-        {% endif %}
-
+        <!-- Service Overview & Media Section -->
         {% if category.full_description %}
-        <div class="service-category-description" style="margin: 0 auto 4rem auto; max-width: 900px;">
-            <p style="text-align: justify; font-size: 1.15rem; line-height: 1.8; color: var(--text-dark);">{{ category.full_description }}</p>
-        </div>
+            {% if category.slug == 'pre-sales-design' and category.hero_image %}
+            <!-- Pre-Sales Design with Media (Side-by-Side) -->
+            <div class="service-overview-showcase has-media">
+                <div class="overview-content-col">
+                    <div class="overview-header-tag">
+                        <i data-lucide="sparkles"></i>
+                        <span>Service Overview & Engineering Scope</span>
+                    </div>
+                    <h2 class="overview-title">{{ category.hero_heading or category.name }}</h2>
+                    <p class="overview-text">{{ category.full_description }}</p>
+                    <div class="overview-pills">
+                        <span class="overview-pill"><i data-lucide="box"></i> Photorealistic 3D Visuals</span>
+                        <span class="overview-pill"><i data-lucide="layout"></i> Precise 2D GA Layouts</span>
+                        <span class="overview-pill"><i data-lucide="trending-up"></i> Higher Pitch Conversion</span>
+                        <span class="overview-pill"><i data-lucide="shield-check"></i> EPC Ready Standards</span>
+                    </div>
+                </div>
+                <div class="overview-media-col">
+                    <div class="overview-media-card">
+                        {% if category.hero_image.endswith('.mp4') or category.hero_image.endswith('.webm') or category.hero_image.endswith('.mov') or category.hero_image.endswith('.ogg') %}
+                        <video autoplay loop muted playsinline controls class="overview-media-video">
+                            <source src="{{ category.hero_image }}" type="video/mp4">
+                        </video>
+                        <div class="media-type-badge">
+                            <i data-lucide="video"></i> Pre-Sales 3D Video
+                        </div>
+                        {% else %}
+                        <img src="{{ category.hero_image }}" alt="{{ category.name }} Visualization" class="overview-media-img" loading="lazy">
+                        <div class="media-type-badge">
+                            <i data-lucide="image"></i> 3D Visualization Preview
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- All Other Services or Pre-Sales without media -->
+            <div class="service-overview-showcase full-width">
+                <div class="overview-content-col">
+                    <div class="overview-header-tag">
+                        <i data-lucide="sparkles"></i>
+                        <span>Service Overview & Engineering Scope</span>
+                    </div>
+                    <h2 class="overview-title">{{ category.hero_heading or category.name }}</h2>
+                    <p class="overview-text">{{ category.full_description }}</p>
+                    <div class="overview-pills">
+                        <span class="overview-pill"><i data-lucide="shield-check"></i> Standard Compliant</span>
+                        <span class="overview-pill"><i data-lucide="zap"></i> Rapid Turnaround</span>
+                        <span class="overview-pill"><i data-lucide="award"></i> Certified Engineering</span>
+                        <span class="overview-pill"><i data-lucide="check-circle-2"></i> Client-Ready Deliverables</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         {% endif %}
         
         <div class="services-grid grid {% if services|length is divisibleby 2 %}grid-2-forced{% else %}grid-3{% endif %}">
