@@ -61,6 +61,12 @@
                         <span>Contact Leads</span>
                     </a>
                 </li>
+                <li class="sidebar-item" data-target="client-logos-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="award" style="width: 18px; height: 18px;"></i>
+                        <span>Client Logos</span>
+                    </a>
+                </li>
                 {% if session.get('user_role') == 'super_admin' %}
                 <li class="sidebar-item" data-target="users-tab">
                     <a href="javascript:void(0)">
@@ -342,8 +348,43 @@
                         </div>
                     </div>
                 </section>
+                
+                <!-- 6. CLIENT LOGOS TAB -->
+                <section class="tab-panel" id="client-logos-tab" style="display:none;">
+                    <div class="admin-card-table">
+                        <div class="table-header">
+                            <div>
+                                <h2>Our Client & Partner Logos</h2>
+                                <p style="font-size:0.85rem; color:var(--admin-text-light); margin-top:2px;">
+                                    Logos automatically scroll horizontally on the home page. Add, edit, or remove client logos anytime.
+                                </p>
+                            </div>
+                            <button class="btn-admin btn-admin-primary" id="btn-add-client-logo">
+                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                <span>Add Client Logo</span>
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 120px;">Logo Preview</th>
+                                        <th>Company / Client Name</th>
+                                        <th>Website URL</th>
+                                        <th>Order</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="client-logos-table-body">
+                                    <!-- Rendered dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
-                <!-- 6. USERS TAB -->
+                <!-- 7. USERS TAB -->
                 {% if session.get('user_role') == 'super_admin' %}
                 <section class="tab-panel" id="users-tab">
                     <div class="admin-card-table">
@@ -920,6 +961,65 @@
         </div>
     </div>
 
+
+    <!-- Client Logo Modal -->
+    <div class="modal" id="client-logo-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="client-logo-modal-title">Add Client Logo</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="client-logo-form">
+                <div class="modal-body">
+                    <input type="hidden" id="client-logo-id" name="id">
+                    <input type="hidden" id="client-logo-preset" name="preset_image" value="">
+                    
+                    <div class="admin-form-group">
+                        <label for="client-logo-name">Company / Client Name *</label>
+                        <input type="text" id="client-logo-name" name="name" required placeholder="e.g. Apex Solar EPC">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="client-logo-url">Website Link (Optional)</label>
+                        <input type="url" id="client-logo-url" name="website_url" placeholder="https://company.com">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="client-logo-status">Display Status</label>
+                        <select id="client-logo-status" name="is_published">
+                            <option value="1">Published (Visible in Auto-Scroll Marquee)</option>
+                            <option value="0">Hidden / Draft</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Client Logo Image * (Upload transparent SVG, PNG, WEBP, or select preset)</label>
+                        <input type="file" id="client-logo-file" name="image" accept="image/*">
+                        
+                        <div style="margin-top: 8px;">
+                            <span style="font-size: 0.76rem; color: var(--admin-text-light); font-weight: 600;">Or pick a preset solar brand badge:</span>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px;">
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-logo-apex" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Apex Solar</button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-logo-sunpeak" style="font-size:0.75rem; padding:0.25rem 0.6rem;">SunPeak</button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-logo-nexus" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Nexus Power</button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-logo-solaria" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Solaria</button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-logo-voltix" style="font-size:0.75rem; padding:0.25rem 0.6rem;">Voltix</button>
+                                <button type="button" class="btn-admin btn-admin-secondary" id="btn-preset-logo-terrawatt" style="font-size:0.75rem; padding:0.25rem 0.6rem;">TerraWatt</button>
+                            </div>
+                        </div>
+
+                        <div id="client-logo-preview" style="display:none; margin-top:12px; padding:12px; background:#F8FAFC; border:1px solid var(--admin-border); border-radius:8px; text-align:center; max-width:240px;">
+                            <!-- Preview rendered here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="submit" class="btn-admin btn-admin-primary">Save Client Logo</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- User Modal -->
     {% if session.get('user_role') == 'super_admin' %}

@@ -115,3 +115,13 @@ CREATE TABLE IF NOT EXISTS services (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(category_id) REFERENCES service_categories(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS client_logos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    image TEXT NOT NULL,
+    website_url TEXT DEFAULT '',
+    display_order INTEGER DEFAULT 0,
+    is_published INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

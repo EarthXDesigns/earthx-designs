@@ -532,6 +532,21 @@ def init_db(data_dir=None):
         
         print("Services seeded.")
         
+        # 5. Seed Client Logos
+        client_logos = [
+            ('Apex Solar EPC', '/uploads/client_apex_solar.svg', '', 1, 1),
+            ('SunPeak Energy', '/uploads/client_sunpeak.svg', '', 2, 1),
+            ('Nexus Power EPC', '/uploads/client_nexus_power.svg', '', 3, 1),
+            ('Solaria Global', '/uploads/client_solaria.svg', '', 4, 1),
+            ('Voltix Renewables', '/uploads/client_voltix.svg', '', 5, 1),
+            ('TerraWatt Engineering', '/uploads/client_terrawatt.svg', '', 6, 1)
+        ]
+        cursor.executemany("""
+            INSERT INTO client_logos (name, image, website_url, display_order, is_published)
+            VALUES (?, ?, ?, ?, ?)
+        """, client_logos)
+        print("Client logos seeded.")
+        
         conn.commit()
     conn.close()
 

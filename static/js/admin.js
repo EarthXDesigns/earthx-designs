@@ -60,6 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'leads-tab':
                 fetchLeads();
                 break;
+            case 'client-logos-tab':
+                fetchClientLogos();
+                break;
             case 'users-tab':
                 fetchUsers();
                 break;
@@ -1549,6 +1552,178 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ==========================================
+    // 10. CLIENT LOGOS MANAGEMENT
+    // ==========================================
+    const fetchClientLogos = async () => {
+        try {
+            const res = await fetch('/api/client-logos');
+            const data = await res.json();
+            const tbody = document.getElementById('client-logos-table-body');
+            if (tbody) {
+                tbody.innerHTML = '';
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--admin-text-light); padding:2rem;">No client logos found. Click "Add Client Logo" to add your first partner logo.</td></tr>';
+                } else {
+                    data.forEach(logo => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>
+                                <div style="width:96px; height:44px; background:#F8FAFC; border:1px solid var(--admin-border); border-radius:6px; display:flex; align-items:center; justify-content:center; padding:4px;">
+                                    <img src="${logo.image}" alt="${logo.name}" style="max-width:100%; max-height:36px; object-fit:contain;">
+                                </div>
+                            </td>
+                            <td><strong>${logo.name}</strong></td>
+                            <td>${logo.website_url ? `<a href="${logo.website_url}" target="_blank" style="color:var(--accent);">${logo.website_url}</a>` : '<span style="color:var(--admin-text-light);">-</span>'}</td>
+                            <td><span class="badge badge-info">${logo.display_order || 0}</span></td>
+                            <td><span class="badge ${logo.is_published ? 'badge-success' : 'badge-warning'}">${logo.is_published ? 'Published' : 'Hidden'}</span></td>
+                            <td>
+                                <div class="btn-action-group">
+                                    <button class="btn-action edit" onclick="editClientLogo(${logo.id})" title="Edit">
+                                        <i data-lucide="edit-3" style="width:14px; height:14px;"></i>
+                                    </button>
+                                    <button class="btn-action delete" onclick="deleteClientLogo(${logo.id})" title="Delete">
+                                        <i data-lucide="trash-2" style="width:14px; height:14px;"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+                initIcons();
+            }
+        } catch (err) {
+            console.error('Error fetching client logos:', err);
+        }
+    };
+
+    window.editClientLogo = async (id) => {
+        try {
+            const res = await fetch(`/api/client-logos/${id}`);
+            const logo = await res.json();
+            if (!res.ok) return alert(logo.error || 'Failed to fetch logo');
+
+            document.getElementById('client-logo-form').reset();
+            document.getElementById('client-logo-id').value = logo.id;
+            document.getElementById('client-logo-name').value = logo.name;
+            document.getElementById('client-logo-url').value = logo.website_url || '';
+            document.getElementById('client-logo-status').value = String(logo.is_published);
+            document.getElementById('client-logo-preset').value = '';
+            
+            const preview = document.getElementById('client-logo-preview');
+            if (preview && logo.image) {
+                preview.innerHTML = `<div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Logo:</div><img src="${logo.image}" style="max-width:100%; max-height:45px; object-fit:contain;">`;
+                preview.style.display = 'block';
+            }
+            document.getElementById('client-logo-modal-title').textContent = `Edit Logo: ${logo.name}`;
+            openModal('client-logo-modal');
+            initIcons();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    window.deleteClientLogo = async (id) => {
+        if (confirm('Delete this client logo from the auto-scroll marquee?')) {
+            try {
+                const res = await fetch(`/api/client-logos/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (res.ok) {
+                    fetchClientLogos();
+                } else {
+                    alert(data.error || 'Failed to delete client logo.');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    };
+
+    const btnAddClientLogo = document.getElementById('btn-add-client-logo');
+    if (btnAddClientLogo) {
+        btnAddClientLogo.addEventListener('click', () => {
+            document.getElementById('client-logo-form').reset();
+            document.getElementById('client-logo-id').value = '';
+            document.getElementById('client-logo-preset').value = '';
+            const preview = document.getElementById('client-logo-preview');
+            if (preview) {
+                preview.innerHTML = '';
+                preview.style.display = 'none';
+            }
+            document.getElementById('client-logo-modal-title').textContent = 'Add Client Logo';
+            openModal('client-logo-modal');
+        });
+    }
+
+    const setLogoPreset = (btnId, imgPath, defaultName) => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const fileInput = document.getElementById('client-logo-file');
+                if (fileInput) fileInput.value = '';
+                document.getElementById('client-logo-preset').value = imgPath;
+                if (!document.getElementById('client-logo-name').value) {
+                    document.getElementById('client-logo-name').value = defaultName;
+                }
+                const preview = document.getElementById('client-logo-preview');
+                if (preview) {
+                    preview.innerHTML = `<div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Preset Selected:</div><img src="${imgPath}" style="max-width:100%; max-height:45px; object-fit:contain;">`;
+                    preview.style.display = 'block';
+                }
+            });
+        }
+    };
+
+    setLogoPreset('btn-preset-logo-apex', '/uploads/client_apex_solar.svg', 'Apex Solar EPC');
+    setLogoPreset('btn-preset-logo-sunpeak', '/uploads/client_sunpeak.svg', 'SunPeak Energy');
+    setLogoPreset('btn-preset-logo-nexus', '/uploads/client_nexus_power.svg', 'Nexus Power EPC');
+    setLogoPreset('btn-preset-logo-solaria', '/uploads/client_solaria.svg', 'Solaria Global');
+    setLogoPreset('btn-preset-logo-voltix', '/uploads/client_voltix.svg', 'Voltix Renewables');
+    setLogoPreset('btn-preset-logo-terrawatt', '/uploads/client_terrawatt.svg', 'TerraWatt Engineering');
+
+    const clientLogoFileInput = document.getElementById('client-logo-file');
+    if (clientLogoFileInput) {
+        clientLogoFileInput.addEventListener('change', () => {
+            const file = clientLogoFileInput.files[0];
+            if (file) {
+                document.getElementById('client-logo-preset').value = '';
+                const fileUrl = URL.createObjectURL(file);
+                const preview = document.getElementById('client-logo-preview');
+                if (preview) {
+                    preview.innerHTML = `<div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Uploaded Preview:</div><img src="${fileUrl}" style="max-width:100%; max-height:45px; object-fit:contain;">`;
+                    preview.style.display = 'block';
+                }
+            }
+        });
+    }
+
+    const clientLogoForm = document.getElementById('client-logo-form');
+    if (clientLogoForm) {
+        clientLogoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('client-logo-id').value;
+            const formData = new FormData(clientLogoForm);
+            const url = id ? `/api/client-logos/${id}` : '/api/client-logos';
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    closeModal('client-logo-modal');
+                    fetchClientLogos();
+                } else {
+                    alert(result.error || 'Failed to save client logo.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Network or server error while saving client logo.');
+            }
+        });
+    }
 
     // --- INITIAL DATA LOAD ---
     // Default load is projects

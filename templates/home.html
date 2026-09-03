@@ -45,37 +45,62 @@
     </div>
 </section>
 
-<!-- About Section -->
+<!-- About Section (Who We Are) -->
 <section class="section-padding bg-light-sec">
     <div class="container">
         <div class="about-home-grid grid grid-2">
             <div class="about-home-text">
-                <span class="section-tag">Who We Are</span>
-                <h2>Complete Design & Engineering Support for Solar Professionals</h2>
-                <p>EarthX Designs is a premium solar engineering consultancy providing complete technical design and drafting support for EPC companies, solar developers, and contractors worldwide.</p>
-                <p>Our core mission is to streamline pre-construction processes by delivering error-free blueprints, precise electrical designs, and comprehensive documentation that satisfy municipal permit departments and electrical inspectors on the first attempt.</p>
+                <div class="who-we-are-pill">
+                    <span class="pill-dot"></span>
+                    <span>Who We Are</span>
+                </div>
+                <h2 class="who-we-are-title">Complete Design & Engineering Support for Solar Professionals</h2>
+                
+                <p class="who-lead-paragraph">
+                    <strong>EarthX Designs</strong> is a premier solar engineering consultancy providing complete technical design, layout drafting, and electrical schematics support for EPC companies, solar developers, and contractors worldwide.
+                </p>
+                
+                <p class="who-body-paragraph">
+                    Our core mission is to streamline pre-construction processes by delivering 100% error-free blueprints, precise electrical designs, and comprehensive documentation that satisfy municipal permit departments and electrical inspectors on the first attempt.
+                </p>
                 
                 <div class="about-features">
                     <div class="feature-box">
-                        <div class="feature-icon-wrapper">✓</div>
+                        <div class="feature-icon-wrapper">
+                            <i data-lucide="award" style="width: 20px; height: 20px;"></i>
+                        </div>
                         <div>
                             <h4>PE Stamp Ready</h4>
-                            <p>Designs compliant with NEC and local standards.</p>
+                            <p>Designs fully compliant with NEC, IEC, and local codes.</p>
                         </div>
                     </div>
                     <div class="feature-box">
-                        <div class="feature-icon-wrapper">✓</div>
+                        <div class="feature-icon-wrapper">
+                            <i data-lucide="zap" style="width: 20px; height: 20px;"></i>
+                        </div>
                         <div>
                             <h4>Optimized Layouts</h4>
-                            <p>Maximizing density and annual generation.</p>
+                            <p>Maximizing panel density and annual energy generation.</p>
                         </div>
                     </div>
                 </div>
                 
-                <a href="{{ url_for('about') }}" class="btn btn-outline" style="margin-top: 2rem;">Learn More About Us</a>
+                <a href="{{ url_for('about') }}" class="btn btn-primary who-we-are-btn">
+                    <span>Learn More About Us</span>
+                    <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                </a>
             </div>
+            
             <div class="about-home-image">
-                <img src="/uploads/commercial_solar_featured.png" alt="Commercial Solar Installation Engineering">
+                <div class="img-wrapper">
+                    <img src="/uploads/commercial_solar_featured.png" alt="Commercial Solar Installation Engineering" loading="lazy">
+                </div>
+                <div class="about-image-badge">
+                    <div class="badge-stat">100MW+</div>
+                    <div class="badge-text">
+                        High-Precision Solar<br>Capacity Engineered
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -282,6 +307,45 @@
         </div>
     </div>
 </section>
+
+<!-- Client Logos Auto-Scroll Marquee Section -->
+{% if client_logos %}
+<section class="client-logos-section">
+    <div class="container">
+        <div class="logos-header text-center">
+            <span class="section-tag">Trusted Worldwide</span>
+            <h3 class="logos-heading">Trusted by Leading Solar EPC Contractors & Developers</h3>
+        </div>
+    </div>
+    <div class="logos-marquee-wrapper">
+        <div class="logos-marquee-track">
+            {% for logo in client_logos %}
+            <div class="marquee-logo-card">
+                {% if logo.website_url %}
+                <a href="{{ logo.website_url }}" target="_blank" rel="noopener" title="{{ logo.name }}">
+                    <img src="{{ logo.image }}" alt="{{ logo.name }}" loading="lazy">
+                </a>
+                {% else %}
+                <img src="{{ logo.image }}" alt="{{ logo.name }}" title="{{ logo.name }}" loading="lazy">
+                {% endif %}
+            </div>
+            {% endfor %}
+            <!-- Duplicate set for seamless continuous loop -->
+            {% for logo in client_logos %}
+            <div class="marquee-logo-card">
+                {% if logo.website_url %}
+                <a href="{{ logo.website_url }}" target="_blank" rel="noopener" title="{{ logo.name }}">
+                    <img src="{{ logo.image }}" alt="{{ logo.name }}" loading="lazy">
+                </a>
+                {% else %}
+                <img src="{{ logo.image }}" alt="{{ logo.name }}" title="{{ logo.name }}" loading="lazy">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
 
 <!-- Contact CTA Section -->
 <section class="section-padding cta-section">

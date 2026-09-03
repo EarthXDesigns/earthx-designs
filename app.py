@@ -162,8 +162,11 @@ def home():
     # Blog posts
     blogs = conn.execute("SELECT * FROM blog_posts WHERE status = 'published' ORDER BY created_at DESC LIMIT 3").fetchall()
     
+    # Client logos for auto-scroll marquee
+    client_logos = conn.execute("SELECT * FROM client_logos WHERE is_published = 1 ORDER BY display_order ASC, id ASC").fetchall()
+    
     conn.close()
-    return render_template('home.html', projects=projects, testimonials=testimonials, blogs=blogs)
+    return render_template('home.html', projects=projects, testimonials=testimonials, blogs=blogs, client_logos=client_logos)
 
 @app.route('/about')
 def about():
@@ -1403,7 +1406,108 @@ def api_change_password():
     conn.execute('UPDATE users SET password = ? WHERE id = ?', (hashed, session['user_id']))
     conn.commit()
     conn.close()
-    return jsonify({'message': 'Password changed successfully'})
+# 9. CLIENT LOGOS MANAGEMENT API
+@app.route('/api/client-logos', methods=['GET', 'POST'])
+@login_required
+def api_client_logos():
+    conn = get_db_connection()
+    if request.method == 'GET':
+        logos = conn.execute('SELECT * FROM client_logos ORDER BY display_order ASC, id DESC').fetchall()
+        result = [dict(row) for row in logos]
+        conn.close()
+        return jsonify(result)
+        
+    elif request.method == 'POST':
+        data = request.form if request.form else request.json
+        if not data:
+            data = {}
+            
+        name = data.get('name', '').strip()
+        website_url = data.get('website_url', '').strip()
+        is_published = int(data.get('is_published', 1))
+        
+        if not name:
+            conn.close()
+            return jsonify({'error': 'Client/Partner name is required.'}), 400
+            
+        image = ''
+        file = request.files.get('image') if hasattr(request, 'files') else None
+        if file and file.filename != '' and allowed_file(file.filename):
+            filename = secure_filename(f"client_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            image = f"/uploads/{filename}"
+        elif data.get('preset_image'):
+            image = data.get('preset_image').strip()
+            
+        if not image:
+            conn.close()
+            return jsonify({'error': 'Logo image is required.'}), 400
+            
+        max_order = conn.execute('SELECT MAX(display_order) FROM client_logos').fetchone()[0]
+        display_order = (max_order or 0) + 1
+        
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO client_logos (name, image, website_url, display_order, is_published)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (name, image, website_url, display_order, is_published))
+        conn.commit()
+        new_id = cursor.lastrowid
+        conn.close()
+        return jsonify({'message': 'Client logo added successfully', 'id': new_id}), 201
+
+@app.route('/api/client-logos/<int:logo_id>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@login_required
+def api_client_logo_detail(logo_id):
+    conn = get_db_connection()
+    if request.method == 'GET':
+        logo = conn.execute('SELECT * FROM client_logos WHERE id = ?', (logo_id,)).fetchone()
+        conn.close()
+        if not logo:
+            return jsonify({'error': 'Client logo not found'}), 404
+        return jsonify(dict(logo))
+        
+    elif request.method in ['POST', 'PUT']:
+        data = request.form if request.form else request.json
+        if not data:
+            data = {}
+            
+        name = data.get('name', '').strip()
+        website_url = data.get('website_url', '').strip()
+        is_published = int(data.get('is_published', 1))
+        
+        if not name:
+            conn.close()
+            return jsonify({'error': 'Client/Partner name is required.'}), 400
+            
+        logo = conn.execute('SELECT image FROM client_logos WHERE id = ?', (logo_id,)).fetchone()
+        if not logo:
+            conn.close()
+            return jsonify({'error': 'Client logo not found'}), 404
+            
+        image = logo['image']
+        file = request.files.get('image') if hasattr(request, 'files') else None
+        if file and file.filename != '' and allowed_file(file.filename):
+            filename = secure_filename(f"client_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            image = f"/uploads/{filename}"
+        elif data.get('preset_image'):
+            image = data.get('preset_image').strip()
+            
+        conn.execute('''
+            UPDATE client_logos SET
+                name = ?, image = ?, website_url = ?, is_published = ?
+            WHERE id = ?
+        ''', (name, image, website_url, is_published, logo_id))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Client logo updated successfully'})
+        
+    elif request.method == 'DELETE':
+        conn.execute('DELETE FROM client_logos WHERE id = ?', (logo_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Client logo deleted successfully'})
 
 # Main entrypoint setup
 if __name__ == '__main__':
