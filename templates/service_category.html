@@ -3,11 +3,11 @@
 {% block title %}{{ category.name }} Services | EarthX Designs{% endblock %}
 
 {% block content %}
-<!-- Page Hero Banner (Configurable background image behind text with dark-green overlay) -->
-<section class="service-page-hero" style="background-image: linear-gradient(135deg, rgba(7, 24, 18, 0.88) 0%, rgba(11, 28, 38, 0.90) 100%), url('{{ category.hero_bg_image or category.hero_image or "/uploads/commercial_solar_featured.png" }}');">
+<!-- Page Hero Banner (Deep Midnight Navy with Warm Gold accents) -->
+<section class="service-page-hero" style="background-image: linear-gradient(135deg, rgba(6, 16, 30, 0.92) 0%, rgba(10, 25, 47, 0.88) 100%), url('{{ category.hero_bg_image or category.hero_image or "/uploads/commercial_solar_featured.png" }}');">
     <div class="container">
         <div class="service-hero-main">
-            <!-- Upper Path / Breadcrumbs -->
+            <!-- Breadcrumbs Navigation -->
             <nav class="service-breadcrumbs" aria-label="Breadcrumb">
                 <a href="{{ url_for('home') }}">HOME</a>
                 <span class="bc-sep">/</span>
@@ -21,36 +21,80 @@
 
             <!-- Hero Action Button -->
             <div class="service-hero-actions">
-                <a href="{{ url_for('contact') }}" class="btn-hero-consultation">Request a Consultation</a>
+                <a href="{{ url_for('contact') }}" class="btn-hero-consultation">
+                    <span>Request a Consultation</span>
+                    <i data-lucide="arrow-right" style="width: 18px; height: 18px; margin-left: 6px;"></i>
+                </a>
+                <a href="tel:+919978841256" class="btn btn-white-outline" style="font-size: 0.95rem;">
+                    <i data-lucide="phone" style="width: 16px; height: 16px;"></i>
+                    <span>+91 9978841256</span>
+                </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Basic Intro & Detailed Overview Section -->
-<section class="section-padding service-overview-section" style="padding-top: 4rem; padding-bottom: 4rem;">
+<!-- Main Consultancy Layout (Two Columns inspired by Jupisol) -->
+<section class="section-padding" style="padding-top: 4.5rem; padding-bottom: 5.5rem;">
     <div class="container">
-        <div class="service-detail-grid {% if category.hero_image %}has-hero-media{% else %}no-hero-media{% endif %}">
-            <!-- Left Column: Detailed Content -->
-            <div class="service-detail-content">
-                <div class="service-subtag">
-                    <span class="subtag-accent">•</span> {{ category.name|upper }}
-                </div>
-                <h2 class="service-intro-heading">Engineering & Design Overview</h2>
+        <div class="service-consultancy-layout">
+            
+            <!-- LEFT COLUMN: Sticky Sidebar -->
+            <aside class="consultancy-sidebar">
                 
-                <div class="service-body-paragraphs">
-                    <p class="service-body-p">{{ category.full_description }}</p>
+                <!-- Services Navigation Menu -->
+                <div class="sidebar-nav-card">
+                    <div class="sidebar-nav-header">
+                        <h3 class="sidebar-nav-title">
+                            <i data-lucide="layers" style="color: var(--accent); width: 18px; height: 18px;"></i>
+                            <span>Our Services</span>
+                        </h3>
+                    </div>
+                    <ul class="sidebar-nav-list">
+                        {% for cat in nav_services %}
+                        <li class="sidebar-nav-item {% if cat.slug == category.slug %}active{% endif %}">
+                            <a href="{{ url_for('service_category', slug=cat.slug) }}">
+                                <span>{{ cat.name }}</span>
+                                <i data-lucide="chevron-right" class="sidebar-nav-arrow" style="width: 16px; height: 16px;"></i>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
 
-                <!-- Get a Free Quote Button (Below Detailed Content) -->
-                <div class="service-cta-btn-wrapper">
-                    <a href="{{ url_for('contact') }}" class="btn btn-primary" style="padding: 0.75rem 1.8rem;">Get a Free Quote</a>
+                <!-- "Get Professional Help" CTA Box (Jupisol Style) -->
+                <div class="sidebar-help-card">
+                    <div class="sidebar-help-icon">
+                        <i data-lucide="phone-call" style="width: 26px; height: 26px;"></i>
+                    </div>
+                    <h3>Get Professional Help</h3>
+                    <p>Consult with our lead solar engineers for custom sizing, single line diagrams, or feasibility studies.</p>
+                    <a href="tel:+919978841256" class="sidebar-help-phone">+91 9978841256</a>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 0.5rem;">
+                        <a href="https://wa.me/919978841256?text=Hello%20EarthX%20Designs%2C%20I%20would%20like%20a%20quote%20for%20{{ category.name }}%20services." 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="sidebar-help-btn">
+                            <i data-lucide="message-circle" style="width: 18px; height: 18px;"></i>
+                            <span>Chat on WhatsApp</span>
+                        </a>
+                        <a href="mailto:sales.earthxd@gmail.com" 
+                           class="btn btn-outline" 
+                           style="border-color: rgba(255, 255, 255, 0.25); color: #FFFFFF; font-size: 0.85rem; padding: 0.65rem 1rem; width: 100%;">
+                            <i data-lucide="mail" style="width: 15px; height: 15px;"></i>
+                            <span>sales.earthxd@gmail.com</span>
+                        </a>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Right Column: Hero Media (Image or Video) -->
-            {% if category.hero_image %}
-            <div class="service-detail-media">
+            </aside>
+
+            <!-- RIGHT COLUMN: Main Content & Engineering Details -->
+            <div class="service-main-content">
+                
+                <!-- Hero Media Preview (Image or Video) -->
+                {% if category.hero_image %}
                 <div class="service-media-frame">
                     {% if category.hero_image.endswith('.mp4') or category.hero_image.endswith('.webm') or category.hero_image.endswith('.mov') or category.hero_image.endswith('.ogg') %}
                     <video autoplay loop muted playsinline controls class="service-hero-video">
@@ -60,49 +104,142 @@
                     <img src="{{ category.hero_image }}" alt="{{ category.name }}" class="service-hero-img" loading="lazy">
                     {% endif %}
                 </div>
-            </div>
-            {% endif %}
-        </div>
-        
-        <div class="services-grid grid {% if services|length is divisibleby 2 %}grid-2-forced{% else %}grid-3{% endif %}">
-            {% for service in services %}
-            <div class="service-card" style="display:flex; flex-direction:column;">
-                {% if service.image %}
-                <div class="service-card-media" style="margin: -2.2rem -2.2rem 1.5rem -2.2rem; overflow: hidden; border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); background: #0F172A; position: relative;">
-                    {% if service.image.endswith('.mp4') or service.image.endswith('.webm') or service.image.endswith('.mov') or service.image.endswith('.ogg') %}
-                    <video autoplay loop muted playsinline class="service-media-video" style="width: 100%; height: 210px; object-fit: cover; display: block;">
-                        <source src="{{ service.image }}" type="video/mp4">
-                    </video>
-                    {% else %}
-                    <img src="{{ service.image }}" alt="{{ service.name }}" class="service-media-img" style="width: 100%; height: 210px; object-fit: cover; display: block;" loading="lazy">
-                    {% endif %}
+                {% endif %}
+
+                <!-- Detailed Overview -->
+                <div class="service-detail-text">
+                    <div class="service-subtag">
+                        <span class="subtag-accent">•</span> {{ category.name|upper }}
+                    </div>
+                    <h2 class="service-intro-heading">Engineering & Design Overview</h2>
+                    
+                    <div class="service-body-paragraphs">
+                        <p class="service-body-p">{{ category.full_description }}</p>
+                    </div>
+
+                    <div class="service-cta-btn-wrapper">
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary" style="padding: 0.85rem 2rem;">
+                            <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                            <span>Get a Free Quote</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- "Why Us!" Section (Reference Element) -->
+                <div class="consultancy-why-box reveal-on-scroll">
+                    <h3>
+                        <i data-lucide="check-circle" style="color: var(--accent); width: 22px; height: 22px;"></i>
+                        <span>Why Us!</span>
+                    </h3>
+                    <p>
+                        <strong>Backed by a skilled in-house design & engineering team</strong> with extensive hands-on project experience across residential, commercial, industrial, and ground-mount sectors.<br><br>
+                        We deliver <strong>accurate, site-specific engineering packages</strong> using top-tier solar design software (AutoCAD, Helioscope, PVsyst, SketchUp) and adhering strictly to international and local regulatory codes.
+                    </p>
+                </div>
+
+                <!-- "Benefits of our Solar Design Consultancy" Section (Reference Element) -->
+                <div class="consultancy-benefits-section reveal-on-scroll">
+                    <h3 class="consultancy-benefits-title">Benefits of our Solar Design Consultancy</h3>
+                    <div class="benefits-grid">
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i data-lucide="zap" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Maximized Energy Output</h4>
+                                <p>Custom designs tailored precisely to site coordinates, irradiance, tilt, azimuth, and 3D shadow conditions.</p>
+                            </div>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i data-lucide="shield-check" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Permit & Code Compliance</h4>
+                                <p>Strict alignment with NEC, IEC, CEIG, and local utility regulations ensuring first-pass permit approvals.</p>
+                            </div>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i data-lucide="sliders-horizontal" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Optimized BOS & CapEx</h4>
+                                <p>Value engineering that minimizes balance-of-system costs, string cable losses, and structural over-design.</p>
+                            </div>
+                        </div>
+
+                        <div class="benefit-card">
+                            <div class="benefit-icon">
+                                <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
+                            </div>
+                            <div class="benefit-content">
+                                <h4>Rapid 24-48 Hr Turnaround</h4>
+                                <p>Fast and dependable engineering drafting turnaround times to keep your sales and installation teams on schedule.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Services & Deliverables Packages -->
+                {% if services and services|length > 0 %}
+                <div class="consultancy-services-section reveal-on-scroll">
+                    <h3 class="consultancy-services-title">Available Service Packages</h3>
+                    <div class="services-grid grid {% if services|length is divisibleby 2 %}grid-2-forced{% else %}grid-2{% endif %}" style="margin-top: 1rem;">
+                        {% for service in services %}
+                        <div class="service-card" style="display: flex; flex-direction: column;">
+                            {% if service.image %}
+                            <div class="service-card-media" style="margin: -2.2rem -2.2rem 1.5rem -2.2rem; overflow: hidden; border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); background: #0F172A; position: relative;">
+                                {% if service.image.endswith('.mp4') or service.image.endswith('.webm') or service.image.endswith('.mov') or service.image.endswith('.ogg') %}
+                                <video autoplay loop muted playsinline class="service-media-video" style="width: 100%; height: 210px; object-fit: cover; display: block;">
+                                    <source src="{{ service.image }}" type="video/mp4">
+                                </video>
+                                {% else %}
+                                <img src="{{ service.image }}" alt="{{ service.name }}" class="service-media-img" style="width: 100%; height: 210px; object-fit: cover; display: block;" loading="lazy">
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.8rem;">
+                                <div class="service-icon" style="margin-bottom: 0; font-size: 1.8rem;">
+                                    <i data-lucide="{{ service.icon or 'box' }}"></i>
+                                </div>
+                                <h3 style="margin-bottom: 0; font-size: 1.25rem;">{{ service.name }}</h3>
+                            </div>
+                            <p style="margin-bottom: 1.2rem; font-size: 0.95rem;">{{ service.short_description }}</p>
+                            
+                            {% if service.features and service.features|length > 0 %}
+                            <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                                <h5 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent-dark); margin-bottom: 0.6rem;">Key Deliverables</h5>
+                                <ul style="padding-left: 1.2rem; font-size: 0.88rem; color: var(--text-muted); margin: 0;">
+                                    {% for feature in service.features %}
+                                    <li style="margin-bottom: 0.35rem;">{{ feature }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
 
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.8rem;">
-                    <div class="service-icon" style="margin-bottom: 0; font-size: 1.8rem;"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
-                    <h3 style="margin-bottom: 0;">{{ service.name }}</h3>
+                <!-- Call to Action Link (Custom Proposal) -->
+                <div class="reveal-on-scroll text-center" style="margin-top: 1rem; background: var(--bg-light); padding: 3rem 2rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); border-top: 3px solid var(--accent);">
+                    <h3 style="color: var(--primary);">Need a Custom Design Package?</h3>
+                    <p style="margin-bottom: 1.5rem; max-width: 620px; margin-left: auto; margin-right: auto; margin-top: 0.5rem; color: var(--text-muted);">
+                        We provide customized monthly engineering retainer contracts for high-volume installers, as well as pay-per-project designs.
+                    </p>
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary">
+                        <span>Request a Custom Proposal</span>
+                        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                    </a>
                 </div>
-                <p style="margin-bottom: 1rem;">{{ service.short_description }}</p>
-                
-                {% if service.features and service.features|length > 0 %}
-                <ul style="margin-top: auto; padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-muted);">
-                    {% for feature in service.features %}
-                    <li style="margin-bottom: 0.4rem;">{{ feature }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}
+
             </div>
-            {% else %}
-            <p>No services currently available in this category.</p>
-            {% endfor %}
-        </div>
-        
-        <!-- Call to Action Link -->
-        <div class="text-center" style="margin-top: 4rem; background: var(--bg-light); padding: 3rem; border-radius: var(--radius-md); border: 1px solid var(--admin-border);">
-            <h3>Need a Custom Design Package?</h3>
-            <p style="margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; margin-top: 0.5rem;">We provide customized monthly engineering retainer contracts for high-volume installers, as well as pay-per-project designs.</p>
-            <a href="{{ url_for('contact') }}" class="btn btn-primary">Request a Custom Proposal</a>
+
         </div>
     </div>
 </section>
