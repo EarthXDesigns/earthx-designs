@@ -49,7 +49,7 @@
                 <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
                 <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
                 <div class="nav-dropdown">
-                    <a href="javascript:void(0)" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
+                    <a href="{{ url_for('services') }}" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
                         Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
                     </a>
                     <div class="nav-dropdown-menu">

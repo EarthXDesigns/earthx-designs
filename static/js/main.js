@@ -63,17 +63,34 @@ document.addEventListener('DOMContentLoaded', () => {
         const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
         dropdownToggles.forEach(toggle => {
             toggle.addEventListener('click', (e) => {
-                if (window.innerWidth <= 768) {
-                    e.preventDefault();
+                if (window.innerWidth <= 992) {
                     const parent = toggle.closest('.nav-dropdown');
-                    parent.classList.toggle('expanded');
-                    
-                    const isExpanded = parent.classList.contains('expanded');
-                    toggle.setAttribute('aria-expanded', isExpanded);
+                    if (parent && !parent.classList.contains('expanded')) {
+                        // On mobile, first tap expands dropdown
+                        e.preventDefault();
+                        parent.classList.add('expanded');
+                        toggle.setAttribute('aria-expanded', 'true');
+                    }
                 }
             });
         });
     }
+
+    // Speculative prefetching on link hover / touch for instant zero-delay navigation
+    const prefetchCache = new Set();
+    const prefetchUrl = (url) => {
+        if (!url || url.startsWith('#') || url.startsWith('javascript') || prefetchCache.has(url)) return;
+        prefetchCache.add(url);
+        const linkElem = document.createElement('link');
+        linkElem.rel = 'prefetch';
+        linkElem.href = url;
+        document.head.appendChild(linkElem);
+    };
+
+    document.querySelectorAll('a[href^="/"]').forEach(a => {
+        a.addEventListener('mouseenter', () => prefetchUrl(a.getAttribute('href')), { passive: true });
+        a.addEventListener('touchstart', () => prefetchUrl(a.getAttribute('href')), { passive: true });
+    });
 
     // 4. Testimonials Slideshow/Carousel
     const track = document.querySelector('.testimonial-track');
