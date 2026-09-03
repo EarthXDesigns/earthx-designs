@@ -206,7 +206,7 @@ a {
     z-index: 1000;
     transition: var(--transition);
     background: linear-gradient(180deg, rgba(7, 20, 32, 0.7) 0%, rgba(7, 20, 32, 0) 100%);
-    border-bottom: 1px solid transparent;
+    border-bottom: none;
 }
 
 .navbar.scrolled {
@@ -338,6 +338,7 @@ a {
     z-index: 0;
     transform: translate(-50%, -50%);
     object-fit: cover;
+    background-color: #0A192F;
 }
 
 .hero-overlay {
@@ -385,8 +386,8 @@ a {
     display: flex;
     flex-wrap: wrap;
     gap: var(--spacing-md);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    padding-top: var(--spacing-md);
+    border-top: none;
+    padding-top: var(--spacing-xs);
 }
 
 .stat-item {

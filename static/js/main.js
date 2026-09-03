@@ -10,6 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initIcons();
     window.addEventListener('load', initIcons);
 
+    // Hero Background Video Immediate Playback
+    const heroVideo = document.querySelector('.hero-video-bg');
+    if (heroVideo) {
+        heroVideo.muted = true;
+        const playPromise = heroVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {});
+        }
+    }
+
     // 2. Navbar Scroll Behavior
     const navbar = document.getElementById('navbar');
     if (navbar) {
