@@ -15,12 +15,17 @@
     <meta property="og:title" content="{% block og_title %}EarthX Designs | Solar Design & Engineering{% endblock %}">
     <meta property="og:description" content="{% block og_desc %}Professional 2D & 3D solar designs, shadow analysis, SLDs and complete engineering packages for solar installers globally.{% endblock %}">
     
-    <!-- Favicon & Fonts -->
+    <!-- Google Fonts Preconnect & Optimized Load (Plus Jakarta Sans + Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon & Stylesheet -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
-    <!-- Lucide Icons CDN -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons (Local Fast Load, Non-blocking) -->
+    <script src="{{ url_for('static', filename='js/lucide.min.js') }}" defer></script>
     
     {% block head_extra %}{% endblock %}
 </head>

@@ -38,6 +38,7 @@ else:
 
 app.config['UPLOAD_FOLDER'] = os.path.join(DATA_DIR, 'uploads')
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max upload size
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 86400  # Cache static assets for 1 day
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'mp4', 'webm', 'mov', 'ogg'}
 
 # Ensure upload directory exists
@@ -51,16 +52,16 @@ init_db(DATA_DIR)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Serve uploaded files from persistent storage (with fallback to default images)
+# Serve uploaded files from persistent storage (with fallback to default images and cache headers)
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(file_path):
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename, max_age=86400)
     default_path = os.path.join(app.root_path, 'static', 'default_images', filename)
     if os.path.exists(default_path):
-        return send_from_directory(os.path.join(app.root_path, 'static', 'default_images'), filename)
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        return send_from_directory(os.path.join(app.root_path, 'static', 'default_images'), filename, max_age=86400)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, max_age=86400)
 
 # Login decorator
 def login_required(f):

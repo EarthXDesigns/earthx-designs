@@ -1,9 +1,7 @@
 /*
  * EarthX Designs - Premium Solar Engineering CSS System
- * Color Palette: White background, Dark Blue (#0B192F), Solar Green (#10B981)
+ * Performance-Optimized Typography (Plus Jakarta Sans + Inter)
  */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
     /* Color Tokens */
@@ -21,8 +19,8 @@
     --text-light: #F1F5F9;
     
     /* Layout & Spacing */
-    --font-heading: 'Outfit', sans-serif;
-    --font-body: 'Inter', sans-serif;
+    --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --max-width: 1280px;
     --spacing-xs: 0.5rem;
     --spacing-sm: 1rem;
@@ -38,7 +36,7 @@
     --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
     --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
     --shadow-lg: 0 20px 40px -10px rgba(15, 23, 42, 0.12);
-    --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     
     /* Navigation height */
     --nav-height: 80px;
@@ -56,6 +54,17 @@ html {
     scroll-padding-top: var(--nav-height);
 }
 
+@keyframes pageFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 body {
     font-family: var(--font-body);
     color: var(--text-dark);
@@ -63,6 +72,9 @@ body {
     line-height: 1.6;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    animation: pageFadeIn 0.35s ease-out;
 }
 
 /* Typography */
@@ -2335,3 +2347,127 @@ a {
     filter: grayscale(0%) opacity(1);
     transform: scale(1.04);
 }
+
+/* ==========================================================
+   Smooth Animations, Micro-Effects & Transitions System
+========================================================== */
+
+/* Silky Scroll-Reveal Animation */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-on-scroll.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger delay classes */
+.delay-1 { transition-delay: 0.1s; }
+.delay-2 { transition-delay: 0.2s; }
+.delay-3 { transition-delay: 0.3s; }
+.delay-4 { transition-delay: 0.4s; }
+
+/* Interactive Button Hover Shine Effect */
+.btn {
+    position: relative;
+    overflow: hidden;
+    will-change: transform, box-shadow;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(60deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+    transform: rotate(30deg) translateX(-130%);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+.btn:hover::after {
+    transform: rotate(30deg) translateX(130%);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Card Smooth Lifts & Micro-Effects */
+.service-card, .why-card, .feature-box, .project-card {
+    will-change: transform, box-shadow;
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px -8px rgba(10, 25, 47, 0.12);
+}
+
+.service-card .service-icon {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.service-card:hover .service-icon {
+    transform: scale(1.1) rotate(4deg);
+}
+
+.why-card, .feature-box {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.why-card:hover, .feature-box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px -4px rgba(10, 25, 47, 0.08);
+}
+
+.project-card {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.project-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 36px -8px rgba(10, 25, 47, 0.14);
+}
+
+/* Floating WhatsApp Heartbeat / Breath */
+.whatsapp-float {
+    animation: whatsappBreath 3.2s ease-in-out infinite;
+    will-change: transform;
+}
+
+@keyframes whatsappBreath {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+    }
+    50% {
+        transform: translateY(-5px) scale(1.06);
+        box-shadow: 0 14px 32px rgba(37, 211, 102, 0.5);
+    }
+}
+
+/* Badge dot micro-pulse */
+.who-we-are-pill .pill-dot {
+    animation: dotPulse 2s infinite ease-in-out;
+}
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.7; }
+}
+
+/* Hero Stats Micro-Hover */
+.stat-item {
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+}
+

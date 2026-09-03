@@ -2,9 +2,13 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Lucide Icons
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
+    const initIcons = () => {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    };
+    initIcons();
+    window.addEventListener('load', initIcons);
 
     // 2. Navbar Scroll Behavior
     const navbar = document.getElementById('navbar');
@@ -134,5 +138,74 @@ document.addEventListener('DOMContentLoaded', () => {
             isDragging = false;
             startAutoplay();
         }, { passive: true });
+    }
+
+    // 5. Scroll-Reveal Observer with Smooth Staggering
+    const revealTargets = document.querySelectorAll('.reveal-on-scroll, .section-header, .service-card, .project-card, .feature-box, .why-card');
+    if ('IntersectionObserver' in window && revealTargets.length > 0) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.08,
+            rootMargin: '0px 0px -30px 0px'
+        });
+
+        revealTargets.forEach(el => {
+            el.classList.add('reveal-on-scroll');
+            const parent = el.parentElement;
+            if (parent) {
+                const siblings = Array.from(parent.children);
+                const siblingIdx = siblings.indexOf(el);
+                if (siblingIdx > 0 && siblingIdx <= 4) {
+                    el.classList.add(`delay-${Math.min(siblingIdx, 4)}`);
+                }
+            }
+            revealObserver.observe(el);
+        });
+    } else {
+        revealTargets.forEach(el => el.classList.add('revealed'));
+    }
+
+    // 6. Smooth Number Counter for Stats on Scroll
+    const statNumbers = document.querySelectorAll('.stat-number');
+    if (statNumbers.length > 0 && 'IntersectionObserver' in window) {
+        const statsObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const text = el.textContent.trim();
+                    const match = text.match(/^(\d+)(.*)$/);
+                    if (match) {
+                        const targetNum = parseInt(match[1], 10);
+                        const suffix = match[2] || '';
+                        const duration = 1200;
+                        const startTime = performance.now();
+                        
+                        const updateNumber = (currentTime) => {
+                            const elapsed = currentTime - startTime;
+                            const progress = Math.min(elapsed / duration, 1);
+                            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                            const currentVal = Math.floor(easeOutCubic * targetNum);
+                            el.textContent = currentVal + suffix;
+                            
+                            if (progress < 1) {
+                                requestAnimationFrame(updateNumber);
+                            } else {
+                                el.textContent = text;
+                            }
+                        };
+                        requestAnimationFrame(updateNumber);
+                    }
+                    observer.unobserve(el);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        statNumbers.forEach(s => statsObserver.observe(s));
     }
 });
