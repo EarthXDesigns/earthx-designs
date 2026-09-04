@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const tr = document.createElement('tr');
                         
                         // Hero Background thumbnail
-                        const bgSrc = cat.hero_bg_image || '/uploads/commercial_solar_featured.png';
+                        const bgSrc = cat.hero_bg_image || cat.hero_image || '/uploads/commercial_solar_featured.png';
                         const heroBgThumb = `<div style="width:58px; height:38px; border-radius:4px; overflow:hidden; background:#071815; border:1px solid var(--admin-border);">
                             <img src="${bgSrc}" style="width:100%; height:100%; object-fit:cover;" title="Hero Background Image">
                         </div>`;

@@ -1,7 +1,10 @@
 import sqlite3
 import os
+import json
 import shutil
 import glob
+import urllib.request
+import urllib.error
 from werkzeug.security import generate_password_hash
 
 SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'schema.sql')
@@ -9,7 +12,181 @@ SCHEMA_PATH = os.path.join(os.path.dirname(__file__), 'schema.sql')
 # We'll use a global variable to hold the configured DATA_DIR
 CONFIGURED_DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 
+def is_using_cloudflare_d1():
+    """Returns True if Cloudflare D1 credentials are set in the environment."""
+    return bool(
+        os.environ.get('CLOUDFLARE_D1_DATABASE_ID') and
+        os.environ.get('CLOUDFLARE_ACCOUNT_ID') and
+        os.environ.get('CLOUDFLARE_API_TOKEN')
+    )
+
+class D1Row:
+    """Wraps Cloudflare D1 row dictionaries to behave like sqlite3.Row."""
+    def __init__(self, data_dict):
+        self._dict = data_dict or {}
+        self._keys = list(self._dict.keys())
+        self._values = list(self._dict.values())
+        
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self._values[key]
+        return self._dict[key]
+        
+    def get(self, key, default=None):
+        return self._dict.get(key, default)
+        
+    def keys(self):
+        return self._dict.keys()
+        
+    def values(self):
+        return self._dict.values()
+        
+    def items(self):
+        return self._dict.items()
+        
+    def __iter__(self):
+        return iter(self._dict)
+        
+    def __contains__(self, key):
+        return key in self._dict
+        
+    def __repr__(self):
+        return repr(self._dict)
+
+class D1Cursor:
+    """Cursor that executes SQL queries against Cloudflare D1 REST API."""
+    def __init__(self, connection):
+        self.connection = connection
+        self.description = None
+        self.lastrowid = None
+        self.rowcount = 0
+        self._results = []
+        self._idx = 0
+
+    def execute(self, sql, params=None):
+        self._results = []
+        self._idx = 0
+        self.lastrowid = None
+        self.rowcount = 0
+        
+        result_data = self.connection._query(sql, params)
+        if result_data:
+            results_list = result_data.get('results', [])
+            self._results = [D1Row(r) for r in results_list]
+            meta = result_data.get('meta', {})
+            self.lastrowid = meta.get('last_row_id')
+            self.rowcount = meta.get('changes', len(self._results))
+            if results_list and len(results_list) > 0:
+                self.description = [(k, None, None, None, None, None, None) for k in results_list[0].keys()]
+            else:
+                self.description = None
+        return self
+
+    def executemany(self, sql, seq_of_parameters):
+        for params in seq_of_parameters:
+            self.execute(sql, params)
+        return self
+
+    def fetchone(self):
+        if self._idx < len(self._results):
+            row = self._results[self._idx]
+            self._idx += 1
+            return row
+        return None
+
+    def fetchall(self):
+        res = self._results[self._idx:]
+        self._idx = len(self._results)
+        return res
+
+    def close(self):
+        pass
+
+class D1Connection:
+    """Connection that wraps Cloudflare D1 REST API to provide a SQLite-compatible interface."""
+    def __init__(self, account_id, database_id, api_token):
+        self.account_id = account_id.strip().strip('\'"')
+        self.database_id = database_id.strip().strip('\'"')
+        self.api_token = api_token.strip().strip('\'"')
+        self.url = f"https://api.cloudflare.com/client/v4/accounts/{self.account_id}/d1/database/{self.database_id}/query"
+        self.row_factory = None
+
+    def cursor(self):
+        return D1Cursor(self)
+
+    def execute(self, sql, params=None):
+        cur = self.cursor()
+        return cur.execute(sql, params)
+
+    def executemany(self, sql, seq_of_parameters):
+        cur = self.cursor()
+        return cur.executemany(sql, seq_of_parameters)
+
+    def executescript(self, script):
+        cleaned_lines = []
+        for line in script.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('--'):
+                continue
+            cleaned_lines.append(line)
+        cleaned_sql = '\n'.join(cleaned_lines)
+        statements = [s.strip() for s in cleaned_sql.split(';') if s.strip()]
+        for stmt in statements:
+            self.execute(stmt)
+
+    def commit(self):
+        pass  # Cloudflare D1 auto-commits
+
+    def close(self):
+        pass
+
+    def _query(self, sql, params=None):
+        body = {"sql": sql}
+        if params is not None:
+            clean_params = []
+            for p in params:
+                if isinstance(p, (bytes, bytearray)):
+                    clean_params.append(p.decode('utf-8', errors='ignore'))
+                else:
+                    clean_params.append(p)
+            body["params"] = clean_params
+
+        req = urllib.request.Request(
+            self.url,
+            data=json.dumps(body).encode('utf-8'),
+            headers={
+                "Authorization": f"Bearer {self.api_token}",
+                "Content-Type": "application/json",
+                "User-Agent": "EarthXDesigns-D1Client/1.0"
+            },
+            method="POST"
+        )
+        
+        try:
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                data = json.loads(resp.read().decode('utf-8'))
+                if not data.get('success'):
+                    err_msg = json.dumps(data.get('errors', []))
+                    if 'UNIQUE constraint' in err_msg or '19' in err_msg:
+                        raise sqlite3.IntegrityError(err_msg)
+                    raise Exception(f"D1 Query failed: {err_msg}")
+                result_list = data.get('result', [])
+                if result_list:
+                    return result_list[0]
+                return None
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode('utf-8', errors='ignore')
+            if 'UNIQUE constraint' in err_body:
+                raise sqlite3.IntegrityError(err_body)
+            raise Exception(f"D1 HTTP Error {e.code}: {err_body}")
+
 def get_db_connection():
+    if is_using_cloudflare_d1():
+        return D1Connection(
+            os.environ.get('CLOUDFLARE_ACCOUNT_ID'),
+            os.environ.get('CLOUDFLARE_D1_DATABASE_ID'),
+            os.environ.get('CLOUDFLARE_API_TOKEN')
+        )
     db_path = os.path.join(CONFIGURED_DATA_DIR, 'database.db')
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -51,19 +228,32 @@ def init_db(data_dir=None):
     
     copy_generated_images(uploads_dir)
     
-    # Check if database already initialized
-    db_exists = os.path.exists(db_path)
-    
     conn = get_db_connection()
     
-    with open(SCHEMA_PATH, 'r') as f:
-        conn.executescript(f.read())
-        
-    cursor = conn.cursor()
-    
-    # Check if we need to seed
-    cursor.execute("SELECT COUNT(*) FROM users")
-    if cursor.fetchone()[0] == 0:
+    # Check if database already initialized
+    user_count = 0
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM users")
+        row = cursor.fetchone()
+        if row:
+            user_count = row[0]
+    except Exception as e:
+        # Tables do not exist yet, execute schema
+        try:
+            with open(SCHEMA_PATH, 'r') as f:
+                conn.executescript(f.read())
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM users")
+            row = cursor.fetchone()
+            if row:
+                user_count = row[0]
+        except Exception as schema_err:
+            print(f"[DATABASE INIT ERROR] Could not initialize schema: {schema_err}")
+            return
+
+    if user_count == 0:
+        cursor = conn.cursor()
         # 1. Seed Admin User
         admin_email = 'sales.earthxd@gmail.com'
         admin_pw = 'EarthX@123'
@@ -229,6 +419,7 @@ def init_db(data_dir=None):
                 'hero_heading': 'Pre Sales Design',
                 'hero_subtitle': 'Professional solar design support for EPC companies during the pre-sales stage. Win more projects with compelling visualizations and precise layouts.',
                 'hero_image': '/uploads/residential_3d_featured.png',
+                'hero_bg_image': '/uploads/residential_3d_featured.png',
                 'display_order': 1
             },
             {
@@ -240,6 +431,7 @@ def init_db(data_dir=None):
                 'hero_heading': '3D Post Sales Design',
                 'hero_subtitle': 'Convert approved solar concepts into detailed, execution-ready 3D designs with comprehensive engineering documentation.',
                 'hero_image': '/uploads/commercial_solar_featured.png',
+                'hero_bg_image': '/uploads/commercial_solar_featured.png',
                 'display_order': 2
             },
             {
@@ -251,6 +443,7 @@ def init_db(data_dir=None):
                 'hero_heading': 'Detailed Plan Design , Engineering & Consultancy',
                 'hero_subtitle': 'Comprehensive solar design planning, detailed engineering specifications, and technical consultancy.',
                 'hero_image': '/uploads/commercial_solar_featured.png',
+                'hero_bg_image': '/uploads/commercial_solar_featured.png',
                 'display_order': 3
             },
             {
@@ -262,6 +455,7 @@ def init_db(data_dir=None):
                 'hero_heading': 'CEIG Drawing Services',
                 'hero_subtitle': 'Government and electrical inspector approval drawings, compliance documentation, and grounding schematics.',
                 'hero_image': '/uploads/sld_blueprint.png',
+                'hero_bg_image': '/uploads/sld_blueprint.png',
                 'display_order': 4
             },
             {
@@ -273,6 +467,7 @@ def init_db(data_dir=None):
                 'hero_heading': 'Ground Mounted Detailed Design',
                 'hero_subtitle': 'End-to-end civil, structural, and electrical engineering for utility-scale and commercial ground mount installations.',
                 'hero_image': '/uploads/ground_mount_featured.png',
+                'hero_bg_image': '/uploads/ground_mount_featured.png',
                 'display_order': 5
             },
             {
@@ -284,6 +479,7 @@ def init_db(data_dir=None):
                 'hero_heading': 'Electrical Calculation and Schedules',
                 'hero_subtitle': 'DC and AC cable sizing, voltage drop calculations, fault analysis, and procurement schedules.',
                 'hero_image': '/uploads/sld_blueprint.png',
+                'hero_bg_image': '/uploads/sld_blueprint.png',
                 'display_order': 6
             },
             {
@@ -295,6 +491,7 @@ def init_db(data_dir=None):
                 'hero_heading': 'Substation and Evacuation Design',
                 'hero_subtitle': 'Pooling substations, switchyards, transmission lines, and grid power evacuation documentation.',
                 'hero_image': '/uploads/ground_mount_featured.png',
+                'hero_bg_image': '/uploads/ground_mount_featured.png',
                 'display_order': 7
             },
             {
@@ -306,15 +503,16 @@ def init_db(data_dir=None):
                 'hero_heading': 'Shadow Analysis Report & Structure Stability Report',
                 'hero_subtitle': '3D yearly shadow profile simulations and STAAD Pro structural stability reports for maximum yield and safety.',
                 'hero_image': '/uploads/residential_3d_featured.png',
+                'hero_bg_image': '/uploads/residential_3d_featured.png',
                 'display_order': 8
             }
         ]
         
         for cat in service_cats:
             cursor.execute("""
-                INSERT INTO service_categories (name, slug, short_description, full_description, icon, hero_heading, hero_subtitle, display_order, hero_image)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (cat['name'], cat['slug'], cat['short_description'], cat['full_description'], cat['icon'], cat['hero_heading'], cat['hero_subtitle'], cat['display_order'], cat.get('hero_image', '')))
+                INSERT INTO service_categories (name, slug, short_description, full_description, icon, hero_heading, hero_subtitle, display_order, hero_image, hero_bg_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (cat['name'], cat['slug'], cat['short_description'], cat['full_description'], cat['icon'], cat['hero_heading'], cat['hero_subtitle'], cat['display_order'], cat.get('hero_image', ''), cat.get('hero_bg_image', '')))
         
         print("Service categories seeded.")
         

@@ -55,12 +55,151 @@ init_db(DATA_DIR)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Serve uploaded files from persistent storage (with fallback to default images and cache headers)
+# Cloudinary Setup (for lifetime CDN media persistence across cloud container restarts)
+HAS_CLOUDINARY = False
+try:
+    import cloudinary
+    import cloudinary.uploader
+    HAS_CLOUDINARY = True
+except ImportError:
+    HAS_CLOUDINARY = False
+
+def get_clean_cloudinary_url():
+    url = os.environ.get('CLOUDINARY_URL', '').strip().strip('\'"')
+    if url.startswith('CLOUDINARY_URL='):
+        url = url.split('=', 1)[1].strip().strip('\'"')
+    return url
+
+def configure_cloudinary():
+    if not HAS_CLOUDINARY:
+        return False
+    url = get_clean_cloudinary_url()
+    if not url:
+        return False
+    try:
+        c = cloudinary.Config()
+        c._load_from_url(url)
+        cloudinary.config(
+            cloud_name=c.cloud_name,
+            api_key=c.api_key,
+            api_secret=c.api_secret,
+            secure=True
+        )
+        print(f"[STORAGE] Cloudinary CDN configured successfully for cloud: {c.cloud_name}")
+        return True
+    except Exception as e:
+        print(f"[STORAGE ERROR] Cloudinary configuration failed: {e}")
+        return False
+
+# Initialize on startup
+configure_cloudinary()
+
+@app.route('/api/storage-status')
+def storage_status():
+    """Diagnostic endpoint to verify storage, Cloudinary, and database connectivity."""
+    from database import is_using_cloudflare_d1
+    url = get_clean_cloudinary_url()
+    cloud_name = getattr(cloudinary.config(), 'cloud_name', None) if HAS_CLOUDINARY else None
+    d1_enabled = is_using_cloudflare_d1()
+    
+    db_status = "Cloudflare D1 (Cloud SQLite - Permanent)" if d1_enabled else (
+        "Vercel Ephemeral SQLite (/tmp) - Temporary" if IS_VERCEL else "Local Persistent SQLite (Disk)"
+    )
+    
+    return jsonify({
+        'has_cloudinary_library': HAS_CLOUDINARY,
+        'cloudinary_url_present': bool(url),
+        'cloudinary_configured': bool(cloud_name),
+        'cloud_name': cloud_name or 'None',
+        'is_vercel': IS_VERCEL,
+        'database_type': db_status,
+        'cloudflare_d1_connected': d1_enabled,
+        'data_dir': DATA_DIR
+    })
+
+def save_uploaded_file(file_storage, prefix="img"):
+    """
+    Saves an uploaded file. If CLOUDINARY_URL is configured, uploads to Cloudinary for permanent cloud storage.
+    Otherwise, saves to UPLOAD_FOLDER and stores a binary BLOB in the uploaded_files database table for self-healing persistence.
+    Returns the URL/path to store in the database (e.g., https://res.cloudinary.com/... or /uploads/filename.ext).
+    """
+    if not file_storage or not hasattr(file_storage, 'filename') or file_storage.filename == '' or not allowed_file(file_storage.filename):
+        return None
+
+    # Check for Cloudinary first (Permanent CDN)
+    cloudinary_url = get_clean_cloudinary_url()
+    if HAS_CLOUDINARY and cloudinary_url:
+        try:
+            if not getattr(cloudinary.config(), 'cloud_name', None):
+                configure_cloudinary()
+
+            file_storage.seek(0)
+            filename_lower = file_storage.filename.lower()
+            is_video = (file_storage.mimetype and file_storage.mimetype.startswith('video/')) or any(filename_lower.endswith(f'.{ext}') for ext in ['mp4', 'webm', 'mov', 'ogg'])
+            resource_type = "video" if is_video else "image"
+            upload_result = cloudinary.uploader.upload(
+                file_storage,
+                folder="earthx_designs",
+                resource_type=resource_type
+            )
+            secure_url = upload_result.get('secure_url')
+            if secure_url:
+                print(f"[CLOUDINARY SUCCESS] Uploaded {file_storage.filename} -> {secure_url}")
+                return secure_url
+        except Exception as e:
+            print(f"[CLOUDINARY ERROR] Upload failed: {e}. Falling back to persistent database storage.")
+            try:
+                file_storage.seek(0)
+            except Exception:
+                pass
+
+    # Local disk storage + Database BLOB backup
+    filename = secure_filename(f"{prefix}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file_storage.filename}")
+    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file_storage.save(save_path)
+    
+    # Store binary BLOB in SQLite uploaded_files table as a persistent backup
+    try:
+        with open(save_path, 'rb') as f:
+            file_bytes = f.read()
+        conn = get_db_connection()
+        conn.execute(
+            'INSERT OR REPLACE INTO uploaded_files (filename, mimetype, data) VALUES (?, ?, ?)',
+            (filename, file_storage.mimetype or 'application/octet-stream', file_bytes)
+        )
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[STORAGE WARNING] Failed to backup image to database: {e}")
+
+    return f"/uploads/{filename}"
+
+# Serve uploaded files from persistent storage (with fallback to database BLOB and default images)
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(file_path):
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename, max_age=86400)
+        
+    # Check if file is stored in database (BLOB) - auto-heal ephemeral disks
+    try:
+        conn = get_db_connection()
+        row = conn.execute('SELECT mimetype, data FROM uploaded_files WHERE filename = ?', (filename,)).fetchone()
+        conn.close()
+        if row and row['data']:
+            # Restore to disk cache so subsequent requests serve instantly
+            try:
+                with open(file_path, 'wb') as f:
+                    f.write(row['data'])
+            except Exception:
+                pass
+            return make_response(row['data'], 200, {
+                'Content-Type': row['mimetype'] or 'image/png',
+                'Cache-Control': 'public, max-age=86400'
+            })
+    except Exception as e:
+        print(f"[SERVE_UPLOADS ERROR] DB lookup failed: {e}")
+
     default_path = os.path.join(app.root_path, 'static', 'default_images', filename)
     if os.path.exists(default_path):
         return send_from_directory(os.path.join(app.root_path, 'static', 'default_images'), filename, max_age=86400)
@@ -544,12 +683,9 @@ def api_projects():
         if not file or file.filename == '':
             return jsonify({'error': 'Featured image is required.'}), 400
             
-        if not allowed_file(file.filename):
-            return jsonify({'error': 'Invalid image format.'}), 400
-            
-        filename = secure_filename(f"proj_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        featured_image_url = f"/uploads/{filename}"
+        featured_image_url = save_uploaded_file(file, "proj")
+        if not featured_image_url:
+            return jsonify({'error': 'Failed to save or upload featured image.'}), 400
         
         cursor = conn.cursor()
         cursor.execute('''
@@ -563,10 +699,9 @@ def api_projects():
         gallery_files = request.files.getlist('gallery_images')
         for i, gfile in enumerate(gallery_files):
             if gfile and gfile.filename != '' and allowed_file(gfile.filename):
-                gfilename = secure_filename(f"gal_{project_id}_{i}_{datetime.datetime.now().strftime('%M%S')}_{gfile.filename}")
-                gfile.save(os.path.join(app.config['UPLOAD_FOLDER'], gfilename))
-                gurl = f"/uploads/{gfilename}"
-                cursor.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (project_id, gurl, i))
+                gurl = save_uploaded_file(gfile, f"gal_{project_id}_{i}")
+                if gurl:
+                    cursor.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (project_id, gurl, i))
                 
         conn.commit()
         conn.close()
@@ -614,10 +749,9 @@ def api_project_detail(proj_id):
         # Check if new featured image was uploaded
         file = request.files.get('featured_image')
         if file and file.filename != '':
-            if allowed_file(file.filename):
-                filename = secure_filename(f"proj_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                featured_image_url = f"/uploads/{filename}"
+            new_featured = save_uploaded_file(file, "proj")
+            if new_featured:
+                featured_image_url = new_featured
                 
         conn.execute('''
             UPDATE projects SET title = ?, category_id = ?, capacity = ?, location = ?, client_name = ?, description = ?, services_delivered = ?, featured_image = ?, completion_date = ?, status = ?
@@ -631,10 +765,9 @@ def api_project_detail(proj_id):
         
         for i, gfile in enumerate(gallery_files):
             if gfile and gfile.filename != '' and allowed_file(gfile.filename):
-                gfilename = secure_filename(f"gal_{proj_id}_{max_order + i + 1}_{datetime.datetime.now().strftime('%M%S')}_{gfile.filename}")
-                gfile.save(os.path.join(app.config['DATA_DIR'], gfilename))
-                gurl = f"/uploads/{gfilename}"
-                conn.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (proj_id, gurl, max_order + i + 1))
+                gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + i + 1}")
+                if gurl:
+                    conn.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (proj_id, gurl, max_order + i + 1))
                 
         conn.commit()
         conn.close()
@@ -742,12 +875,9 @@ def api_blogs():
         if not file or file.filename == '':
             return jsonify({'error': 'Featured image is required.'}), 400
             
-        if not allowed_file(file.filename):
-            return jsonify({'error': 'Invalid image format.'}), 400
-            
-        filename = secure_filename(f"blog_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        featured_image_url = f"/uploads/{filename}"
+        featured_image_url = save_uploaded_file(file, "blog")
+        if not featured_image_url:
+            return jsonify({'error': 'Failed to save or upload featured image.'}), 400
         
         try:
             cursor = conn.cursor()
@@ -795,10 +925,9 @@ def api_blog_detail(post_id):
         
         file = request.files.get('featured_image')
         if file and file.filename != '':
-            if allowed_file(file.filename):
-                filename = secure_filename(f"blog_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                featured_image_url = f"/uploads/{filename}"
+            new_featured = save_uploaded_file(file, "blog")
+            if new_featured:
+                featured_image_url = new_featured
                 
         try:
             conn.execute('''
@@ -982,10 +1111,10 @@ def api_service_categories():
         preset_hero_bg = data.get('preset_hero_bg', '').strip()
         hero_bg_image = ''
         file_bg = request.files.get('hero_bg_image') if hasattr(request, 'files') else None
-        if file_bg and file_bg.filename != '' and allowed_file(file_bg.filename):
-            filename_bg = secure_filename(f"svccat_bg_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file_bg.filename}")
-            file_bg.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_bg))
-            hero_bg_image = f"/uploads/{filename_bg}"
+        if file_bg and file_bg.filename != '':
+            uploaded_bg = save_uploaded_file(file_bg, "svccat_bg")
+            if uploaded_bg:
+                hero_bg_image = uploaded_bg
         elif preset_hero_bg:
             hero_bg_image = preset_hero_bg
 
@@ -993,10 +1122,10 @@ def api_service_categories():
         preset_media = data.get('preset_media', '').strip()
         hero_image = ''
         file = request.files.get('hero_image') if hasattr(request, 'files') else None
-        if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            hero_image = f"/uploads/{filename}"
+        if file and file.filename != '':
+            uploaded_media = save_uploaded_file(file, "svccat")
+            if uploaded_media:
+                hero_image = uploaded_media
         elif preset_media:
             hero_image = preset_media
             
@@ -1071,10 +1200,10 @@ def api_service_category_detail(cat_id):
         preset_hero_bg = data.get('preset_hero_bg', '').strip()
         hero_bg_image = '' if remove_hero_bg else cat_dict.get('hero_bg_image', '')
         file_bg = request.files.get('hero_bg_image') if hasattr(request, 'files') else None
-        if file_bg and file_bg.filename != '' and allowed_file(file_bg.filename):
-            filename_bg = secure_filename(f"svccat_bg_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file_bg.filename}")
-            file_bg.save(os.path.join(app.config['UPLOAD_FOLDER'], filename_bg))
-            hero_bg_image = f"/uploads/{filename_bg}"
+        if file_bg and file_bg.filename != '':
+            uploaded_bg = save_uploaded_file(file_bg, "svccat_bg")
+            if uploaded_bg:
+                hero_bg_image = uploaded_bg
         elif preset_hero_bg and not remove_hero_bg:
             hero_bg_image = preset_hero_bg
 
@@ -1082,10 +1211,10 @@ def api_service_category_detail(cat_id):
         preset_media = data.get('preset_media', '').strip()
         hero_image = '' if remove_hero_image else cat_dict.get('hero_image', '')
         file = request.files.get('hero_image') if hasattr(request, 'files') else None
-        if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(f"svccat_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            hero_image = f"/uploads/{filename}"
+        if file and file.filename != '':
+            uploaded_media = save_uploaded_file(file, "svccat")
+            if uploaded_media:
+                hero_image = uploaded_media
         elif preset_media and not remove_hero_image:
             hero_image = preset_media
             
@@ -1191,10 +1320,10 @@ def api_services():
             
         image = ''
         file = request.files.get('image') if hasattr(request, 'files') else None
-        if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(f"svc_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image = f"/uploads/{filename}"
+        if file and file.filename != '':
+            uploaded_img = save_uploaded_file(file, "svc")
+            if uploaded_img:
+                image = uploaded_img
             
         max_order = conn.execute('SELECT MAX(display_order) FROM services WHERE category_id = ?', (category_id,)).fetchone()[0]
         display_order = (max_order or 0) + 1
@@ -1278,10 +1407,10 @@ def api_service_detail(svc_id):
         image = '' if remove_image else svc['image']
         
         file = request.files.get('image') if hasattr(request, 'files') else None
-        if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(f"svc_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image = f"/uploads/{filename}"
+        if file and file.filename != '':
+            uploaded_img = save_uploaded_file(file, "svc")
+            if uploaded_img:
+                image = uploaded_img
             
         conn.execute('''
             UPDATE services SET
@@ -1436,10 +1565,10 @@ def api_client_logos():
             
         image = ''
         file = request.files.get('image') if hasattr(request, 'files') else None
-        if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(f"client_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image = f"/uploads/{filename}"
+        if file and file.filename != '':
+            uploaded_logo = save_uploaded_file(file, "client")
+            if uploaded_logo:
+                image = uploaded_logo
         elif data.get('preset_image'):
             image = data.get('preset_image').strip()
             
@@ -1491,10 +1620,10 @@ def api_client_logo_detail(logo_id):
             
         image = logo['image']
         file = request.files.get('image') if hasattr(request, 'files') else None
-        if file and file.filename != '' and allowed_file(file.filename):
-            filename = secure_filename(f"client_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image = f"/uploads/{filename}"
+        if file and file.filename != '':
+            uploaded_logo = save_uploaded_file(file, "client")
+            if uploaded_logo:
+                image = uploaded_logo
         elif data.get('preset_image'):
             image = data.get('preset_image').strip()
             
