@@ -365,33 +365,40 @@ body.admin-body {
 .btn-admin {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.92rem;
     font-weight: 600;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: var(--transition);
+    transition: all 0.2s ease;
+    text-decoration: none;
 }
 
 .btn-admin-primary {
-    background-color: var(--admin-accent);
+    background-color: #059669;
     color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
 }
 
 .btn-admin-primary:hover {
-    background-color: var(--admin-accent-hover);
+    background-color: #047857;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
 }
 
 .btn-admin-secondary {
-    background-color: var(--admin-card);
-    border-color: var(--admin-border);
-    color: var(--admin-text);
+    background-color: #FFFFFF;
+    border-color: #CBD5E1;
+    color: #334155;
 }
 
 .btn-admin-secondary:hover {
-    background-color: var(--admin-bg);
+    background-color: #F1F5F9;
+    border-color: #94A3B8;
+    color: #0F172A;
 }
 
 /* Modals & Forms */
@@ -402,8 +409,8 @@ body.admin-body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(4px);
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(6px);
     z-index: 1000;
     justify-content: center;
     align-items: center;
@@ -412,52 +419,78 @@ body.admin-body {
 
 .modal-content {
     background-color: var(--admin-card);
-    border-radius: var(--radius);
+    border-radius: 12px;
     width: 100%;
-    max-width: 650px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    max-height: 90vh;
+    max-width: 720px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-height: 88vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* Prevents contents from bleeding out */
+    border: 1px solid var(--admin-border);
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; /* CRITICAL: Enables flex child body to scroll */
+    overflow: hidden;
 }
 
 .modal-header {
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 2rem;
     border-bottom: 1px solid var(--admin-border);
+    background-color: #FFFFFF;
 }
 
 .modal-header h3 {
-    font-size: 1.15rem;
+    font-size: 1.2rem;
+    font-weight: 700;
     font-family: 'Outfit', sans-serif;
     color: var(--admin-primary);
 }
 
 .modal-close {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     cursor: pointer;
     background: none;
     border: none;
     color: var(--admin-text-light);
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--admin-primary);
+    background-color: var(--admin-bg);
 }
 
 .modal-body {
-    padding: 2rem;
+    padding: 1.75rem 2rem;
     overflow-y: auto;
     flex: 1;
+    min-height: 0; /* Ensures scrollbar appears whenever content exceeds modal height */
 }
 
 .modal-footer {
+    flex-shrink: 0; /* ALWAYS VISIBLE AT BOTTOM OF MODAL */
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    padding: 1.25rem 2rem;
+    align-items: center;
+    gap: 12px;
+    padding: 1rem 2rem;
     border-top: 1px solid var(--admin-border);
-    background-color: var(--admin-bg);
-    border-bottom-left-radius: var(--radius);
-    border-bottom-right-radius: var(--radius);
+    background-color: #F8FAFC;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    z-index: 10;
 }
 
 /* Form layouts */

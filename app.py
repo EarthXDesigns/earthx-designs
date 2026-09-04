@@ -273,15 +273,54 @@ Message:
 # Context processor for global templates
 @app.context_processor
 def inject_global_data():
+    from database import seed_service_categories_and_services
     conn = get_db_connection()
     nav_services = conn.execute(
         'SELECT name, slug FROM service_categories WHERE is_published = 1 ORDER BY display_order'
     ).fetchall()
+    if not nav_services:
+        seed_service_categories_and_services(conn)
+        nav_services = conn.execute(
+            'SELECT name, slug FROM service_categories WHERE is_published = 1 ORDER BY display_order'
+        ).fetchall()
     conn.close()
     return {
         'now': datetime.datetime.now(),
         'nav_services': nav_services
     }
+
+@app.route('/api/admin/restore-service-categories', methods=['GET', 'POST'])
+def restore_service_categories():
+    from database import seed_service_categories_and_services
+    conn = get_db_connection()
+    force = request.args.get('force') == '1'
+    if force:
+        try:
+            conn.execute("DELETE FROM services")
+            conn.execute("DELETE FROM service_categories")
+            conn.commit()
+        except Exception as e:
+            print(f"[RESTORE] Clean tables error: {e}")
+            
+    seed_service_categories_and_services(conn, force=force)
+    
+    count_after = 0
+    svc_count = 0
+    try:
+        count_after = conn.execute("SELECT COUNT(*) FROM service_categories").fetchone()[0]
+        svc_count = conn.execute("SELECT COUNT(*) FROM services").fetchone()[0]
+    except Exception:
+        pass
+    conn.close()
+    
+    if request.args.get('redirect') == 'admin':
+        return redirect('/admin')
+    return jsonify({
+        'status': 'success',
+        'categories_count': count_after,
+        'services_count': svc_count,
+        'message': f'Successfully restored {count_after} service categories and {svc_count} services!'
+    })
 
 # ==========================================
 # PUBLIC ROUTES
@@ -317,8 +356,14 @@ def about():
 
 @app.route('/services')
 def services():
+    from database import seed_service_categories_and_services
     conn = get_db_connection()
     categories = conn.execute('SELECT * FROM service_categories WHERE is_published = 1 ORDER BY display_order').fetchall()
+    
+    # Auto-heal: If empty, seed and re-fetch!
+    if not categories:
+        seed_service_categories_and_services(conn)
+        categories = conn.execute('SELECT * FROM service_categories WHERE is_published = 1 ORDER BY display_order').fetchall()
     
     # We will pass a dict of category -> services to the template
     services_by_cat = {}
@@ -330,9 +375,14 @@ def services():
 
 @app.route('/services/<slug>')
 def service_category(slug):
+    from database import seed_service_categories_and_services
     conn = get_db_connection()
     category = conn.execute('SELECT * FROM service_categories WHERE slug = ? AND is_published = 1', (slug,)).fetchone()
     
+    if not category:
+        seed_service_categories_and_services(conn)
+        category = conn.execute('SELECT * FROM service_categories WHERE slug = ? AND is_published = 1', (slug,)).fetchone()
+
     if not category:
         conn.close()
         return "Service category not found or unpublished", 404
@@ -1073,7 +1123,11 @@ import json
 def api_service_categories():
     conn = get_db_connection()
     if request.method == 'GET':
+        from database import seed_service_categories_and_services
         categories = conn.execute('SELECT * FROM service_categories ORDER BY display_order ASC').fetchall()
+        if not categories:
+            seed_service_categories_and_services(conn)
+            categories = conn.execute('SELECT * FROM service_categories ORDER BY display_order ASC').fetchall()
         result = []
         for c in categories:
             c_dict = dict(c)
@@ -1263,6 +1317,11 @@ def api_service_categories_reorder():
 def api_services():
     conn = get_db_connection()
     if request.method == 'GET':
+        from database import seed_service_categories_and_services
+        count = conn.execute('SELECT COUNT(*) FROM services').fetchone()[0]
+        if count == 0:
+            seed_service_categories_and_services(conn)
+            
         cat_id = request.args.get('category_id')
         if cat_id:
             services = conn.execute('''

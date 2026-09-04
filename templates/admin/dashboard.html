@@ -199,10 +199,16 @@
                                 <h2>Service Categories (Services Nav Dropdown)</h2>
                                 <p style="font-size: 0.85rem; color: var(--admin-text-light); margin-top: 4px;">Manage category pages, hero media, and dropdown menu options.</p>
                             </div>
-                            <button class="btn-admin btn-admin-primary" id="btn-add-service-category">
-                                <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
-                                <span>Add Category</span>
-                            </button>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <button class="btn-admin btn-admin-secondary" id="btn-restore-service-categories" title="Restore all original service categories & services">
+                                    <i data-lucide="rotate-ccw" style="width: 15px; height: 15px;"></i>
+                                    <span>Restore Defaults</span>
+                                </button>
+                                <button class="btn-admin btn-admin-primary" id="btn-add-service-category">
+                                    <i data-lucide="plus" style="width: 16px; height: 16px;"></i>
+                                    <span>Add Category</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="table-responsive">
                             <table class="data-table">

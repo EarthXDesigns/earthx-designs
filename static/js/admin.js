@@ -608,6 +608,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnRestoreServiceCategories = document.getElementById('btn-restore-service-categories');
+    if (btnRestoreServiceCategories) {
+        btnRestoreServiceCategories.addEventListener('click', async () => {
+            if (!confirm('Restore default service categories and standard options? Existing categories will be preserved unless duplicates exist.')) {
+                return;
+            }
+            try {
+                btnRestoreServiceCategories.disabled = true;
+                btnRestoreServiceCategories.innerHTML = '<i data-lucide="loader" class="spin" style="width:15px;height:15px;"></i> Restoring...';
+                initIcons();
+                const res = await fetch('/api/admin/restore-service-categories?force=1', { method: 'POST' });
+                const data = await res.json();
+                if (res.ok) {
+                    alert(data.message || 'Service categories restored successfully!');
+                    fetchServiceCategories();
+                    fetchServices();
+                } else {
+                    alert(data.error || 'Failed to restore service categories.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred while restoring service categories.');
+            } finally {
+                btnRestoreServiceCategories.disabled = false;
+                btnRestoreServiceCategories.innerHTML = '<i data-lucide="rotate-ccw" style="width:15px;height:15px;"></i> <span>Restore Defaults</span>';
+                initIcons();
+            }
+        });
+    }
+
     // --- SERVICES / SERVICE OPTIONS LOGIC ---
     const fetchServices = async (filterCatId = '') => {
         try {
