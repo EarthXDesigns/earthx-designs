@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 5. Scroll-Reveal Observer with Smooth Staggering
-    const revealTargets = document.querySelectorAll('.reveal-on-scroll, .section-header, .service-card, .project-card, .feature-box, .why-card');
+    const revealTargets = document.querySelectorAll('.reveal-on-scroll, .section-header, .service-card, .project-card, .feature-box, .why-card, .testimonial-bubble, .blog-card, .contact-detail-item, .contact-form-panel');
     if ('IntersectionObserver' in window && revealTargets.length > 0) {
         const revealObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
