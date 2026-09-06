@@ -600,7 +600,7 @@ def init_db(data_dir=None):
     if user_count == 0:
         cursor = conn.cursor()
         # 1. Seed Admin User
-        admin_email = 'sales.earthxd@gmail.com'
+        admin_email = 'Sales@earthxdesigns.com'
         admin_pw = 'EarthX@123'
         hashed_pw = generate_password_hash(admin_pw)
         cursor.execute("INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)", (admin_email, hashed_pw, 'EarthX Admin', 'super_admin'))
@@ -782,6 +782,14 @@ def init_db(data_dir=None):
             conn.commit()
     except Exception as e:
         print(f"[SITE SETTINGS INIT ERROR] {e}")
+
+    # Ensure existing users with legacy email are upgraded to Sales@earthxdesigns.com
+    try:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE users SET email = 'Sales@earthxdesigns.com' WHERE LOWER(email) = 'sales.earthxd@gmail.com'")
+        conn.commit()
+    except Exception as e:
+        print(f"[USER EMAIL MIGRATE ERROR] {e}")
 
     conn.close()
 

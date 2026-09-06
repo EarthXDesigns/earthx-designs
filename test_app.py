@@ -73,7 +73,7 @@ class EarthXDesignsTestCase(unittest.TestCase):
     def test_admin_login_success(self):
         """Test that login works with seeded admin credentials."""
         payload = {
-            'email': 'sales.earthxd@gmail.com',
+            'email': 'Sales@earthxdesigns.com',
             'password': 'EarthX@123'
         }
         response = self.app.post('/admin/login', data=payload)
@@ -85,7 +85,7 @@ class EarthXDesignsTestCase(unittest.TestCase):
         """Test project creation, edit, and dedicated gallery upload isolation."""
         import io
         # 1. Login
-        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+        self.app.post('/admin/login', data={'email': 'Sales@earthxdesigns.com', 'password': 'EarthX@123'})
 
         # 2. Add Project
         add_data = {
@@ -153,7 +153,7 @@ class EarthXDesignsTestCase(unittest.TestCase):
     def test_cross_project_isolation_and_no_cache_headers(self):
         """Test that updating one project never affects another project, and API responses have no-cache headers."""
         import io
-        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+        self.app.post('/admin/login', data={'email': 'Sales@earthxdesigns.com', 'password': 'EarthX@123'})
 
         # 1. Verify API endpoints return no-store, no-cache headers
         res_api = self.app.get('/api/projects')
@@ -216,7 +216,7 @@ class EarthXDesignsTestCase(unittest.TestCase):
         """Test the Admin CRM controls to add, replace, and remove the Home page Who We Are featured image."""
         import io
         # 1. Login
-        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+        self.app.post('/admin/login', data={'email': 'Sales@earthxdesigns.com', 'password': 'EarthX@123'})
 
         # 2. GET current home settings
         res = self.app.get('/api/admin/home-settings')
@@ -273,7 +273,7 @@ class EarthXDesignsTestCase(unittest.TestCase):
         from app import compress_video_web_optimized, get_ffmpeg_executable
 
         # 1. Login as admin
-        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+        self.app.post('/admin/login', data={'email': 'Sales@earthxdesigns.com', 'password': 'EarthX@123'})
 
         # 2. GET current home settings (must return hero_bg_media)
         res = self.app.get('/api/admin/home-settings')

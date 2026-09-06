@@ -437,7 +437,7 @@ Message:
     smtp_port = os.environ.get('SMTP_PORT')
     smtp_user = os.environ.get('SMTP_USER')
     smtp_password = os.environ.get('SMTP_PASSWORD')
-    smtp_to = os.environ.get('SMTP_TO', 'sales.earthxd@gmail.com')
+    smtp_to = os.environ.get('SMTP_TO', 'Sales@earthxdesigns.com')
     
     if smtp_host and smtp_user and smtp_password:
         import smtplib

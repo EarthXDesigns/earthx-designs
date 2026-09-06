@@ -58,7 +58,7 @@ python app.py
 The server starts at `http://127.0.0.1:5000`.
 
 ### Default Admin Credentials
-- **Email:** `sales.earthxd@gmail.com`
+- **Email:** `Sales@earthxdesigns.com`
 - **Password:** `EarthX@123`
 
 > ⚠️ Change the default password after first login via the **User Access** tab in the admin panel.
@@ -103,6 +103,6 @@ EarthX_designs/
 
 ## 📧 Contact
 
-- **Email:** sales.earthxd@gmail.com
+- **Email:** Sales@earthxdesigns.com
 - **WhatsApp:** +91 9978841256
 - **Address:** 317, Devashish Business Park, Premchand Nagar Rd, Bodakdev, Ahmedabad, Gujarat 380015
