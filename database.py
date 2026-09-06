@@ -770,6 +770,19 @@ def init_db(data_dir=None):
 
     # Always ensure service categories and options are seeded even if admin already exists
     seed_service_categories_and_services(conn)
+
+    # Ensure site_settings table and default who_we_are_image exist
+    try:
+        conn.execute("CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM site_settings WHERE key = 'home_who_we_are_image'")
+        row = cursor.fetchone()
+        if not row:
+            cursor.execute("INSERT OR REPLACE INTO site_settings (key, value) VALUES (?, ?)", ('home_who_we_are_image', '/uploads/commercial_solar_featured.png'))
+            conn.commit()
+    except Exception as e:
+        print(f"[SITE SETTINGS INIT ERROR] {e}")
+
     conn.close()
 
 if __name__ == '__main__':

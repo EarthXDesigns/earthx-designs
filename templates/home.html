@@ -48,7 +48,7 @@
 <!-- About Section (Who We Are / Technical Engineering Engine) -->
 <section class="section-padding bg-light-sec who-we-are-section">
     <div class="container">
-        <div class="about-home-grid grid grid-2">
+        <div class="about-home-grid {% if who_we_are_image %}grid grid-2{% else %}about-home-no-image{% endif %}">
             <div class="about-home-text">
                 <div class="who-we-are-pill">
                     <span class="pill-dot"></span>
@@ -115,10 +115,11 @@
                 </div>
             </div>
             
+            {% if who_we_are_image %}
             <div class="about-home-image-col">
                 <div class="about-home-image">
                     <div class="img-wrapper">
-                        <img src="/uploads/commercial_solar_featured.png" alt="Commercial Solar Installation Engineering" loading="lazy">
+                        <img src="{{ who_we_are_image }}" alt="Commercial Solar Installation Engineering" loading="lazy">
                     </div>
                     
                     <!-- Floating Top Trust Pill -->
@@ -136,6 +137,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
         </div>
     </div>
 </section>

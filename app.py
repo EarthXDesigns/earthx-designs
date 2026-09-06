@@ -257,6 +257,31 @@ def serve_uploads(filename):
         return send_from_directory(os.path.join(app.root_path, 'static', 'default_images'), filename, max_age=86400)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, max_age=86400)
 
+def get_site_setting(key, default=''):
+    try:
+        conn = get_db_connection()
+        conn.execute("CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+        row = conn.execute("SELECT value FROM site_settings WHERE key = ?", (key,)).fetchone()
+        conn.close()
+        if row and row['value'] is not None:
+            return row['value']
+    except Exception as e:
+        print(f"[SITE SETTINGS GET ERROR] {e}")
+    return default
+
+def set_site_setting(key, value):
+    try:
+        conn = get_db_connection()
+        conn.execute("CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+        cursor = conn.cursor()
+        cursor.execute("INSERT OR REPLACE INTO site_settings (key, value) VALUES (?, ?)", (key, value))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"[SITE SETTINGS SET ERROR] {e}")
+        return False
+
 # Login decorator
 def login_required(f):
     from functools import wraps
@@ -441,7 +466,8 @@ def home():
     client_logos = conn.execute("SELECT * FROM client_logos WHERE is_published = 1 ORDER BY display_order ASC, id ASC").fetchall()
     
     conn.close()
-    return render_template('home.html', projects=projects, testimonials=testimonials, blogs=blogs, client_logos=client_logos)
+    who_we_are_image = get_site_setting('home_who_we_are_image', '/uploads/commercial_solar_featured.png')
+    return render_template('home.html', projects=projects, testimonials=testimonials, blogs=blogs, client_logos=client_logos, who_we_are_image=who_we_are_image)
 
 @app.route('/about')
 def about():
@@ -1877,6 +1903,71 @@ def api_client_logo_detail(logo_id):
         conn.commit()
         conn.close()
         return jsonify({'message': 'Client logo deleted successfully'})
+
+# 10. HOME PAGE SETTINGS API
+@app.route('/api/admin/home-settings', methods=['GET', 'POST'])
+@login_required
+def api_admin_home_settings():
+    if request.method == 'GET':
+        who_we_are_image = get_site_setting('home_who_we_are_image', '/uploads/commercial_solar_featured.png')
+        return jsonify({
+            'success': True,
+            'who_we_are_image': who_we_are_image
+        })
+
+    # POST - Add / Replace / Remove
+    if request.is_json:
+        data = request.get_json(silent=True) or {}
+    else:
+        data = request.form or {}
+    remove_image = data.get('remove_image')
+    if str(remove_image) == '1' or str(remove_image).lower() == 'true':
+        set_site_setting('home_who_we_are_image', '')
+        return jsonify({
+            'success': True,
+            'who_we_are_image': '',
+            'message': 'Image removed successfully from Who We Are section.'
+        })
+
+    # Check preset
+    preset_image = data.get('preset_image')
+    if preset_image:
+        preset_image = preset_image.strip()
+        set_site_setting('home_who_we_are_image', preset_image)
+        return jsonify({
+            'success': True,
+            'who_we_are_image': preset_image,
+            'message': 'Who We Are featured image updated successfully!'
+        })
+
+    # Check uploaded file
+    file = request.files.get('who_we_are_image') if hasattr(request, 'files') else None
+    if not file and hasattr(request, 'files'):
+        file = request.files.get('image')
+    if file and file.filename != '':
+        new_path = save_uploaded_file(file, prefix="home_who_we_are")
+        if new_path:
+            set_site_setting('home_who_we_are_image', new_path)
+            return jsonify({
+                'success': True,
+                'who_we_are_image': new_path,
+                'message': 'Featured image uploaded and updated successfully!'
+            })
+        else:
+            return jsonify({'error': 'Invalid file format. Allowed formats: PNG, JPG, JPEG, WEBP, SVG'}), 400
+
+    # Check custom_url
+    custom_url = data.get('custom_url')
+    if custom_url is not None and custom_url != '':
+        custom_url = custom_url.strip()
+        set_site_setting('home_who_we_are_image', custom_url)
+        return jsonify({
+            'success': True,
+            'who_we_are_image': custom_url,
+            'message': 'Featured image updated successfully!'
+        })
+
+    return jsonify({'error': 'No image file or preset specified'}), 400
 
 # Main entrypoint setup
 if __name__ == '__main__':

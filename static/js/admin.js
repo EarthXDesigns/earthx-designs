@@ -115,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'client-logos-tab':
                 fetchClientLogos();
                 break;
+            case 'home-tab':
+                fetchHomeSettings();
+                break;
             case 'users-tab':
                 fetchUsers();
                 break;
@@ -2255,6 +2258,252 @@ document.addEventListener('DOMContentLoaded', () => {
                     submitBtn.innerHTML = originalBtnHtml;
                     initIcons();
                 }
+            }
+        });
+    }
+
+    // ==========================================
+    // 10. HOME PAGE FEATURED IMAGE SETTINGS
+    // ==========================================
+    let currentHomeImage = '';
+
+    const showHomeAlert = (message, type = 'success') => {
+        const box = document.getElementById('home-img-alert-box');
+        if (!box) return;
+        box.textContent = message;
+        if (type === 'success') {
+            box.style.background = '#dcfce7';
+            box.style.color = '#166534';
+            box.style.border = '1px solid #bbf7d0';
+        } else {
+            box.style.background = '#fee2e2';
+            box.style.color = '#991b1b';
+            box.style.border = '1px solid #fecaca';
+        }
+        box.style.display = 'block';
+        setTimeout(() => {
+            if (box) box.style.display = 'none';
+        }, 4500);
+    };
+
+    const updateHomeImagePreview = (src) => {
+        const img = document.getElementById('home-who-preview-img');
+        const emptyNotice = document.getElementById('home-img-empty-notice');
+        const badge = document.getElementById('home-img-status-badge');
+        const pathDisplay = document.getElementById('home-img-path-display');
+
+        if (src && src.trim() !== '') {
+            if (img) {
+                img.src = src;
+                img.style.display = 'block';
+            }
+            if (emptyNotice) emptyNotice.style.display = 'none';
+            if (badge) {
+                badge.textContent = 'Active';
+                badge.className = 'badge-status badge-published';
+            }
+            if (pathDisplay) pathDisplay.textContent = 'Path: ' + src;
+        } else {
+            if (img) {
+                img.src = '';
+                img.style.display = 'none';
+            }
+            if (emptyNotice) {
+                emptyNotice.style.display = 'flex';
+            }
+            if (badge) {
+                badge.textContent = 'No Image (Full-Width Text)';
+                badge.className = 'badge-status badge-draft';
+            }
+            if (pathDisplay) pathDisplay.textContent = 'No image set (text will span full width on Home page)';
+        }
+        initIcons();
+    };
+
+    const fetchHomeSettings = async () => {
+        try {
+            const res = await fetch('/api/admin/home-settings');
+            if (res.ok) {
+                const data = await res.json();
+                currentHomeImage = data.who_we_are_image || '';
+                updateHomeImagePreview(currentHomeImage);
+                
+                // Highlight active preset button if match
+                document.querySelectorAll('.home-preset-btn').forEach(btn => {
+                    if (btn.getAttribute('data-preset') === currentHomeImage) {
+                        btn.classList.add('active-preset');
+                    } else {
+                        btn.classList.remove('active-preset');
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Error fetching home settings:', err);
+        }
+    };
+
+    // Preset button clicks
+    document.querySelectorAll('.home-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const presetUrl = btn.getAttribute('data-preset');
+            const presetInput = document.getElementById('home-preset-input');
+            const removeInput = document.getElementById('home-remove-input');
+            if (presetInput) presetInput.value = presetUrl;
+            if (removeInput) removeInput.value = '0';
+            const fileInput = document.getElementById('home-img-file-input');
+            if (fileInput) fileInput.value = '';
+
+            document.querySelectorAll('.home-preset-btn').forEach(b => b.classList.remove('active-preset'));
+            btn.classList.add('active-preset');
+
+            updateHomeImagePreview(presetUrl);
+            const badge = document.getElementById('home-img-status-badge');
+            if (badge) {
+                badge.textContent = 'Preset Selected (Click Save)';
+                badge.className = 'badge-status badge-draft';
+            }
+        });
+    });
+
+    // File input change preview
+    const homeFileInput = document.getElementById('home-img-file-input');
+    if (homeFileInput) {
+        homeFileInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) {
+                const presetInput = document.getElementById('home-preset-input');
+                const removeInput = document.getElementById('home-remove-input');
+                if (presetInput) presetInput.value = '';
+                if (removeInput) removeInput.value = '0';
+                document.querySelectorAll('.home-preset-btn').forEach(b => b.classList.remove('active-preset'));
+                
+                const objectUrl = URL.createObjectURL(file);
+                updateHomeImagePreview(objectUrl);
+                const pathDisplay = document.getElementById('home-img-path-display');
+                if (pathDisplay) pathDisplay.textContent = 'Selected: ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)';
+                const badge = document.getElementById('home-img-status-badge');
+                if (badge) {
+                    badge.textContent = 'File Ready (Click Save)';
+                    badge.className = 'badge-status badge-draft';
+                }
+            }
+        });
+    }
+
+    // Save / Update form submit
+    const homeForm = document.getElementById('form-home-image-settings');
+    if (homeForm) {
+        homeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('btn-save-home-image');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Updating...';
+                initIcons();
+            }
+
+            try {
+                const formData = new FormData(homeForm);
+                const res = await fetch('/api/admin/home-settings', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (res.status === 401) {
+                    alert('Your admin session has expired. Please log in again.');
+                    window.location.href = '/admin/login';
+                    return;
+                }
+
+                const result = await res.json();
+                if (res.ok) {
+                    currentHomeImage = result.who_we_are_image || '';
+                    updateHomeImagePreview(currentHomeImage);
+                    showHomeAlert(result.message || 'Featured image updated successfully!', 'success');
+                    const fileInput = document.getElementById('home-img-file-input');
+                    if (fileInput) fileInput.value = '';
+                    const presetInput = document.getElementById('home-preset-input');
+                    if (presetInput) presetInput.value = '';
+                    const removeInput = document.getElementById('home-remove-input');
+                    if (removeInput) removeInput.value = '0';
+                    fetchHomeSettings();
+                } else {
+                    alert(result.error || 'Failed to update image.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred while saving: ' + (err.message || 'Network error'));
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                    initIcons();
+                }
+            }
+        });
+    }
+
+    // Reset to Default button
+    const btnResetDefault = document.getElementById('btn-reset-default-home-image');
+    if (btnResetDefault) {
+        btnResetDefault.addEventListener('click', async () => {
+            if (!confirm('Reset the Who We Are section image to the default Commercial Solar featured image?')) {
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('preset_image', '/uploads/commercial_solar_featured.png');
+                const res = await fetch('/api/admin/home-settings', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    currentHomeImage = result.who_we_are_image;
+                    updateHomeImagePreview(currentHomeImage);
+                    showHomeAlert('Reset to default image successfully!', 'success');
+                    fetchHomeSettings();
+                } else {
+                    alert(result.error || 'Failed to reset.');
+                }
+            } catch (err) {
+                alert('Error resetting image: ' + err.message);
+            }
+        });
+    }
+
+    // Remove Image button
+    const btnRemoveHomeImg = document.getElementById('btn-remove-home-image');
+    if (btnRemoveHomeImg) {
+        btnRemoveHomeImg.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to remove the image from the "Who We Are" section? The section text will span full-width without an image.')) {
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('remove_image', '1');
+                const res = await fetch('/api/admin/home-settings', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    currentHomeImage = '';
+                    updateHomeImagePreview('');
+                    showHomeAlert('Image removed from Who We Are section.', 'success');
+                    document.querySelectorAll('.home-preset-btn').forEach(b => b.classList.remove('active-preset'));
+                    const fileInput = document.getElementById('home-img-file-input');
+                    if (fileInput) fileInput.value = '';
+                    const presetInput = document.getElementById('home-preset-input');
+                    if (presetInput) presetInput.value = '';
+                    const removeInput = document.getElementById('home-remove-input');
+                    if (removeInput) removeInput.value = '0';
+                } else {
+                    alert(result.error || 'Failed to remove image.');
+                }
+            } catch (err) {
+                alert('Error removing image: ' + err.message);
             }
         });
     }

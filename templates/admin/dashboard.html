@@ -67,6 +67,12 @@
                         <span>Client Logos</span>
                     </a>
                 </li>
+                <li class="sidebar-item" data-target="home-tab">
+                    <a href="javascript:void(0)">
+                        <i data-lucide="home" style="width: 18px; height: 18px;"></i>
+                        <span>Home Page</span>
+                    </a>
+                </li>
                 {% if session.get('user_role') == 'super_admin' %}
                 <li class="sidebar-item" data-target="users-tab">
                     <a href="javascript:void(0)">
@@ -390,7 +396,112 @@
                     </div>
                 </section>
 
-                <!-- 7. USERS TAB -->
+                <!-- 7. HOME PAGE TAB -->
+                <section class="tab-panel" id="home-tab" style="display:none;">
+                    <div class="admin-card-table" style="max-width: 960px; padding: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--admin-border); padding-bottom: 16px;">
+                            <div>
+                                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--admin-text); display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="image" style="width: 22px; height: 22px; color: var(--admin-primary);"></i>
+                                    "Who We Are" Section Featured Image
+                                </h2>
+                                <p style="font-size: 0.875rem; color: var(--admin-text-light); margin-top: 4px;">
+                                    Manage the featured engineering image displayed in the "Who We Are" (Turnkey Solar CAD) section on the website homepage. You can upload a new image, replace the existing one, choose from preset solar engineering images, or remove it entirely.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="home-img-alert-box" style="display: none; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.875rem;"></div>
+
+                        <!-- Current Image Status & Live Preview -->
+                        <div class="home-settings-grid">
+                            <!-- Left: Live Preview Card -->
+                            <div style="background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 12px; padding: 16px; text-align: center;">
+                                <div style="font-weight: 600; font-size: 0.875rem; color: var(--admin-text); margin-bottom: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+                                    <span>Current Active Image</span>
+                                    <span id="home-img-status-badge" class="badge-status badge-published" style="font-size: 0.75rem;">Active</span>
+                                </div>
+                                <div id="home-img-preview-container" style="position: relative; width: 100%; height: 260px; border-radius: 8px; overflow: hidden; background: #e2e8f0; display: flex; align-items: center; justify-content: center; border: 1px dashed #cbd5e1;">
+                                    <img id="home-who-preview-img" src="/uploads/commercial_solar_featured.png" alt="Who We Are Preview" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                    <div id="home-img-empty-notice" style="display: none; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; padding: 20px;">
+                                        <i data-lucide="image-off" style="width: 48px; height: 48px; margin-bottom: 8px; opacity: 0.6;"></i>
+                                        <p style="font-weight: 500; font-size: 0.9rem; margin: 0;">No image currently set</p>
+                                        <p style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">The homepage section will display full-width text without an image.</p>
+                                    </div>
+                                </div>
+                                <div id="home-img-path-display" style="font-family: monospace; font-size: 0.75rem; color: #64748b; margin-top: 10px; word-break: break-all; text-align: left; background: #fff; padding: 6px 10px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                                    Path: /uploads/commercial_solar_featured.png
+                                </div>
+                            </div>
+
+                            <!-- Right: Controls & Form -->
+                            <div>
+                                <form id="form-home-image-settings" enctype="multipart/form-data">
+                                    <input type="hidden" id="home-preset-input" name="preset_image" value="">
+                                    <input type="hidden" id="home-remove-input" name="remove_image" value="0">
+
+                                    <!-- Upload / Replace Input -->
+                                    <div class="form-group" style="margin-bottom: 20px;">
+                                        <label style="display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 6px; color: var(--admin-text);">
+                                            Upload / Replace Image from Computer
+                                        </label>
+                                        <input type="file" id="home-img-file-input" name="who_we_are_image" accept="image/png,image/jpeg,image/webp,image/svg+xml" class="form-control" style="padding: 8px; width: 100%; border: 1px solid var(--admin-border); border-radius: 6px; background: #fff;">
+                                        <span style="font-size: 0.75rem; color: var(--admin-text-light); margin-top: 4px; display: block;">
+                                            Recommended: 1200x800px (16:10 or 4:3 ratio). Supported: PNG, JPG, WEBP.
+                                        </span>
+                                    </div>
+
+                                    <!-- Quick Presets -->
+                                    <div class="form-group" style="margin-bottom: 20px;">
+                                        <label style="display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 8px; color: var(--admin-text);">
+                                            Or Choose from Preset Solar Images:
+                                        </label>
+                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;" id="home-preset-buttons">
+                                            <button type="button" class="btn-admin btn-admin-secondary home-preset-btn" data-preset="/uploads/commercial_solar_featured.png" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="sun" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #f59e0b;"></i>
+                                                <span>Commercial Solar (Default)</span>
+                                            </button>
+                                            <button type="button" class="btn-admin btn-admin-secondary home-preset-btn" data-preset="/uploads/ground_mount_featured.png" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="mountain" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #10b981;"></i>
+                                                <span>Ground Mount Utility</span>
+                                            </button>
+                                            <button type="button" class="btn-admin btn-admin-secondary home-preset-btn" data-preset="/uploads/residential_3d_featured.png" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="box" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #3b82f6;"></i>
+                                                <span>Residential 3D CAD</span>
+                                            </button>
+                                            <button type="button" class="btn-admin btn-admin-secondary home-preset-btn" data-preset="/uploads/sld_blueprint.png" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="file-text" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #6366f1;"></i>
+                                                <span>SLD Technical Blueprint</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 24px; border-top: 1px solid var(--admin-border); padding-top: 16px;">
+                                        <button type="submit" class="btn-admin btn-admin-primary" id="btn-save-home-image" style="width: 100%; justify-content: center; padding: 0.75rem;">
+                                            <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                                            <span>Save / Update Image</span>
+                                        </button>
+                                        
+                                        <div style="display: flex; gap: 10px;">
+                                            <button type="button" class="btn-admin btn-admin-secondary" id="btn-reset-default-home-image" style="flex: 1; justify-content: center; font-size: 0.82rem; padding: 0.6rem;">
+                                                <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                                                <span>Reset to Default</span>
+                                            </button>
+                                            
+                                            <button type="button" class="btn-admin" id="btn-remove-home-image" style="flex: 1; justify-content: center; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; font-size: 0.82rem; padding: 0.6rem;">
+                                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                                <span>Remove Image</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. USERS TAB -->
                 {% if session.get('user_role') == 'super_admin' %}
                 <section class="tab-panel" id="users-tab">
                     <div class="admin-card-table">

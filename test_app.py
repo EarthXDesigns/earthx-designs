@@ -212,5 +212,59 @@ class EarthXDesignsTestCase(unittest.TestCase):
         self.app.delete(f'/api/projects/{id_a}')
         self.app.delete(f'/api/projects/{id_b}')
 
+    def test_home_who_we_are_image_settings(self):
+        """Test the Admin CRM controls to add, replace, and remove the Home page Who We Are featured image."""
+        import io
+        # 1. Login
+        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+
+        # 2. GET current home settings
+        res = self.app.get('/api/admin/home-settings')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue(data.get('success'))
+
+        # 3. Replace image with a preset (Ground Mount)
+        res_preset = self.app.post('/api/admin/home-settings', data={'preset_image': '/uploads/ground_mount_featured.png'})
+        self.assertEqual(res_preset.status_code, 200)
+        self.assertEqual(res_preset.get_json()['who_we_are_image'], '/uploads/ground_mount_featured.png')
+
+        # Check Home page displays updated ground mount image
+        home_res = self.app.get('/')
+        self.assertEqual(home_res.status_code, 200)
+        self.assertIn(b'/uploads/ground_mount_featured.png', home_res.data)
+
+        # 4. Remove image (empty state)
+        res_remove = self.app.post('/api/admin/home-settings', data={'remove_image': '1'})
+        self.assertEqual(res_remove.status_code, 200)
+        self.assertEqual(res_remove.get_json()['who_we_are_image'], '')
+
+        # Check Home page handles removed image gracefully (full width text, no img tag for who we are)
+        home_res2 = self.app.get('/')
+        self.assertEqual(home_res2.status_code, 200)
+        self.assertIn(b'about-home-no-image', home_res2.data)
+        self.assertNotIn(b'about-home-image-col', home_res2.data)
+
+        # 5. Upload / Replace with custom file
+        fake_img = (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'custom_who_we_are.png')
+        res_upload = self.app.post('/api/admin/home-settings', data={'who_we_are_image': fake_img}, content_type='multipart/form-data')
+        self.assertEqual(res_upload.status_code, 200)
+        uploaded_path = res_upload.get_json()['who_we_are_image']
+        self.assertTrue('home_who_we_are' in uploaded_path)
+
+        # Check Home page displays new uploaded image
+        home_res3 = self.app.get('/')
+        self.assertEqual(home_res3.status_code, 200)
+        self.assertIn(uploaded_path.encode('utf-8'), home_res3.data)
+
+        # 6. Reset to default (Commercial Solar)
+        res_reset = self.app.post('/api/admin/home-settings', data={'preset_image': '/uploads/commercial_solar_featured.png'})
+        self.assertEqual(res_reset.status_code, 200)
+        self.assertEqual(res_reset.get_json()['who_we_are_image'], '/uploads/commercial_solar_featured.png')
+
+        home_res4 = self.app.get('/')
+        self.assertEqual(home_res4.status_code, 200)
+        self.assertIn(b'/uploads/commercial_solar_featured.png', home_res4.data)
+
 if __name__ == '__main__':
     unittest.main()

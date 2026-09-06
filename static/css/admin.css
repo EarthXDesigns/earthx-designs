@@ -683,3 +683,37 @@ body.admin-body {
         padding: 1rem;
     }
 }
+
+/* Home Page Settings Tab */
+.home-settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .home-settings-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+.home-preset-btn {
+    transition: all 0.2s ease;
+    border: 1px solid var(--admin-border);
+    cursor: pointer;
+    background: #ffffff;
+}
+
+.home-preset-btn:hover {
+    border-color: var(--admin-primary);
+    background: rgba(249, 115, 22, 0.05);
+}
+
+.home-preset-btn.active-preset {
+    border-color: var(--admin-primary) !important;
+    background: rgba(249, 115, 22, 0.1) !important;
+    font-weight: 600;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+}
+

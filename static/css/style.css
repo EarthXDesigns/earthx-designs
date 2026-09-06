@@ -444,6 +444,17 @@ a {
     gap: 3.5rem;
 }
 
+.about-home-no-image {
+    display: block;
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.about-home-no-image .about-features {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+
 .who-we-are-pill {
     display: inline-flex;
     align-items: center;

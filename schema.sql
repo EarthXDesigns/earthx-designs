@@ -134,3 +134,9 @@ CREATE TABLE IF NOT EXISTS uploaded_files (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS site_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+
