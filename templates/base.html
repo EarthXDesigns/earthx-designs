@@ -91,42 +91,39 @@
             <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
             <div class="mobile-nav-dropdown" id="mobile-services-dropdown">
                 <button type="button" class="mobile-dropdown-toggle" id="services-menu-trigger" aria-expanded="false">
-                    <span>Services</span>
-                    <span class="mobile-services-badge">8 Services</span>
-                    <i data-lucide="chevron-right" class="mobile-dropdown-chevron"></i>
+                    <span class="mobile-toggle-left">
+                        <span>Services</span>
+                    </span>
+                    <span class="mobile-toggle-right">
+                        <span class="mobile-services-badge">8 Services</span>
+                        <svg class="mobile-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </span>
                 </button>
                 <div class="mobile-submenu-panel" id="services-dropdown-panel">
-                    <!-- Mobile Submenu Header with Back Button -->
-                    <div class="mobile-submenu-header">
-                        <button type="button" class="submenu-back-btn" id="submenu-back-btn" aria-label="Back to Menu">
-                            <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
-                            <span>Main Menu</span>
-                        </button>
-                        <span class="submenu-title">Our Services</span>
-                        <button type="button" class="submenu-close-btn" id="submenu-close-btn" aria-label="Close Menu">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <a href="{{ url_for('services') }}" class="mobile-dropdown-all">
-                        <span class="mobile-all-label">
-                            <i data-lucide="layout-grid" style="width: 17px; height: 17px; margin-right: 8px; display: inline-block; vertical-align: middle;"></i>
-                            <strong>All Services Overview</strong>
-                        </span>
-                        <i data-lucide="arrow-right" class="nav-all-arrow" style="width: 16px; height: 16px;"></i>
-                    </a>
-                    <div class="mobile-dropdown-divider"></div>
-                    <div class="mobile-dropdown-cat-list">
-                        {% for cat in nav_services %}
-                            <a href="{{ url_for('service_category', slug=cat.slug) }}" class="mobile-dropdown-cat {% if request.path == url_for('service_category', slug=cat.slug) %}active-sub{% endif %}">
-                                <span class="cat-dot"></span>
-                                <span class="cat-name">{{ cat.name }}</span>
-                                <i data-lucide="chevron-right" class="cat-arrow"></i>
-                            </a>
-                        {% endfor %}
+                    <div class="mobile-submenu-panel-inner">
+                        <a href="{{ url_for('services') }}" class="mobile-dropdown-all">
+                            <span class="mobile-all-label">
+                                <i data-lucide="layout-grid" style="width: 17px; height: 17px; margin-right: 8px; display: inline-block; vertical-align: middle;"></i>
+                                <strong>All Services Overview</strong>
+                            </span>
+                            <i data-lucide="arrow-right" class="nav-all-arrow" style="width: 16px; height: 16px;"></i>
+                        </a>
+                        <div class="mobile-dropdown-divider"></div>
+                        <div class="mobile-dropdown-cat-list">
+                            {% for cat in nav_services %}
+                                <a href="{{ url_for('service_category', slug=cat.slug) }}" class="mobile-dropdown-cat {% if request.path == url_for('service_category', slug=cat.slug) %}active-sub{% endif %}">
+                                    <span class="cat-name-wrap">
+                                        <span class="cat-dot"></span>
+                                        <span class="cat-name">{{ cat.name }}</span>
+                                    </span>
+                                    <svg class="cat-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </a>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>

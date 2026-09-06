@@ -76,24 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Submenu Back Button (Returns from sliding submenu panel back to main mobile drawer)
-        if (submenuBackBtn && mobileServicesDropdown) {
-            submenuBackBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                mobileServicesDropdown.classList.remove('expanded');
-                if (servicesMenuTrigger) servicesMenuTrigger.setAttribute('aria-expanded', 'false');
-            });
-        }
-
-        // Submenu Close Button (Closes entire mobile navigation immediately)
-        if (submenuCloseBtn) {
-            submenuCloseBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                closeNavMenu();
-            });
-        }
 
         // Services Menu Trigger on Mobile (Toggles sliding sub-panel)
         if (servicesMenuTrigger && mobileServicesDropdown) {
