@@ -194,7 +194,7 @@ a {
     transform: translateY(-2px);
 }
 
-/* Header & Navbar */
+/* Header & Navbar (Zero Dark Gradient Overlay) */
 .navbar {
     position: fixed;
     top: 0;
@@ -205,13 +205,17 @@ a {
     align-items: center;
     z-index: 1000;
     transition: var(--transition);
-    background: linear-gradient(180deg, rgba(7, 20, 32, 0.7) 0%, rgba(7, 20, 32, 0) 100%);
+    background: transparent;
+    background-image: none;
     border-bottom: none;
 }
 
 .navbar.scrolled {
+    background: rgba(255, 255, 255, 0.95);
     background-color: rgba(255, 255, 255, 0.95);
+    background-image: none;
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     height: 70px;
     box-shadow: var(--shadow-sm);
     border-bottom: 1px solid rgba(226, 232, 240, 0.8);

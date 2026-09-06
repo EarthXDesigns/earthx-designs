@@ -329,7 +329,7 @@ def inject_global_data():
         return {
             'now': now,
             'nav_services': _NAV_SERVICES_CACHE,
-            'asset_version': '20260906_v10'
+            'asset_version': '20260906_v11'
         }
 
     from database import seed_service_categories_and_services
@@ -348,7 +348,7 @@ def inject_global_data():
     _NAV_SERVICES_CACHE_TIME = now_ts
 
     # Cache busting timestamp for static assets (updated upon code deploys)
-    asset_version = "20260906_v10"
+    asset_version = "20260906_v11"
 
     return {
         'now': now,
