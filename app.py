@@ -887,16 +887,15 @@ def api_project_detail(proj_id):
             WHERE id = ?
         ''', (title, category_id, capacity, location, client_name or None, description, services_delivered, featured_image_url, completion_date, status, proj_id))
         
-        # Add new gallery images if uploaded
+        # Add new gallery images if uploaded via project form (legacy support)
         gallery_files = request.files.getlist('gallery_images')
-        # Get maximum display order
-        max_order = conn.execute('SELECT MAX(display_order) FROM project_images WHERE project_id = ?', (proj_id,)).fetchone()[0] or 0
-        
-        for i, gfile in enumerate(gallery_files):
-            if gfile and gfile.filename != '' and allowed_file(gfile.filename):
-                gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + i + 1}")
-                if gurl:
-                    conn.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (proj_id, gurl, max_order + i + 1))
+        if gallery_files and any(f and f.filename != '' for f in gallery_files):
+            max_order = conn.execute('SELECT MAX(display_order) FROM project_images WHERE project_id = ?', (proj_id,)).fetchone()[0] or 0
+            for i, gfile in enumerate(gallery_files):
+                if gfile and gfile.filename != '' and allowed_file(gfile.filename):
+                    gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + i + 1}")
+                    if gurl:
+                        conn.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (proj_id, gurl, max_order + i + 1))
                 
         conn.commit()
         conn.close()
@@ -983,6 +982,37 @@ def api_delete_gallery_image(img_id):
             except Exception: pass
             
     return jsonify({'message': 'Gallery image deleted successfully'})
+
+# Bulk delete gallery images
+@app.route('/api/projects/gallery/bulk-delete', methods=['POST'])
+@login_required
+def api_bulk_delete_gallery_images():
+    data = request.json or {}
+    image_ids = data.get('image_ids', [])
+    if not image_ids or not isinstance(image_ids, list):
+        return jsonify({'error': 'No image IDs provided for deletion.'}), 400
+
+    conn = get_db_connection()
+    placeholders = ','.join(['?'] * len(image_ids))
+    images = conn.execute(f'SELECT id, image_path FROM project_images WHERE id IN ({placeholders})', image_ids).fetchall()
+
+    if not images:
+        conn.close()
+        return jsonify({'message': 'No matching images found', 'deleted_count': 0})
+
+    conn.execute(f'DELETE FROM project_images WHERE id IN ({placeholders})', image_ids)
+    conn.commit()
+    conn.close()
+
+    deleted_count = len(images)
+    for img in images:
+        if img['image_path'].startswith('/uploads/'):
+            filepath = os.path.join(app.root_path, img['image_path'].lstrip('/'))
+            if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
+                try: os.remove(filepath)
+                except Exception: pass
+
+    return jsonify({'message': f'Successfully deleted {deleted_count} gallery images', 'deleted_count': deleted_count})
 
 # Reorder gallery images
 @app.route('/api/projects/gallery/reorder', methods=['POST'])

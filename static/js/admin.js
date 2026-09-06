@@ -1076,9 +1076,6 @@ document.addEventListener('DOMContentLoaded', () => {
             featInput.required = true;
         }
 
-        const galInput = document.getElementById('project-gallery-images');
-        if (galInput) galInput.value = '';
-
         const preview = document.getElementById('project-featured-preview');
         if (preview) {
             preview.innerHTML = `<i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>`;
@@ -1087,11 +1084,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const titleEl = document.getElementById('project-modal-title');
         if (titleEl) titleEl.textContent = 'Add Project';
 
+        const helpEl = document.getElementById('project-featured-help');
+        if (helpEl) helpEl.textContent = 'Select the main cover image for this project.';
+
+        const galleryInfo = document.getElementById('project-edit-gallery-info');
+        if (galleryInfo) galleryInfo.style.display = 'none';
+
         initIcons();
     };
     window.resetProjectModal = resetProjectModal;
 
-    // Project form submit (Supports multipart uploads with strict isolation)
+    // Project form submit (Clean metadata + featured image only)
     document.getElementById('project-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -1100,14 +1103,14 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;"></i> Optimizing & Saving...';
+                submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;"></i> Saving...';
                 initIcons();
             }
 
             const id = document.getElementById('project-id').value;
             const formData = new FormData(e.target);
 
-            // Auto-compress featured image if a new file was actually selected
+            // Auto-compress featured image if a new file was selected
             const featInput = document.getElementById('project-featured-image');
             if (featInput && featInput.files && featInput.files[0]) {
                 const originalFile = featInput.files[0];
@@ -1116,15 +1119,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     formData.set('featured_image', compressed);
                 }
             } else if (id) {
-                // If editing and no new featured image chosen, omit empty field
+                // If editing and no new featured image chosen, omit empty field so current image is preserved
                 formData.delete('featured_image');
             }
 
-            // If editing and no gallery images selected, delete empty field to avoid spurious uploads
-            const galInput = document.getElementById('project-gallery-images');
-            if (id && (!galInput || !galInput.files || galInput.files.length === 0)) {
-                formData.delete('gallery_images');
-            }
+            // Always ensure no gallery_images are sent from the project form (handled exclusively via Drawings modal)
+            formData.delete('gallery_images');
             
             const url = id ? `/api/projects/${id}` : '/api/projects';
             const res = await fetch(url, {
@@ -1140,9 +1140,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await res.json();
             if (res.ok) {
+                const wasAdd = !id;
+                const newId = data.id;
                 resetProjectModal();
                 closeModal('project-modal');
                 fetchProjects();
+                
+                // If user just created a new project, offer to open Gallery Manager to add drawings right away
+                if (wasAdd && newId) {
+                    setTimeout(() => {
+                        if (confirm('Project created successfully! Would you like to upload drawings to this project now?')) {
+                            openGalleryManager(newId);
+                        }
+                    }, 250);
+                }
             } else {
                 alert(data.error || 'An error occurred.');
             }
@@ -1162,6 +1173,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resetProjectModal();
         document.getElementById('project-featured-image').required = true;
         document.getElementById('project-modal-title').textContent = 'Add Project';
+        const helpEl = document.getElementById('project-featured-help');
+        if (helpEl) helpEl.textContent = 'Upload the featured project cover image (required).';
         
         // Ensure categories are loaded
         fetchCategories().then(() => {
@@ -1194,16 +1207,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('project-services').value = p.services_delivered || '';
                 document.getElementById('project-description').value = p.description || '';
                 
-                // Explicitly clear file inputs so they never inherit or leak files
+                // Clear file input & make optional for edit
                 document.getElementById('project-featured-image').value = '';
-                document.getElementById('project-gallery-images').value = '';
-                document.getElementById('project-featured-image').required = false; // Not required for editing
+                document.getElementById('project-featured-image').required = false;
                 
-                // Show current featured image
+                const helpEl = document.getElementById('project-featured-help');
+                if (helpEl) helpEl.textContent = 'Leave empty to keep current image, or select a new file to replace it.';
+
+                // Show current featured image preview
                 if (p.featured_image) {
                     document.getElementById('project-featured-preview').innerHTML = `<img src="${p.featured_image}" alt="Featured preview">`;
                 } else {
                     document.getElementById('project-featured-preview').innerHTML = `<i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>`;
+                }
+
+                // Show Gallery Manager shortcut inside Edit tab
+                const galleryInfo = document.getElementById('project-edit-gallery-info');
+                const galBtn = document.getElementById('btn-open-gallery-from-edit');
+                const galBtnText = document.getElementById('edit-modal-gallery-btn-text');
+                if (galleryInfo && galBtn) {
+                    galleryInfo.style.display = 'block';
+                    const drawingsCount = (p.gallery && p.gallery.length) || 0;
+                    if (galBtnText) galBtnText.textContent = `Manage Drawings (${drawingsCount})`;
+                    galBtn.onclick = () => {
+                        closeModal('project-modal');
+                        openGalleryManager(p.id);
+                    };
                 }
                 
                 document.getElementById('project-modal-title').textContent = 'Edit Project';
@@ -1230,7 +1259,28 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // --- PROJECT GALLERY MANAGER LOGIC ---
+    // --- PROJECT GALLERY MANAGER LOGIC (Multi-Add, Multi-Select, Bulk-Delete) ---
+    const updateBulkDeleteVisibility = () => {
+        const selectedCheckboxes = document.querySelectorAll('.gallery-item-select:checked');
+        const count = selectedCheckboxes.length;
+        const bulkDeleteBtn = document.getElementById('btn-bulk-delete-gallery');
+        const countSpan = document.getElementById('gallery-selected-count');
+        const selectAllCheckbox = document.getElementById('gallery-select-all');
+        const allCheckboxes = document.querySelectorAll('.gallery-item-select');
+
+        if (countSpan) countSpan.textContent = count;
+        if (bulkDeleteBtn) {
+            bulkDeleteBtn.style.display = count > 0 ? 'inline-flex' : 'none';
+        }
+        if (selectAllCheckbox && allCheckboxes.length > 0) {
+            selectAllCheckbox.checked = count === allCheckboxes.length;
+            selectAllCheckbox.indeterminate = count > 0 && count < allCheckboxes.length;
+        } else if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+    };
+
     const loadGalleryImages = async (projId) => {
         try {
             const res = await fetch(`/api/projects/${projId}`);
@@ -1238,26 +1288,49 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const list = document.getElementById('gallery-manager-list');
             const emptyText = document.getElementById('gallery-empty-text');
+            const totalCount = document.getElementById('gallery-total-count');
+            const subtitle = document.getElementById('gallery-modal-subtitle');
             list.innerHTML = '';
             
-            if (!data.gallery || data.gallery.length === 0) {
+            if (subtitle && data.title) {
+                subtitle.textContent = `Drawings & renderings for "${data.title}"`;
+            }
+
+            const drawings = data.gallery || [];
+            if (totalCount) totalCount.textContent = drawings.length;
+
+            if (drawings.length === 0) {
                 emptyText.style.display = 'block';
             } else {
                 emptyText.style.display = 'none';
                 
-                data.gallery.forEach(img => {
+                drawings.forEach(img => {
                     const div = document.createElement('div');
                     div.classList.add('gallery-preview-item');
+                    div.dataset.imgId = img.id;
                     div.innerHTML = `
-                        <img src="${img.image_path}" alt="Gallery item">
-                        <button class="gallery-preview-item-delete" onclick="deleteGalleryImage(${img.id}, ${projId})">&times;</button>
-                        <input type="text" value="${img.caption || ''}" placeholder="Caption..." 
-                               onblur="updateGalleryCaption(${img.id}, this.value)" 
-                               style="width: 100%; font-size: 0.72rem; padding: 2px 4px; border: 1px solid var(--admin-border); margin-top: 4px; outline:none; border-radius:3px;">
+                        <div class="img-wrapper">
+                            <input type="checkbox" class="gallery-item-select" data-img-id="${img.id}">
+                            <img src="${img.image_path}" alt="Gallery drawing" loading="lazy">
+                            <button type="button" class="gallery-preview-item-delete" title="Delete drawing" onclick="deleteGalleryImage(${img.id}, ${projId})">&times;</button>
+                        </div>
+                        <div class="gallery-item-caption-wrap">
+                            <input type="text" class="gallery-item-caption-input" value="${img.caption || ''}" placeholder="Caption (e.g. SLD, 3D)..." 
+                                   onblur="updateGalleryCaption(${img.id}, this.value)">
+                        </div>
                     `;
+
+                    // Checkbox toggle logic
+                    const chk = div.querySelector('.gallery-item-select');
+                    chk.addEventListener('change', () => {
+                        div.classList.toggle('selected', chk.checked);
+                        updateBulkDeleteVisibility();
+                    });
+
                     list.appendChild(div);
                 });
             }
+            updateBulkDeleteVisibility();
         } catch (err) {
             console.error(err);
         }
@@ -1267,9 +1340,78 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('gallery-project-id').value = projId;
         const galFiles = document.getElementById('gallery-manager-files');
         if (galFiles) galFiles.value = '';
+        const selectAll = document.getElementById('gallery-select-all');
+        if (selectAll) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        }
+        updateBulkDeleteVisibility();
         loadGalleryImages(projId);
         openModal('gallery-manager-modal');
+        initIcons();
     };
+
+    // Select All checkbox toggle
+    const selectAllCheckbox = document.getElementById('gallery-select-all');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            const items = document.querySelectorAll('.gallery-preview-item');
+            items.forEach(item => {
+                const chk = item.querySelector('.gallery-item-select');
+                if (chk) chk.checked = isChecked;
+                item.classList.toggle('selected', isChecked);
+            });
+            updateBulkDeleteVisibility();
+        });
+    }
+
+    // Bulk Delete Selected Drawings
+    const bulkDeleteBtn = document.getElementById('btn-bulk-delete-gallery');
+    if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener('click', async () => {
+            const projId = document.getElementById('gallery-project-id').value;
+            const selectedCheckboxes = document.querySelectorAll('.gallery-item-select:checked');
+            const ids = Array.from(selectedCheckboxes).map(chk => parseInt(chk.dataset.imgId, 10)).filter(id => !isNaN(id));
+
+            if (ids.length === 0) {
+                alert('No drawings selected.');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to permanently delete the ${ids.length} selected drawing(s)?`)) {
+                return;
+            }
+
+            const origHtml = bulkDeleteBtn.innerHTML;
+            bulkDeleteBtn.disabled = true;
+            bulkDeleteBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:14px;height:14px;vertical-align:middle;margin-right:4px;"></i> Deleting...';
+            initIcons();
+
+            try {
+                const res = await fetch('/api/projects/gallery/bulk-delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_ids: ids })
+                });
+
+                if (res.ok) {
+                    loadGalleryImages(projId);
+                    fetchProjects();
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    alert(errData.error || 'Failed to delete selected drawings.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error during bulk deletion: ' + (err.message || 'Network error'));
+            } finally {
+                bulkDeleteBtn.disabled = false;
+                bulkDeleteBtn.innerHTML = origHtml;
+                initIcons();
+            }
+        });
+    }
 
     // Upload more gallery drawings with dedicated endpoint & loading state
     document.getElementById('btn-upload-more-gallery').addEventListener('click', async () => {

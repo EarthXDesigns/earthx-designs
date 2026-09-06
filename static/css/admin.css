@@ -559,42 +559,96 @@ body.admin-body {
 }
 
 .gallery-preview-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    margin-top: 12px;
 }
 
 .gallery-preview-item {
-    width: 100px;
-    height: 100px;
-    border-radius: 6px;
+    border-radius: 8px;
     overflow: hidden;
     position: relative;
     border: 1px solid var(--admin-border);
+    background-color: #FFFFFF;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.gallery-preview-item.selected {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+
+.gallery-preview-item .img-wrapper {
+    position: relative;
+    width: 100%;
+    height: 110px;
+    background-color: #f1f5f9;
+    overflow: hidden;
 }
 
 .gallery-preview-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+.gallery-item-select {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    z-index: 2;
+    accent-color: var(--admin-primary);
 }
 
 .gallery-preview-item-delete {
     position: absolute;
-    top: 4px;
-    right: 4px;
-    background-color: var(--admin-danger);
+    top: 6px;
+    right: 6px;
+    background-color: rgba(239, 68, 68, 0.9);
     color: #FFFFFF;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
+    font-size: 13px;
     cursor: pointer;
     border: none;
+    z-index: 2;
+    transition: transform 0.15s, background-color 0.15s;
+}
+
+.gallery-preview-item-delete:hover {
+    background-color: rgb(220, 38, 38);
+    transform: scale(1.1);
+}
+
+.gallery-item-caption-wrap {
+    padding: 6px;
+    background: #FFFFFF;
+    border-top: 1px solid var(--admin-border);
+}
+
+.gallery-item-caption-input {
+    width: 100%;
+    font-size: 0.72rem;
+    padding: 3px 5px;
+    border: 1px solid var(--admin-border);
+    outline: none;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.gallery-item-caption-input:focus {
+    border-color: var(--admin-primary);
 }
 
 /* Responsive */

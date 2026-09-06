@@ -136,7 +136,17 @@ class EarthXDesignsTestCase(unittest.TestCase):
         self.assertEqual(proj_json['title'], 'Test Precision Solar Design - Updated')
         self.assertEqual(len(proj_json['gallery']), 2)
 
-        # 6. Delete test project
+        # 6. Test bulk deletion of gallery drawings
+        img_ids = [img['id'] for img in proj_json['gallery']]
+        res_bulk_del = self.app.post('/api/projects/gallery/bulk-delete', json={'image_ids': img_ids})
+        self.assertEqual(res_bulk_del.status_code, 200)
+        self.assertEqual(res_bulk_del.get_json()['deleted_count'], 2)
+
+        # Verify gallery is now empty
+        res_get2 = self.app.get(f'/api/projects/{proj_id}')
+        self.assertEqual(len(res_get2.get_json()['gallery']), 0)
+
+        # 7. Delete test project
         res_del = self.app.delete(f'/api/projects/{proj_id}')
         self.assertEqual(res_del.status_code, 200)
 
