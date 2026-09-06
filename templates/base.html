@@ -66,80 +66,88 @@
                 <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
                 <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %}" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
             </div>
+        </div>
+    </nav>
 
-            <!-- Mobile Navigation Drawer (Visible on Mobile <= 992px Only) -->
-            <div class="mobile-nav-drawer" id="mobile-nav-drawer">
-                <div class="mobile-nav-header">
-                    <a href="{{ url_for('home') }}" class="mobile-nav-logo">
-                        <img src="/uploads/logo_white.png?v={{ asset_version }}" alt="EarthX Designs Logo" style="height: 34px; width: auto;">
-                    </a>
-                    <button type="button" class="mobile-nav-close" id="mobile-nav-close" aria-label="Close Menu">
-                        <i data-lucide="x" style="width: 24px; height: 24px;"></i>
-                    </button>
-                </div>
+    <!-- Mobile Navigation Backdrop (Dark dimming, ZERO blur) -->
+    <div class="nav-backdrop" id="nav-backdrop"></div>
 
-                <div class="mobile-nav-body">
-                    <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
-                    <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
-                    <div class="mobile-nav-dropdown" id="mobile-services-dropdown">
-                        <button type="button" class="mobile-dropdown-toggle" id="services-menu-trigger" aria-expanded="false">
-                            <span>Services</span>
-                            <span class="mobile-services-badge">8 Services</span>
-                            <i data-lucide="chevron-right" class="mobile-dropdown-chevron"></i>
+    <!-- Mobile Navigation Drawer (Visible on Mobile <= 992px Only) -->
+    <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <div class="mobile-nav-header">
+            <a href="{{ url_for('home') }}" class="mobile-nav-logo">
+                <img src="/uploads/logo_white.png?v={{ asset_version }}" alt="EarthX Designs Logo" style="height: 34px; width: auto;">
+            </a>
+            <button type="button" class="mobile-nav-close" id="mobile-nav-close" aria-label="Close Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="mobile-nav-body">
+            <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
+            <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
+            <div class="mobile-nav-dropdown" id="mobile-services-dropdown">
+                <button type="button" class="mobile-dropdown-toggle" id="services-menu-trigger" aria-expanded="false">
+                    <span>Services</span>
+                    <span class="mobile-services-badge">8 Services</span>
+                    <i data-lucide="chevron-right" class="mobile-dropdown-chevron"></i>
+                </button>
+                <div class="mobile-submenu-panel" id="services-dropdown-panel">
+                    <!-- Mobile Submenu Header with Back Button -->
+                    <div class="mobile-submenu-header">
+                        <button type="button" class="submenu-back-btn" id="submenu-back-btn" aria-label="Back to Menu">
+                            <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+                            <span>Main Menu</span>
                         </button>
-                        <div class="mobile-submenu-panel" id="services-dropdown-panel">
-                            <!-- Mobile Submenu Header with Back Button -->
-                            <div class="mobile-submenu-header">
-                                <button type="button" class="submenu-back-btn" id="submenu-back-btn" aria-label="Back to Menu">
-                                    <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
-                                    <span>Main Menu</span>
-                                </button>
-                                <span class="submenu-title">Our Services</span>
-                                <button type="button" class="submenu-close-btn" id="submenu-close-btn" aria-label="Close Menu">
-                                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
-                                </button>
-                            </div>
-
-                            <a href="{{ url_for('services') }}" class="mobile-dropdown-all">
-                                <span class="mobile-all-label">
-                                    <i data-lucide="layout-grid" style="width: 17px; height: 17px; margin-right: 8px; display: inline-block; vertical-align: middle;"></i>
-                                    <strong>All Services Overview</strong>
-                                </span>
-                                <i data-lucide="arrow-right" class="nav-all-arrow" style="width: 16px; height: 16px;"></i>
-                            </a>
-                            <div class="mobile-dropdown-divider"></div>
-                            <div class="mobile-dropdown-cat-list">
-                                {% for cat in nav_services %}
-                                    <a href="{{ url_for('service_category', slug=cat.slug) }}" class="mobile-dropdown-cat {% if request.path == url_for('service_category', slug=cat.slug) %}active-sub{% endif %}">
-                                        <span class="cat-dot"></span>
-                                        <span class="cat-name">{{ cat.name }}</span>
-                                        <i data-lucide="chevron-right" class="cat-arrow"></i>
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        </div>
+                        <span class="submenu-title">Our Services</span>
+                        <button type="button" class="submenu-close-btn" id="submenu-close-btn" aria-label="Close Menu">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
-                    <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
-                    <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
-                    <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
-                    <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %} nav-quote-btn">Request Quote</a>
 
-                    <!-- Mobile Contact Info Bar -->
-                    <div class="mobile-nav-contact">
-                        <a href="tel:+919978841256" class="contact-pill">
-                            <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
-                            <span>+91 9978841256</span>
-                        </a>
-                        <a href="mailto:sales.earthxd@gmail.com" class="contact-pill">
-                            <i data-lucide="mail" style="width: 14px; height: 14px;"></i>
-                            <span>sales.earthxd@gmail.com</span>
-                        </a>
+                    <a href="{{ url_for('services') }}" class="mobile-dropdown-all">
+                        <span class="mobile-all-label">
+                            <i data-lucide="layout-grid" style="width: 17px; height: 17px; margin-right: 8px; display: inline-block; vertical-align: middle;"></i>
+                            <strong>All Services Overview</strong>
+                        </span>
+                        <i data-lucide="arrow-right" class="nav-all-arrow" style="width: 16px; height: 16px;"></i>
+                    </a>
+                    <div class="mobile-dropdown-divider"></div>
+                    <div class="mobile-dropdown-cat-list">
+                        {% for cat in nav_services %}
+                            <a href="{{ url_for('service_category', slug=cat.slug) }}" class="mobile-dropdown-cat {% if request.path == url_for('service_category', slug=cat.slug) %}active-sub{% endif %}">
+                                <span class="cat-dot"></span>
+                                <span class="cat-name">{{ cat.name }}</span>
+                                <i data-lucide="chevron-right" class="cat-arrow"></i>
+                            </a>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
+            <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
+            <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
+            <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %} nav-quote-btn">Request Quote</a>
+
+            <!-- Mobile Contact Info Bar -->
+            <div class="mobile-nav-contact">
+                <a href="tel:+919978841256" class="contact-pill">
+                    <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
+                    <span>+91 9978841256</span>
+                </a>
+                <a href="mailto:sales.earthxd@gmail.com" class="contact-pill">
+                    <i data-lucide="mail" style="width: 14px; height: 14px;"></i>
+                    <span>sales.earthxd@gmail.com</span>
+                </a>
+            </div>
         </div>
-    </nav>
-    <div class="nav-backdrop" id="nav-backdrop"></div>
+    </div>
 
     <!-- Main Content Area -->
     <main>
