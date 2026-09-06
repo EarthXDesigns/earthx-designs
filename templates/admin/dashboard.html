@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EarthX Designs CMS | Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v={{ asset_version }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -853,18 +853,18 @@
                 </div>
 
                 <!-- Gallery Header Toolbar -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--admin-border); padding-bottom: 10px;">
-                    <div style="display: flex; align-items: center; gap: 14px;">
-                        <span style="font-weight: 600; font-size: 0.95rem;">Current Gallery Images (<span id="gallery-total-count">0</span>)</span>
-                        <label style="font-size: 0.82rem; color: var(--admin-text-light); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; user-select: none;">
-                            <input type="checkbox" id="gallery-select-all" style="width: 15px; height: 15px; cursor: pointer;">
-                            <span>Select All</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--admin-border); padding-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                        <span style="font-weight: 700; font-size: 0.95rem; color: var(--admin-text-dark);">Current Gallery Drawings (<span id="gallery-total-count">0</span>)</span>
+                        <label id="gallery-select-all-label" style="font-size: 0.82rem; font-weight: 600; color: var(--admin-text-main); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; user-select: none; background: #F1F5F9; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--admin-border);">
+                            <input type="checkbox" id="gallery-select-all" style="width: 16px; height: 16px; cursor: pointer;">
+                            <span id="gallery-select-all-text">Select All</span>
                         </label>
                     </div>
                     <div>
-                        <button type="button" class="btn-admin btn-admin-danger" id="btn-bulk-delete-gallery" style="display: none; font-size: 0.8rem; padding: 0.35rem 0.75rem; background-color: #ef4444; color: #fff;">
+                        <button type="button" class="btn-admin btn-admin-danger" id="btn-bulk-delete-gallery" style="display: none; font-size: 0.82rem; padding: 0.45rem 1rem; background-color: #ef4444; color: #fff; border-radius: 6px; font-weight: 600; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);">
                             <i data-lucide="trash-2" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"></i>
-                            Delete Selected (<span id="gallery-selected-count">0</span>)
+                            <span>Delete Selected (<span id="gallery-selected-count">0</span>)</span>
                         </button>
                     </div>
                 </div>
@@ -1115,6 +1115,6 @@
     {% endif %}
 
     <!-- Admin dashboard core client-side scripting -->
-    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}?v={{ asset_version }}"></script>
 </body>
 </html>

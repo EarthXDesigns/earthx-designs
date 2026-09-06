@@ -118,7 +118,7 @@ def storage_status():
         'data_dir': DATA_DIR
     })
 
-def save_uploaded_file(file_storage, prefix="img"):
+def save_uploaded_file(file_storage, prefix="img", db_conn=None):
     """
     Saves an uploaded file. If CLOUDINARY_URL is configured, uploads to Cloudinary for permanent cloud storage.
     Otherwise, saves to UPLOAD_FOLDER and stores a binary BLOB in the uploaded_files database table for self-healing persistence.
@@ -209,13 +209,18 @@ def save_uploaded_file(file_storage, prefix="img"):
         if file_size <= 10 * 1024 * 1024:
             with open(save_path, 'rb') as f:
                 file_bytes = f.read()
-            conn = get_db_connection()
+            close_conn = False
+            conn = db_conn
+            if conn is None:
+                conn = get_db_connection()
+                close_conn = True
             conn.execute(
                 'INSERT OR REPLACE INTO uploaded_files (filename, mimetype, data) VALUES (?, ?, ?)',
                 (filename, file_storage.mimetype or 'application/octet-stream', file_bytes)
             )
-            conn.commit()
-            conn.close()
+            if close_conn:
+                conn.commit()
+                conn.close()
     except Exception as e:
         print(f"[STORAGE WARNING] Failed to backup image to database: {e}")
 
@@ -359,13 +364,22 @@ def inject_global_data():
     _NAV_SERVICES_CACHE_TIME = now_ts
 
     # Cache busting timestamp for static assets (updated upon code deploys)
-    asset_version = "20260906_v15"
+    asset_version = f"20260906_{int(now_ts)}"
 
     return {
         'now': now,
         'nav_services': nav_services,
         'asset_version': asset_version
     }
+
+@app.after_request
+def add_cache_control_headers(response):
+    """Ensure API endpoints are never cached by the browser, while static assets retain caching."""
+    if request.path.startswith('/api/'):
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api/admin/restore-service-categories', methods=['GET', 'POST'])
 def restore_service_categories():
@@ -810,10 +824,12 @@ def api_projects():
         # File handling for featured image
         file = request.files.get('featured_image')
         if not file or file.filename == '':
+            conn.close()
             return jsonify({'error': 'Featured image is required.'}), 400
             
-        featured_image_url = save_uploaded_file(file, "proj")
+        featured_image_url = save_uploaded_file(file, "proj", db_conn=conn)
         if not featured_image_url:
+            conn.close()
             return jsonify({'error': 'Failed to save or upload featured image.'}), 400
         
         cursor = conn.cursor()
@@ -828,7 +844,7 @@ def api_projects():
         gallery_files = request.files.getlist('gallery_images')
         for i, gfile in enumerate(gallery_files):
             if gfile and gfile.filename != '' and allowed_file(gfile.filename):
-                gurl = save_uploaded_file(gfile, f"gal_{project_id}_{i}")
+                gurl = save_uploaded_file(gfile, f"gal_{project_id}_{i}", db_conn=conn)
                 if gurl:
                     cursor.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (project_id, gurl, i))
                 
@@ -878,7 +894,7 @@ def api_project_detail(proj_id):
         # Check if new featured image was uploaded
         file = request.files.get('featured_image')
         if file and file.filename != '':
-            new_featured = save_uploaded_file(file, "proj")
+            new_featured = save_uploaded_file(file, "proj", db_conn=conn)
             if new_featured:
                 featured_image_url = new_featured
                 
@@ -893,7 +909,7 @@ def api_project_detail(proj_id):
             max_order = conn.execute('SELECT MAX(display_order) FROM project_images WHERE project_id = ?', (proj_id,)).fetchone()[0] or 0
             for i, gfile in enumerate(gallery_files):
                 if gfile and gfile.filename != '' and allowed_file(gfile.filename):
-                    gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + i + 1}")
+                    gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + i + 1}", db_conn=conn)
                     if gurl:
                         conn.execute('INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)', (proj_id, gurl, max_order + i + 1))
                 
@@ -912,18 +928,25 @@ def api_project_detail(proj_id):
         conn.close()
         
         # Clean up files from disk
-        if project and project['featured_image'].startswith('/uploads/'):
-            filepath = os.path.join(app.root_path, project['featured_image'].lstrip('/'))
-            if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
-                try: os.remove(filepath)
-                except Exception: pass
+        seed_files = {'commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png'}
+        if project and project['featured_image'] and project['featured_image'].startswith('/uploads/'):
+            fname = os.path.basename(project['featured_image'])
+            if fname not in seed_files:
+                for target_dir in [app.config['UPLOAD_FOLDER'], os.path.join(app.root_path, 'uploads')]:
+                    fpath = os.path.join(target_dir, fname)
+                    if os.path.exists(fpath):
+                        try: os.remove(fpath)
+                        except Exception: pass
                 
         for img in images:
-            if img['image_path'].startswith('/uploads/'):
-                filepath = os.path.join(app.root_path, img['image_path'].lstrip('/'))
-                if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
-                    try: os.remove(filepath)
-                    except Exception: pass
+            if img['image_path'] and img['image_path'].startswith('/uploads/'):
+                fname = os.path.basename(img['image_path'])
+                if fname not in seed_files:
+                    for target_dir in [app.config['UPLOAD_FOLDER'], os.path.join(app.root_path, 'uploads')]:
+                        fpath = os.path.join(target_dir, fname)
+                        if os.path.exists(fpath):
+                            try: os.remove(fpath)
+                            except Exception: pass
                     
         return jsonify({'message': 'Project deleted successfully'})
 
@@ -948,7 +971,7 @@ def api_upload_project_gallery(proj_id):
     uploaded_count = 0
     for i, gfile in enumerate(gallery_files):
         if gfile and gfile.filename != '' and allowed_file(gfile.filename):
-            gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + uploaded_count + 1}")
+            gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + uploaded_count + 1}", db_conn=conn)
             if gurl:
                 conn.execute(
                     'INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)',
@@ -975,11 +998,15 @@ def api_delete_gallery_image(img_id):
     conn.close()
     
     # Delete from file system if not a seed file
-    if img['image_path'].startswith('/uploads/'):
-        filepath = os.path.join(app.root_path, img['image_path'].lstrip('/'))
-        if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
-            try: os.remove(filepath)
-            except Exception: pass
+    seed_files = {'commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png'}
+    if img['image_path'] and img['image_path'].startswith('/uploads/'):
+        fname = os.path.basename(img['image_path'])
+        if fname not in seed_files:
+            for target_dir in [app.config['UPLOAD_FOLDER'], os.path.join(app.root_path, 'uploads')]:
+                fpath = os.path.join(target_dir, fname)
+                if os.path.exists(fpath):
+                    try: os.remove(fpath)
+                    except Exception: pass
             
     return jsonify({'message': 'Gallery image deleted successfully'})
 
@@ -1005,12 +1032,16 @@ def api_bulk_delete_gallery_images():
     conn.close()
 
     deleted_count = len(images)
+    seed_files = {'commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png'}
     for img in images:
-        if img['image_path'].startswith('/uploads/'):
-            filepath = os.path.join(app.root_path, img['image_path'].lstrip('/'))
-            if os.path.exists(filepath) and os.path.basename(filepath) not in ['commercial_solar_featured.png', 'ground_mount_featured.png', 'residential_3d_featured.png', 'sld_blueprint.png']:
-                try: os.remove(filepath)
-                except Exception: pass
+        if img['image_path'] and img['image_path'].startswith('/uploads/'):
+            fname = os.path.basename(img['image_path'])
+            if fname not in seed_files:
+                for target_dir in [app.config['UPLOAD_FOLDER'], os.path.join(app.root_path, 'uploads')]:
+                    fpath = os.path.join(target_dir, fname)
+                    if os.path.exists(fpath):
+                        try: os.remove(fpath)
+                        except Exception: pass
 
     return jsonify({'message': f'Successfully deleted {deleted_count} gallery images', 'deleted_count': deleted_count})
 

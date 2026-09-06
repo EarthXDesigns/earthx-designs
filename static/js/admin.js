@@ -567,11 +567,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.editServiceCategory = async (id) => {
         try {
-            const res = await fetch(`/api/service-categories/${id}`);
+            document.getElementById('service-category-form').reset();
+            if (svccatBgPreviewContainer) {
+                svccatBgPreviewContainer.innerHTML = '';
+                svccatBgPreviewContainer.style.display = 'none';
+            }
+            if (svccatPreviewContainer) {
+                svccatPreviewContainer.innerHTML = '';
+                svccatPreviewContainer.style.display = 'none';
+            }
+            if (svccatRemoveBgBtn) svccatRemoveBgBtn.style.display = 'none';
+            if (svccatRemoveBtn) svccatRemoveBtn.style.display = 'none';
+            if (svccatRemoveBgFlag) svccatRemoveBgFlag.value = '0';
+            if (svccatRemoveFlag) svccatRemoveFlag.value = '0';
+            if (svccatPresetHeroBgInput) svccatPresetHeroBgInput.value = '';
+            if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
+
+            const res = await fetch(`/api/service-categories/${id}?t=${Date.now()}`);
             const cat = await res.json();
             if (!res.ok) return alert(cat.error || 'Failed to fetch category');
 
-            document.getElementById('service-category-form').reset();
             document.getElementById('svccat-id').value = cat.id;
             document.getElementById('svccat-name').value = cat.name;
             document.getElementById('svccat-slug').value = cat.slug;
@@ -581,15 +596,11 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('svccat-hero-subtitle').value = cat.hero_subtitle || '';
             document.getElementById('svccat-short-desc').value = cat.short_description || '';
             document.getElementById('svccat-full-desc').value = cat.full_description || '';
-            
-            svccatRemoveBgFlag.value = '0';
-            svccatRemoveFlag.value = '0';
-            if (svccatPresetHeroBgInput) svccatPresetHeroBgInput.value = '';
-            if (svccatPresetMediaInput) svccatPresetMediaInput.value = '';
 
             // Hero Background Preview
             if (cat.hero_bg_image) {
-                setHeroBgPreview(cat.hero_bg_image, 'Current Hero Background:');
+                const bgUrl = `${cat.hero_bg_image}${cat.hero_bg_image.includes('?') ? '&' : '?'}t=${Date.now()}`;
+                setHeroBgPreview(bgUrl, 'Current Hero Background:');
             } else {
                 if (svccatBgPreviewContainer) {
                     svccatBgPreviewContainer.innerHTML = '';
@@ -600,7 +611,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Overview Media Preview
             if (cat.hero_image) {
-                setOverviewMediaPreview(cat.hero_image, isVideoFile(cat.hero_image), isVideoFile(cat.hero_image) ? 'Current Video:' : 'Current Image:');
+                const mediaUrl = `${cat.hero_image}${cat.hero_image.includes('?') ? '&' : '?'}t=${Date.now()}`;
+                setOverviewMediaPreview(mediaUrl, isVideoFile(cat.hero_image), isVideoFile(cat.hero_image) ? 'Current Video:' : 'Current Image:');
             } else {
                 if (svccatPreviewContainer) {
                     svccatPreviewContainer.innerHTML = '';
@@ -873,11 +885,18 @@ document.addEventListener('DOMContentLoaded', () => {
     window.editService = async (id) => {
         try {
             await fetchServiceCategories();
-            const res = await fetch(`/api/services/${id}`);
+            document.getElementById('service-form').reset();
+            if (serviceMediaPreviewContainer) {
+                serviceMediaPreviewContainer.innerHTML = '';
+                serviceMediaPreviewContainer.style.display = 'none';
+            }
+            if (serviceRemoveMediaBtn) serviceRemoveMediaBtn.style.display = 'none';
+            if (serviceRemoveFlag) serviceRemoveFlag.value = '0';
+
+            const res = await fetch(`/api/services/${id}?t=${Date.now()}`);
             const svc = await res.json();
             if (!res.ok) return alert(svc.error || 'Failed to fetch service details');
 
-            document.getElementById('service-form').reset();
             document.getElementById('service-id').value = svc.id;
             document.getElementById('service-category').value = svc.category_id || '';
             document.getElementById('service-name').value = svc.name;
@@ -886,7 +905,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('service-status').value = String(svc.is_published);
             document.getElementById('service-short-desc').value = svc.short_description || '';
             document.getElementById('service-full-desc').value = svc.full_description || '';
-            serviceRemoveFlag.value = '0';
 
             // Parse features & deliverables from JSON string if needed
             let featuresStr = '';
@@ -905,15 +923,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Media display
             if (svc.image) {
+                const mediaUrl = `${svc.image}${svc.image.includes('?') ? '&' : '?'}t=${Date.now()}`;
                 if (isVideoFile(svc.image)) {
                     serviceMediaPreviewContainer.innerHTML = `
                         <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Custom Video:</div>
-                        <video src="${svc.image}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
+                        <video src="${mediaUrl}" controls autoplay muted loop style="max-width:100%; max-height:160px; border-radius:4px; display:block;"></video>
                     `;
                 } else {
                     serviceMediaPreviewContainer.innerHTML = `
                         <div style="font-size:0.75rem; color:var(--admin-text-light); margin-bottom:4px;">Current Custom Image:</div>
-                        <img src="${svc.image}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
+                        <img src="${mediaUrl}" style="max-width:100%; max-height:160px; border-radius:4px; object-fit:cover; display:block;">
                     `;
                 }
                 serviceMediaPreviewContainer.style.display = 'block';
@@ -967,7 +986,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const formData = new FormData(serviceForm);
 
                 // Auto-compress service image if uploaded
-                const imageInput = document.getElementById('service-image');
+                const imageInput = document.getElementById('service-image-file');
                 if (imageInput && imageInput.files && imageInput.files[0]) {
                     const originalFile = imageInput.files[0];
                     if (originalFile.type.startsWith('image/')) {
@@ -1013,7 +1032,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- PROJECTS LOGIC ---
     const fetchProjects = async () => {
         try {
-            const res = await fetch('/api/projects');
+            const res = await fetch(`/api/projects?t=${Date.now()}`);
             const data = await res.json();
             
             const tbody = document.getElementById('projects-table-body');
@@ -1024,8 +1043,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (p.status === 'published') pubCount++;
                 
                 const tr = document.createElement('tr');
+                const featImgSrc = p.featured_image ? `${p.featured_image}${p.featured_image.includes('?') ? '&' : '?'}t=${Date.now()}` : '';
                 tr.innerHTML = `
-                    <td><img src="${p.featured_image}" style="width:50px; height:35px; object-fit:cover; border-radius:4px;"></td>
+                    <td><img src="${featImgSrc}" style="width:50px; height:35px; object-fit:cover; border-radius:4px;"></td>
                     <td><strong>${p.title}</strong></td>
                     <td>${p.category_name || '<span style="color:var(--admin-text-light);">Unassigned</span>'}</td>
                     <td><code>${p.capacity}</code></td>
@@ -1191,8 +1211,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // First load categories
             await fetchCategories();
             
-            // Fetch project details
-            const res = await fetch(`/api/projects/${id}`);
+            // Fetch project details with cache-buster
+            const res = await fetch(`/api/projects/${id}?t=${Date.now()}`);
             const p = await res.json();
             
             if (res.ok) {
@@ -1214,9 +1234,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const helpEl = document.getElementById('project-featured-help');
                 if (helpEl) helpEl.textContent = 'Leave empty to keep current image, or select a new file to replace it.';
 
-                // Show current featured image preview
+                // Show current featured image preview with cache-buster
                 if (p.featured_image) {
-                    document.getElementById('project-featured-preview').innerHTML = `<img src="${p.featured_image}" alt="Featured preview">`;
+                    const previewUrl = `${p.featured_image}${p.featured_image.includes('?') ? '&' : '?'}t=${Date.now()}`;
+                    document.getElementById('project-featured-preview').innerHTML = `<img src="${previewUrl}" alt="Featured preview">`;
                 } else {
                     document.getElementById('project-featured-preview').innerHTML = `<i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>`;
                 }
@@ -1261,36 +1282,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- PROJECT GALLERY MANAGER LOGIC (Multi-Add, Multi-Select, Bulk-Delete) ---
     const updateBulkDeleteVisibility = () => {
-        const selectedCheckboxes = document.querySelectorAll('.gallery-item-select:checked');
+        const list = document.getElementById('gallery-manager-list');
+        const selectedCheckboxes = list ? list.querySelectorAll('.gallery-item-select:checked') : [];
         const count = selectedCheckboxes.length;
         const bulkDeleteBtn = document.getElementById('btn-bulk-delete-gallery');
         const countSpan = document.getElementById('gallery-selected-count');
         const selectAllCheckbox = document.getElementById('gallery-select-all');
-        const allCheckboxes = document.querySelectorAll('.gallery-item-select');
+        const selectAllText = document.getElementById('gallery-select-all-text');
+        const allCheckboxes = list ? list.querySelectorAll('.gallery-item-select') : [];
 
         if (countSpan) countSpan.textContent = count;
         if (bulkDeleteBtn) {
-            bulkDeleteBtn.style.display = count > 0 ? 'inline-flex' : 'none';
+            if (count > 0) {
+                bulkDeleteBtn.style.setProperty('display', 'inline-flex', 'important');
+            } else {
+                bulkDeleteBtn.style.setProperty('display', 'none', 'important');
+            }
         }
         if (selectAllCheckbox && allCheckboxes.length > 0) {
             selectAllCheckbox.checked = count === allCheckboxes.length;
             selectAllCheckbox.indeterminate = count > 0 && count < allCheckboxes.length;
+            if (selectAllText) {
+                selectAllText.textContent = count === allCheckboxes.length ? 'Deselect All' : 'Select All';
+            }
         } else if (selectAllCheckbox) {
             selectAllCheckbox.checked = false;
             selectAllCheckbox.indeterminate = false;
+            if (selectAllText) selectAllText.textContent = 'Select All';
         }
     };
 
     const loadGalleryImages = async (projId) => {
         try {
-            const res = await fetch(`/api/projects/${projId}`);
-            const data = await res.json();
-            
             const list = document.getElementById('gallery-manager-list');
             const emptyText = document.getElementById('gallery-empty-text');
             const totalCount = document.getElementById('gallery-total-count');
             const subtitle = document.getElementById('gallery-modal-subtitle');
-            list.innerHTML = '';
+            
+            if (list) list.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding: 2.5rem 1rem; color:var(--admin-text-light);"><i data-lucide="loader-2" class="spin" style="width:26px;height:26px;margin-bottom:8px;display:inline-block;"></i><div>Loading project drawings...</div></div>';
+            initIcons();
+
+            const res = await fetch(`/api/projects/${projId}?t=${Date.now()}`);
+            const data = await res.json();
             
             if (subtitle && data.title) {
                 subtitle.textContent = `Drawings & renderings for "${data.title}"`;
@@ -1299,30 +1332,45 @@ document.addEventListener('DOMContentLoaded', () => {
             const drawings = data.gallery || [];
             if (totalCount) totalCount.textContent = drawings.length;
 
+            if (list) list.innerHTML = '';
+
             if (drawings.length === 0) {
-                emptyText.style.display = 'block';
+                if (emptyText) emptyText.style.display = 'block';
             } else {
-                emptyText.style.display = 'none';
+                if (emptyText) emptyText.style.display = 'none';
                 
                 drawings.forEach(img => {
                     const div = document.createElement('div');
                     div.classList.add('gallery-preview-item');
                     div.dataset.imgId = img.id;
+                    const imgSrc = `${img.image_path}${img.image_path.includes('?') ? '&' : '?'}t=${Date.now()}`;
                     div.innerHTML = `
-                        <div class="img-wrapper">
+                        <div class="img-wrapper" title="Click drawing to select/deselect">
                             <input type="checkbox" class="gallery-item-select" data-img-id="${img.id}">
-                            <img src="${img.image_path}" alt="Gallery drawing" loading="lazy">
-                            <button type="button" class="gallery-preview-item-delete" title="Delete drawing" onclick="deleteGalleryImage(${img.id}, ${projId})">&times;</button>
+                            <img src="${imgSrc}" alt="Gallery drawing" loading="lazy">
+                            <button type="button" class="gallery-preview-item-delete" title="Delete drawing" onclick="event.stopPropagation(); deleteGalleryImage(${img.id}, ${projId})">&times;</button>
                         </div>
                         <div class="gallery-item-caption-wrap">
                             <input type="text" class="gallery-item-caption-input" value="${img.caption || ''}" placeholder="Caption (e.g. SLD, 3D)..." 
+                                   onclick="event.stopPropagation()"
                                    onblur="updateGalleryCaption(${img.id}, this.value)">
                         </div>
                     `;
 
                     // Checkbox toggle logic
                     const chk = div.querySelector('.gallery-item-select');
-                    chk.addEventListener('change', () => {
+                    chk.addEventListener('change', (e) => {
+                        e.stopPropagation();
+                        div.classList.toggle('selected', chk.checked);
+                        updateBulkDeleteVisibility();
+                    });
+
+                    // Clicking anywhere on the img-wrapper toggles selection effortlessly
+                    const imgWrap = div.querySelector('.img-wrapper');
+                    imgWrap.addEventListener('click', (e) => {
+                        if (e.target.closest('.gallery-preview-item-delete')) return;
+                        if (e.target.classList.contains('gallery-item-select')) return;
+                        chk.checked = !chk.checked;
                         div.classList.toggle('selected', chk.checked);
                         updateBulkDeleteVisibility();
                     });
@@ -1331,6 +1379,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             updateBulkDeleteVisibility();
+            initIcons();
         } catch (err) {
             console.error(err);
         }
@@ -1345,24 +1394,41 @@ document.addEventListener('DOMContentLoaded', () => {
             selectAll.checked = false;
             selectAll.indeterminate = false;
         }
+        const selectAllText = document.getElementById('gallery-select-all-text');
+        if (selectAllText) selectAllText.textContent = 'Select All';
+
         updateBulkDeleteVisibility();
         loadGalleryImages(projId);
         openModal('gallery-manager-modal');
         initIcons();
     };
 
-    // Select All checkbox toggle
+    // Select All toggle handler (bind to both checkbox and wrapper label)
     const selectAllCheckbox = document.getElementById('gallery-select-all');
+    const selectAllLabel = document.getElementById('gallery-select-all-label');
+
+    const handleSelectAllToggle = () => {
+        if (!selectAllCheckbox) return;
+        const isChecked = selectAllCheckbox.checked;
+        const list = document.getElementById('gallery-manager-list');
+        const items = list ? list.querySelectorAll('.gallery-preview-item') : [];
+        items.forEach(item => {
+            const chk = item.querySelector('.gallery-item-select');
+            if (chk) chk.checked = isChecked;
+            item.classList.toggle('selected', isChecked);
+        });
+        updateBulkDeleteVisibility();
+    };
+
     if (selectAllCheckbox) {
-        selectAllCheckbox.addEventListener('change', (e) => {
-            const isChecked = e.target.checked;
-            const items = document.querySelectorAll('.gallery-preview-item');
-            items.forEach(item => {
-                const chk = item.querySelector('.gallery-item-select');
-                if (chk) chk.checked = isChecked;
-                item.classList.toggle('selected', isChecked);
-            });
-            updateBulkDeleteVisibility();
+        selectAllCheckbox.addEventListener('change', handleSelectAllToggle);
+    }
+    if (selectAllLabel) {
+        selectAllLabel.addEventListener('click', (e) => {
+            if (e.target !== selectAllCheckbox) {
+                selectAllCheckbox.checked = !selectAllCheckbox.checked;
+                handleSelectAllToggle();
+            }
         });
     }
 
@@ -1375,7 +1441,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const ids = Array.from(selectedCheckboxes).map(chk => parseInt(chk.dataset.imgId, 10)).filter(id => !isNaN(id));
 
             if (ids.length === 0) {
-                alert('No drawings selected.');
+                alert('No drawings selected. Click on drawing images or use "Select All" to select drawings to delete.');
                 return;
             }
 
@@ -1396,6 +1462,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (res.ok) {
+                    const data = await res.json();
                     loadGalleryImages(projId);
                     fetchProjects();
                 } else {

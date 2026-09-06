@@ -150,5 +150,67 @@ class EarthXDesignsTestCase(unittest.TestCase):
         res_del = self.app.delete(f'/api/projects/{proj_id}')
         self.assertEqual(res_del.status_code, 200)
 
+    def test_cross_project_isolation_and_no_cache_headers(self):
+        """Test that updating one project never affects another project, and API responses have no-cache headers."""
+        import io
+        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+
+        # 1. Verify API endpoints return no-store, no-cache headers
+        res_api = self.app.get('/api/projects')
+        self.assertIn('no-store', res_api.headers.get('Cache-Control', ''))
+        self.assertIn('no-cache', res_api.headers.get('Cache-Control', ''))
+
+        # 2. Create Project A ("3D Pre Sales")
+        p_a = {
+            'title': '3D Pre Sales Design Concept',
+            'category_id': '1',
+            'capacity': '100 kWp',
+            'location': 'Mumbai, India',
+            'client_name': 'PreSales Client',
+            'description': 'Preliminary 3D solar model.',
+            'services_delivered': '3D Modeling, Shadow Analysis',
+            'completion_date': '2026-09-01',
+            'status': 'published',
+            'featured_image': (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'presales_feat.png')
+        }
+        res_a = self.app.post('/api/projects', data=p_a, content_type='multipart/form-data')
+        id_a = res_a.get_json()['id']
+
+        # 3. Create Project B ("CEIG Drawings")
+        p_b = {
+            'title': 'CEIG Drawing Package Electrical',
+            'category_id': '2',
+            'capacity': '500 kWp',
+            'location': 'Ahmedabad, India',
+            'client_name': 'CEIG Client',
+            'description': 'Statutory drawings package.',
+            'services_delivered': 'CEIG Approval, SLD',
+            'completion_date': '2026-09-02',
+            'status': 'published',
+            'featured_image': (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'ceig_feat.png')
+        }
+        res_b = self.app.post('/api/projects', data=p_b, content_type='multipart/form-data')
+        id_b = res_b.get_json()['id']
+
+        # 4. Upload gallery drawing ONLY to Project A
+        gal_a = {
+            'gallery_images': [
+                (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'presales_drawing.png')
+            ]
+        }
+        res_gal_a = self.app.post(f'/api/projects/{id_a}/gallery', data=gal_a, content_type='multipart/form-data')
+        self.assertEqual(res_gal_a.status_code, 201)
+
+        # 5. Verify Project A has 1 gallery drawing and Project B has 0
+        get_a = self.app.get(f'/api/projects/{id_a}').get_json()
+        get_b = self.app.get(f'/api/projects/{id_b}').get_json()
+        self.assertEqual(len(get_a['gallery']), 1)
+        self.assertEqual(len(get_b['gallery']), 0)
+        self.assertNotEqual(get_a['featured_image'], get_b['featured_image'])
+
+        # 6. Clean up test projects
+        self.app.delete(f'/api/projects/{id_a}')
+        self.app.delete(f'/api/projects/{id_b}')
+
 if __name__ == '__main__':
     unittest.main()

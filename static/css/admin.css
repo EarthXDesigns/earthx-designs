@@ -569,24 +569,34 @@ body.admin-body {
     border-radius: 8px;
     overflow: hidden;
     position: relative;
-    border: 1px solid var(--admin-border);
+    border: 2px solid var(--admin-border);
     background-color: #FFFFFF;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     flex-direction: column;
+    user-select: none;
+}
+
+.gallery-preview-item:hover {
+    border-color: #94A3B8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .gallery-preview-item.selected {
-    border-color: var(--admin-primary);
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35) !important;
+    background-color: #FEF2F2;
+    transform: translateY(-2px);
 }
 
 .gallery-preview-item .img-wrapper {
     position: relative;
     width: 100%;
-    height: 110px;
+    height: 115px;
     background-color: #f1f5f9;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .gallery-preview-item img {
