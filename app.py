@@ -5,6 +5,7 @@ import datetime
 import secrets
 import string
 import sqlite3
+import uuid
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, make_response, send_from_directory
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
@@ -126,6 +127,10 @@ def save_uploaded_file(file_storage, prefix="img"):
     if not file_storage or not hasattr(file_storage, 'filename') or file_storage.filename == '' or not allowed_file(file_storage.filename):
         return None
 
+    timestamp_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    unique_suffix = uuid.uuid4().hex[:8]
+    clean_base = secure_filename(os.path.splitext(file_storage.filename)[0]) or "asset"
+
     # Check for Cloudinary first (Permanent CDN)
     cloudinary_url = get_clean_cloudinary_url()
     if HAS_CLOUDINARY and cloudinary_url:
@@ -137,9 +142,15 @@ def save_uploaded_file(file_storage, prefix="img"):
             filename_lower = file_storage.filename.lower()
             is_video = (file_storage.mimetype and file_storage.mimetype.startswith('video/')) or any(filename_lower.endswith(f'.{ext}') for ext in ['mp4', 'webm', 'mov', 'ogg'])
             resource_type = "video" if is_video else "image"
+            
+            # Unique public_id strictly prevents any collision or overwrite of existing projects or hero images
+            cloud_public_id = f"{prefix}_{timestamp_str}_{unique_suffix}_{clean_base}"
             upload_result = cloudinary.uploader.upload(
                 file_storage,
                 folder="earthx_designs",
+                public_id=cloud_public_id,
+                overwrite=False,
+                unique_filename=False,
                 resource_type=resource_type
             )
             secure_url = upload_result.get('secure_url')
@@ -154,7 +165,7 @@ def save_uploaded_file(file_storage, prefix="img"):
                 pass
 
     # Local disk storage + Database BLOB backup
-    filename = secure_filename(f"{prefix}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file_storage.filename}")
+    filename = secure_filename(f"{prefix}_{timestamp_str}_{unique_suffix}_{file_storage.filename}")
     save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     
     ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
@@ -329,7 +340,7 @@ def inject_global_data():
         return {
             'now': now,
             'nav_services': _NAV_SERVICES_CACHE,
-            'asset_version': '20260906_v14'
+            'asset_version': '20260906_v15'
         }
 
     from database import seed_service_categories_and_services
@@ -348,7 +359,7 @@ def inject_global_data():
     _NAV_SERVICES_CACHE_TIME = now_ts
 
     # Cache busting timestamp for static assets (updated upon code deploys)
-    asset_version = "20260906_v14"
+    asset_version = "20260906_v15"
 
     return {
         'now': now,
@@ -916,6 +927,39 @@ def api_project_detail(proj_id):
                     except Exception: pass
                     
         return jsonify({'message': 'Project deleted successfully'})
+
+# Upload gallery images to a specific project
+@app.route('/api/projects/<int:proj_id>/gallery', methods=['POST'])
+@login_required
+def api_upload_project_gallery(proj_id):
+    conn = get_db_connection()
+    project = conn.execute('SELECT id FROM projects WHERE id = ?', (proj_id,)).fetchone()
+    if not project:
+        conn.close()
+        return jsonify({'error': 'Project not found'}), 404
+        
+    gallery_files = request.files.getlist('gallery_images')
+    if not gallery_files or all(not f or f.filename == '' for f in gallery_files):
+        conn.close()
+        return jsonify({'error': 'No files selected for upload.'}), 400
+        
+    max_order_row = conn.execute('SELECT MAX(display_order) FROM project_images WHERE project_id = ?', (proj_id,)).fetchone()
+    max_order = (max_order_row[0] or 0) if max_order_row else 0
+    
+    uploaded_count = 0
+    for i, gfile in enumerate(gallery_files):
+        if gfile and gfile.filename != '' and allowed_file(gfile.filename):
+            gurl = save_uploaded_file(gfile, f"gal_{proj_id}_{max_order + uploaded_count + 1}")
+            if gurl:
+                conn.execute(
+                    'INSERT INTO project_images (project_id, image_path, display_order) VALUES (?, ?, ?)',
+                    (proj_id, gurl, max_order + uploaded_count + 1)
+                )
+                uploaded_count += 1
+                
+    conn.commit()
+    conn.close()
+    return jsonify({'message': f'Successfully uploaded {uploaded_count} gallery drawings', 'count': uploaded_count}), 201
 
 # Delete a single gallery image
 @app.route('/api/projects/gallery/<int:img_id>', methods=['DELETE'])

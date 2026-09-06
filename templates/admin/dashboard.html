@@ -735,7 +735,7 @@
         <div class="modal-content" style="max-width: 750px;">
             <div class="modal-header">
                 <h3 id="project-modal-title">Add Project</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close" onclick="resetProjectModal()">&times;</button>
             </div>
             <form id="project-form" enctype="multipart/form-data">
                 <div class="modal-body">
@@ -802,15 +802,17 @@
                             </div>
                             <input type="file" id="project-featured-image" name="featured_image" accept="image/*">
                         </div>
+                        <span style="font-size: 0.75rem; color: var(--admin-text-light); margin-top: 4px; display: block;">When editing, leave empty to keep current image.</span>
                     </div>
 
                     <div class="admin-form-group">
                         <label for="project-gallery-images">Upload Gallery Images (Select multiple)</label>
                         <input type="file" id="project-gallery-images" name="gallery_images" accept="image/*" multiple>
+                        <span style="font-size: 0.75rem; color: var(--admin-text-light); margin-top: 4px; display: block;">Optional. Select drawings to upload. Existing drawings are preserved and can be managed via the "Drawings" button.</span>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn">Cancel</button>
+                    <button type="button" class="btn-admin btn-admin-secondary modal-close-btn" onclick="resetProjectModal()">Cancel</button>
                     <button type="submit" class="btn-admin btn-admin-primary">Save Project</button>
                 </div>
             </form>

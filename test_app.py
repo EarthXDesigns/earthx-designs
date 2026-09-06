@@ -81,5 +81,64 @@ class EarthXDesignsTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue('/admin' in response.headers['Location'])
 
+    def test_project_crud_and_gallery_isolation(self):
+        """Test project creation, edit, and dedicated gallery upload isolation."""
+        import io
+        # 1. Login
+        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+
+        # 2. Add Project
+        add_data = {
+            'title': 'Test Precision Solar Design',
+            'category_id': '1',
+            'capacity': '75 kWp',
+            'location': 'Gujarat, India',
+            'client_name': 'Solar Client Alpha',
+            'description': 'Comprehensive 3D layout and shading design.',
+            'services_delivered': 'CAD Design, Shading Analysis',
+            'completion_date': '2026-09-01',
+            'status': 'published',
+            'featured_image': (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'project_alpha.png')
+        }
+        res_add = self.app.post('/api/projects', data=add_data, content_type='multipart/form-data')
+        self.assertEqual(res_add.status_code, 201)
+        proj_id = res_add.get_json()['id']
+
+        # 3. Edit Project without new image (must preserve existing image and not touch others)
+        edit_data = {
+            'title': 'Test Precision Solar Design - Updated',
+            'category_id': '1',
+            'capacity': '80 kWp',
+            'location': 'Gujarat, India',
+            'client_name': 'Solar Client Alpha Updated',
+            'description': 'Updated scope and specifications.',
+            'services_delivered': 'CAD Design, Shading Analysis, SLD',
+            'completion_date': '2026-09-01',
+            'status': 'published'
+        }
+        res_edit = self.app.post(f'/api/projects/{proj_id}', data=edit_data, content_type='multipart/form-data')
+        self.assertEqual(res_edit.status_code, 200)
+
+        # 4. Upload drawings to dedicated gallery endpoint
+        gal_data = {
+            'gallery_images': [
+                (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'drawing_1.png'),
+                (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'drawing_2.png')
+            ]
+        }
+        res_gal = self.app.post(f'/api/projects/{proj_id}/gallery', data=gal_data, content_type='multipart/form-data')
+        self.assertEqual(res_gal.status_code, 201)
+
+        # 5. Fetch project details and verify integrity
+        res_get = self.app.get(f'/api/projects/{proj_id}')
+        self.assertEqual(res_get.status_code, 200)
+        proj_json = res_get.get_json()
+        self.assertEqual(proj_json['title'], 'Test Precision Solar Design - Updated')
+        self.assertEqual(len(proj_json['gallery']), 2)
+
+        # 6. Delete test project
+        res_del = self.app.delete(f'/api/projects/{proj_id}')
+        self.assertEqual(res_del.status_code, 200)
+
 if __name__ == '__main__':
     unittest.main()

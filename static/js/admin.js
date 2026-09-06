@@ -1062,7 +1062,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Project form submit (Supports multipart uploads)
+    // Helper to completely reset and isolate project modal state
+    const resetProjectModal = () => {
+        const form = document.getElementById('project-form');
+        if (form) form.reset();
+
+        const idInput = document.getElementById('project-id');
+        if (idInput) idInput.value = '';
+
+        const featInput = document.getElementById('project-featured-image');
+        if (featInput) {
+            featInput.value = '';
+            featInput.required = true;
+        }
+
+        const galInput = document.getElementById('project-gallery-images');
+        if (galInput) galInput.value = '';
+
+        const preview = document.getElementById('project-featured-preview');
+        if (preview) {
+            preview.innerHTML = `<i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>`;
+        }
+
+        const titleEl = document.getElementById('project-modal-title');
+        if (titleEl) titleEl.textContent = 'Add Project';
+
+        initIcons();
+    };
+    window.resetProjectModal = resetProjectModal;
+
+    // Project form submit (Supports multipart uploads with strict isolation)
     document.getElementById('project-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const submitBtn = e.target.querySelector('button[type="submit"]');
@@ -1078,7 +1107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const id = document.getElementById('project-id').value;
             const formData = new FormData(e.target);
 
-            // Auto-compress featured image
+            // Auto-compress featured image if a new file was actually selected
             const featInput = document.getElementById('project-featured-image');
             if (featInput && featInput.files && featInput.files[0]) {
                 const originalFile = featInput.files[0];
@@ -1086,11 +1115,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const compressed = await compressImageFile(originalFile);
                     formData.set('featured_image', compressed);
                 }
+            } else if (id) {
+                // If editing and no new featured image chosen, omit empty field
+                formData.delete('featured_image');
+            }
+
+            // If editing and no gallery images selected, delete empty field to avoid spurious uploads
+            const galInput = document.getElementById('project-gallery-images');
+            if (id && (!galInput || !galInput.files || galInput.files.length === 0)) {
+                formData.delete('gallery_images');
             }
             
             const url = id ? `/api/projects/${id}` : '/api/projects';
             const res = await fetch(url, {
-                method: 'POST', // Use POST for both insert and edit to support FormData upload seamlessly
+                method: 'POST',
                 body: formData
             });
 
@@ -1102,6 +1140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await res.json();
             if (res.ok) {
+                resetProjectModal();
                 closeModal('project-modal');
                 fetchProjects();
             } else {
@@ -1120,20 +1159,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-add-project').addEventListener('click', () => {
-        document.getElementById('project-form').reset();
-        document.getElementById('project-id').value = '';
-        document.getElementById('project-featured-preview').innerHTML = `<i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>`;
+        resetProjectModal();
         document.getElementById('project-featured-image').required = true;
         document.getElementById('project-modal-title').textContent = 'Add Project';
         
         // Ensure categories are loaded
         fetchCategories().then(() => {
             openModal('project-modal');
+            initIcons();
         });
     });
 
     window.editProject = async (id) => {
         try {
+            // First cleanly reset any previous form or file state
+            resetProjectModal();
+
             // First load categories
             await fetchCategories();
             
@@ -1143,25 +1184,37 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (res.ok) {
                 document.getElementById('project-id').value = p.id;
-                document.getElementById('project-title').value = p.title;
+                document.getElementById('project-title').value = p.title || '';
                 document.getElementById('project-category').value = p.category_id || '';
-                document.getElementById('project-capacity').value = p.capacity;
-                document.getElementById('project-location').value = p.location;
+                document.getElementById('project-capacity').value = p.capacity || '';
+                document.getElementById('project-location').value = p.location || '';
                 document.getElementById('project-client').value = p.client_name || '';
-                document.getElementById('project-date').value = p.completion_date;
-                document.getElementById('project-status').value = p.status;
-                document.getElementById('project-services').value = p.services_delivered;
-                document.getElementById('project-description').value = p.description;
+                document.getElementById('project-date').value = p.completion_date || '';
+                document.getElementById('project-status').value = p.status || 'published';
+                document.getElementById('project-services').value = p.services_delivered || '';
+                document.getElementById('project-description').value = p.description || '';
+                
+                // Explicitly clear file inputs so they never inherit or leak files
+                document.getElementById('project-featured-image').value = '';
+                document.getElementById('project-gallery-images').value = '';
+                document.getElementById('project-featured-image').required = false; // Not required for editing
                 
                 // Show current featured image
-                document.getElementById('project-featured-preview').innerHTML = `<img src="${p.featured_image}" alt="Featured preview">`;
-                document.getElementById('project-featured-image').required = false; // Not required for editing
+                if (p.featured_image) {
+                    document.getElementById('project-featured-preview').innerHTML = `<img src="${p.featured_image}" alt="Featured preview">`;
+                } else {
+                    document.getElementById('project-featured-preview').innerHTML = `<i data-lucide="image" style="width: 24px; height: 24px; color: var(--admin-text-light);"></i>`;
+                }
                 
                 document.getElementById('project-modal-title').textContent = 'Edit Project';
                 openModal('project-modal');
+                initIcons();
+            } else {
+                alert(p.error || 'Failed to load project details.');
             }
         } catch (err) {
             console.error(err);
+            alert('Error loading project: ' + (err.message || 'Network error'));
         }
     };
 
@@ -1212,29 +1265,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.openGalleryManager = (projId) => {
         document.getElementById('gallery-project-id').value = projId;
-        document.getElementById('gallery-manager-files').value = '';
+        const galFiles = document.getElementById('gallery-manager-files');
+        if (galFiles) galFiles.value = '';
         loadGalleryImages(projId);
         openModal('gallery-manager-modal');
     };
 
-    // Upload more gallery drawings
+    // Upload more gallery drawings with dedicated endpoint & loading state
     document.getElementById('btn-upload-more-gallery').addEventListener('click', async () => {
         const projId = document.getElementById('gallery-project-id').value;
         const fileInput = document.getElementById('gallery-manager-files');
         const files = fileInput.files;
         
-        if (files.length === 0) {
+        if (!projId) {
+            alert('No project selected.');
+            return;
+        }
+
+        if (!files || files.length === 0) {
             alert('Please select files to upload.');
             return;
         }
         
+        const uploadBtn = document.getElementById('btn-upload-more-gallery');
+        const origText = uploadBtn ? uploadBtn.innerHTML : 'Upload';
+        if (uploadBtn) {
+            uploadBtn.disabled = true;
+            uploadBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:14px;height:14px;vertical-align:middle;margin-right:6px;"></i> Uploading...';
+            initIcons();
+        }
+
         const formData = new FormData();
         for (let i = 0; i < files.length; i++) {
             formData.append('gallery_images', files[i]);
         }
         
         try {
-            const res = await fetch(`/api/projects/${projId}/gallery` || `/api/projects/${projId}`, {
+            const res = await fetch(`/api/projects/${projId}/gallery`, {
                 method: 'POST',
                 body: formData
             });
@@ -1243,10 +1310,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadGalleryImages(projId);
                 fetchProjects(); // Update project table gallery count
             } else {
-                alert('Upload failed.');
+                const errData = await res.json().catch(() => ({}));
+                alert(errData.error || 'Upload failed.');
             }
         } catch (err) {
             console.error(err);
+            alert('Error uploading gallery drawings: ' + (err.message || 'Network error'));
+        } finally {
+            if (uploadBtn) {
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = origText;
+                initIcons();
+            }
         }
     });
 
