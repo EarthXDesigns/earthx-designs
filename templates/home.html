@@ -45,33 +45,33 @@
     </div>
 </section>
 
-<!-- About Section (Who We Are) -->
-<section class="section-padding bg-light-sec">
+<!-- About Section (Who We Are / Technical Engineering Engine) -->
+<section class="section-padding bg-light-sec who-we-are-section">
     <div class="container">
         <div class="about-home-grid grid grid-2">
             <div class="about-home-text">
                 <div class="who-we-are-pill">
                     <span class="pill-dot"></span>
-                    <span>Who We Are</span>
+                    <span>Engineering Core</span>
                 </div>
-                <h2 class="who-we-are-title">Complete Design & Engineering Support for Solar Professionals</h2>
+                <h2 class="who-we-are-title">Turnkey Solar CAD & Technical Design Back-Office</h2>
                 
                 <p class="who-lead-paragraph">
-                    <strong>EarthX Designs</strong> is a premier solar engineering consultancy providing complete technical design, layout drafting, and electrical schematics support for EPC companies, solar developers, and contractors worldwide.
+                    <strong>EarthX Designs</strong> empowers solar developers, EPCs, and contractors with high-precision drafting, sub-millimeter CAD layouts, and production-optimized electrical schematics.
                 </p>
                 
                 <p class="who-body-paragraph">
-                    Our core mission is to streamline pre-construction processes by delivering 100% error-free blueprints, precise electrical designs, and comprehensive documentation that satisfy municipal permit departments and electrical inspectors on the first attempt.
+                    We eliminate engineering bottlenecks before ground is broken. From comprehensive shading vectors and single-line diagrams (SLDs) to complete structural plansets, our blueprints pass strict local authority and utility grid interconnection reviews on first submission.
                 </p>
                 
                 <div class="about-features">
                     <div class="feature-box">
                         <div class="feature-icon-wrapper">
-                            <i data-lucide="award" style="width: 20px; height: 20px;"></i>
+                            <i data-lucide="check-circle-2" style="width: 20px; height: 20px;"></i>
                         </div>
                         <div>
-                            <h4>PE Stamp Ready</h4>
-                            <p>Designs fully compliant with NEC, IEC, and local codes.</p>
+                            <h4>Sub-Millimeter Precision</h4>
+                            <p>CAD-accurate layout spacing, tilt & pitch optimization.</p>
                         </div>
                     </div>
                     <div class="feature-box">
@@ -79,26 +79,60 @@
                             <i data-lucide="zap" style="width: 20px; height: 20px;"></i>
                         </div>
                         <div>
-                            <h4>Optimized Layouts</h4>
-                            <p>Maximizing panel density and annual energy generation.</p>
+                            <h4>48-Hour SLA Turnaround</h4>
+                            <p>Fast-track permit sets to keep field construction moving.</p>
+                        </div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i data-lucide="cpu" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div>
+                            <h4>Validated PV Yield Models</h4>
+                            <p>In-depth PVsyst simulations with bifacial & shadow loss vectors.</p>
+                        </div>
+                    </div>
+                    <div class="feature-box">
+                        <div class="feature-icon-wrapper">
+                            <i data-lucide="shield-check" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div>
+                            <h4>Grid &amp; Code Compliance</h4>
+                            <p>Engineered to satisfy NEC, IEC, and AHJ jurisdictional rules.</p>
                         </div>
                     </div>
                 </div>
                 
-                <a href="{{ url_for('about') }}" class="btn btn-primary who-we-are-btn">
-                    <span>Learn More About Us</span>
-                    <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
-                </a>
+                <div class="who-actions-row">
+                    <a href="{{ url_for('about') }}" class="btn btn-primary who-we-are-btn">
+                        <span>Explore Our Engineering Standards</span>
+                        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                    </a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-outline who-we-are-btn-secondary">
+                        <i data-lucide="file-text" style="width: 17px; height: 17px;"></i>
+                        <span>Request Sample Planset</span>
+                    </a>
+                </div>
             </div>
             
-            <div class="about-home-image">
-                <div class="img-wrapper">
-                    <img src="/uploads/commercial_solar_featured.png" alt="Commercial Solar Installation Engineering" loading="lazy">
-                </div>
-                <div class="about-image-badge">
-                    <div class="badge-stat">100MW+</div>
-                    <div class="badge-text">
-                        High-Precision Solar<br>Capacity Engineered
+            <div class="about-home-image-col">
+                <div class="about-home-image">
+                    <div class="img-wrapper">
+                        <img src="/uploads/commercial_solar_featured.png" alt="Commercial Solar Installation Engineering" loading="lazy">
+                    </div>
+                    
+                    <!-- Floating Top Trust Pill -->
+                    <div class="about-floating-pill">
+                        <span class="pill-pulse-dot"></span>
+                        <span>Utility &amp; Commercial Verified</span>
+                    </div>
+
+                    <!-- Bottom Stat Badge -->
+                    <div class="about-image-badge">
+                        <div class="badge-stat">100MW+</div>
+                        <div class="badge-text">
+                            High-Precision Solar<br>Capacity Engineered
+                        </div>
                     </div>
                 </div>
             </div>

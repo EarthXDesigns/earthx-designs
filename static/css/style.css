@@ -553,12 +553,44 @@ a {
     margin-bottom: 0;
 }
 
+.who-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.75rem;
+}
+
 .who-we-are-btn {
     display: inline-flex;
     align-items: center;
     gap: 10px;
     padding: 0.85rem 1.8rem;
     font-weight: 600;
+}
+
+.who-we-are-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.85rem 1.6rem;
+    font-weight: 600;
+    border-color: #CBD5E1;
+    color: var(--primary);
+    background: #FFFFFF;
+    transition: var(--transition);
+}
+
+.who-we-are-btn-secondary:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(16, 185, 129, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+
+.about-home-image-col {
+    position: relative;
 }
 
 .about-home-image {
@@ -585,6 +617,57 @@ a {
 
 .about-home-image:hover img {
     transform: scale(1.04);
+}
+
+.about-floating-pill {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    background: rgba(11, 25, 47, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #FFFFFF;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    box-shadow: 0 10px 25px rgba(11, 25, 47, 0.25);
+    border-radius: 50px;
+    padding: 8px 18px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 3;
+    animation: floatingPillFloat 4s ease-in-out infinite;
+}
+
+.about-floating-pill .pill-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: dotPulse 2s infinite ease-in-out;
+}
+
+@keyframes dotPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.35);
+        opacity: 0.7;
+    }
+}
+
+@keyframes floatingPillFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
 }
 
 .about-image-badge {
@@ -623,6 +706,21 @@ a {
     }
     .about-features {
         grid-template-columns: 1fr;
+    }
+    .who-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .who-we-are-btn,
+    .who-we-are-btn-secondary {
+        justify-content: center;
+        width: 100%;
+    }
+    .about-floating-pill {
+        top: 10px;
+        right: 10px;
+        font-size: 0.72rem;
+        padding: 6px 12px;
     }
     .about-image-badge {
         position: relative;
