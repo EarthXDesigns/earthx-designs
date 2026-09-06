@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Hero Background Video Immediate Playback
     const heroVideo = document.querySelector('.hero-video-bg');
-    if (heroVideo) {
+    if (heroVideo && heroVideo.tagName === 'VIDEO') {
         heroVideo.muted = true;
         const playPromise = heroVideo.play();
         if (playPromise !== undefined) {

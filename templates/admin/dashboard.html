@@ -398,6 +398,119 @@
 
                 <!-- 7. HOME PAGE TAB -->
                 <section class="tab-panel" id="home-tab" style="display:none;">
+                    
+                    <!-- 7A. Hero Section Background (Video / Image) -->
+                    <div class="admin-card-table" style="max-width: 960px; padding: 24px; margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--admin-border); padding-bottom: 16px;">
+                            <div>
+                                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--admin-text); display: flex; align-items: center; gap: 8px;">
+                                    <i data-lucide="video" style="width: 22px; height: 22px; color: #f59e0b;"></i>
+                                    Hero Section Background (Video / Image)
+                                </h2>
+                                <p style="font-size: 0.875rem; color: var(--admin-text-light); margin-top: 4px;">
+                                    Directly manage the looping background video or image playing behind the main hero section on the homepage. Upload high-res videos (MP4, WEBM, MOV) or images from your computer, choose from presets, or remove the background media to show the solid dark theme.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div id="hero-media-alert-box" style="display: none; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 0.875rem;"></div>
+
+                        <!-- Current Media Status & Live Preview -->
+                        <div class="home-settings-grid">
+                            <!-- Left: Live Preview Card -->
+                            <div style="background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 12px; padding: 16px; text-align: center;">
+                                <div style="font-weight: 600; font-size: 0.875rem; color: var(--admin-text); margin-bottom: 12px; text-align: left; display: flex; align-items: center; justify-content: space-between;">
+                                    <span>Current Active Media</span>
+                                    <span id="hero-media-status-badge" class="badge-status badge-published" style="font-size: 0.75rem;">Active Video</span>
+                                </div>
+                                <div id="hero-media-preview-container" style="position: relative; width: 100%; height: 260px; border-radius: 8px; overflow: hidden; background: #0A192F; display: flex; align-items: center; justify-content: center; border: 1px dashed #cbd5e1;">
+                                    <video id="hero-preview-video" src="/uploads/hero_video.mp4" autoplay loop muted controls playsinline style="width: 100%; height: 100%; object-fit: cover; display: block;"></video>
+                                    <img id="hero-preview-img" src="" alt="Hero Image Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                                    <div id="hero-media-empty-notice" style="display: none; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; padding: 20px; text-align: center;">
+                                        <i data-lucide="video-off" style="width: 48px; height: 48px; margin-bottom: 8px; opacity: 0.6;"></i>
+                                        <p style="font-weight: 600; font-size: 0.95rem; margin: 0; color: #cbd5e1;">No background media set</p>
+                                        <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px;">The homepage hero displays the clean high-tech dark solar gradient background.</p>
+                                    </div>
+                                </div>
+                                <div id="hero-media-path-display" style="font-family: monospace; font-size: 0.75rem; color: #64748b; margin-top: 10px; word-break: break-all; text-align: left; background: #fff; padding: 6px 10px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                                    Path: /uploads/hero_video.mp4
+                                </div>
+                            </div>
+
+                            <!-- Right: Controls & Form -->
+                            <div>
+                                <form id="form-hero-media-settings" enctype="multipart/form-data">
+                                    <input type="hidden" name="target" value="hero_bg">
+                                    <input type="hidden" id="hero-preset-input" name="preset_hero_media" value="">
+                                    <input type="hidden" id="hero-remove-input" name="remove_hero_media" value="0">
+
+                                    <!-- Upload / Replace Input -->
+                                    <div class="form-group" style="margin-bottom: 16px;">
+                                        <label style="display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 6px; color: var(--admin-text);">
+                                            Upload / Replace Video or Image from Computer
+                                        </label>
+                                        <input type="file" id="hero-media-file-input" name="hero_media" accept="video/mp4,video/webm,video/quicktime,video/*,image/png,image/jpeg,image/webp,image/svg+xml" class="form-control" style="padding: 8px; width: 100%; border: 1px solid var(--admin-border); border-radius: 6px; background: #fff;">
+                                        
+                                        <!-- Smart Compression Highlight Notice -->
+                                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 10px 12px; margin-top: 10px; font-size: 0.78rem; color: #166534; display: flex; gap: 8px; align-items: flex-start;">
+                                            <i data-lucide="zap" style="width: 16px; height: 16px; flex-shrink: 0; color: #16a34a; margin-top: 1px;"></i>
+                                            <div>
+                                                <strong>Smart Visually Lossless Video Compression:</strong>
+                                                Uploaded videos are automatically compressed using H.264 CRF encoding with <code>+faststart</code> web streaming. Reduces file size up to 80% without perceptible quality loss!
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quick Presets -->
+                                    <div class="form-group" style="margin-bottom: 20px;">
+                                        <label style="display: block; font-weight: 600; font-size: 0.875rem; margin-bottom: 8px; color: var(--admin-text);">
+                                            Or Choose from Preset Background Media:
+                                        </label>
+                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;" id="hero-preset-buttons">
+                                            <button type="button" class="btn-admin btn-admin-secondary hero-preset-btn" data-preset="/uploads/hero_video.mp4" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="video" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #f59e0b;"></i>
+                                                <span>Solar Drone Video (Default)</span>
+                                            </button>
+                                            <button type="button" class="btn-admin btn-admin-secondary hero-preset-btn" data-preset="/uploads/commercial_solar_featured.png" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="sun" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #10b981;"></i>
+                                                <span>Commercial Solar Rooftop</span>
+                                            </button>
+                                            <button type="button" class="btn-admin btn-admin-secondary hero-preset-btn" data-preset="/uploads/ground_mount_featured.png" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="mountain" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #3b82f6;"></i>
+                                                <span>Utility Ground Mount</span>
+                                            </button>
+                                            <button type="button" class="btn-admin btn-admin-secondary hero-preset-btn" data-preset="/uploads/residential_3d_featured.png" style="justify-content: flex-start; text-align: left; font-size: 0.8rem; padding: 8px 10px;">
+                                                <i data-lucide="box" style="width: 14px; height: 14px; margin-right: 6px; flex-shrink: 0; color: #6366f1;"></i>
+                                                <span>Residential 3D CAD</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px; border-top: 1px solid var(--admin-border); padding-top: 16px;">
+                                        <button type="submit" class="btn-admin btn-admin-primary" id="btn-save-hero-media" style="width: 100%; justify-content: center; padding: 0.75rem;">
+                                            <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                                            <span>Save / Update Hero Background</span>
+                                        </button>
+                                        
+                                        <div style="display: flex; gap: 10px;">
+                                            <button type="button" class="btn-admin btn-admin-secondary" id="btn-reset-default-hero-media" style="flex: 1; justify-content: center; font-size: 0.82rem; padding: 0.6rem;">
+                                                <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+                                                <span>Reset to Default Video</span>
+                                            </button>
+                                            
+                                            <button type="button" class="btn-admin" id="btn-remove-hero-media" style="flex: 1; justify-content: center; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; font-size: 0.82rem; padding: 0.6rem;">
+                                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                                <span>Remove Background</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7B. "Who We Are" Section Featured Image -->
                     <div class="admin-card-table" style="max-width: 960px; padding: 24px;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--admin-border); padding-bottom: 16px;">
                             <div>

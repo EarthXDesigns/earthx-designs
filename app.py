@@ -118,14 +118,113 @@ def storage_status():
         'data_dir': DATA_DIR
     })
 
-def save_uploaded_file(file_storage, prefix="img", db_conn=None):
+def get_ffmpeg_executable():
+    """Finds FFmpeg executable using imageio-ffmpeg or system PATH."""
+    try:
+        import imageio_ffmpeg
+        exe = imageio_ffmpeg.get_ffmpeg_exe()
+        if exe and os.path.exists(exe):
+            return exe
+    except Exception:
+        pass
+    import shutil
+    return shutil.which('ffmpeg')
+
+def compress_video_web_optimized(file_path):
     """
-    Saves an uploaded file. If CLOUDINARY_URL is configured, uploads to Cloudinary for permanent cloud storage.
-    Otherwise, saves to UPLOAD_FOLDER and stores a binary BLOB in the uploaded_files database table for self-healing persistence.
-    Returns the URL/path to store in the database (e.g., https://res.cloudinary.com/... or /uploads/filename.ext).
+    Compresses video file size significantly while preserving crisp visual quality.
+    Uses H.264 CRF encoding with faststart for instantaneous web streaming playback.
+    Returns: dict with compression results (original_size, compressed_size, saved_percent, message).
+    """
+    import subprocess
+    ffmpeg_exe = get_ffmpeg_executable()
+    if not ffmpeg_exe or not os.path.exists(file_path):
+        return {'success': False, 'message': 'FFmpeg not available or file not found'}
+
+    original_size = os.path.getsize(file_path)
+    temp_dir = os.path.dirname(file_path)
+    base_name = os.path.splitext(os.path.basename(file_path))[0]
+    temp_output = os.path.join(temp_dir, f"opt_{base_name}.mp4")
+
+    # Parameters:
+    # -c:v libx264: H.264 video codec
+    # -crf 24: Visually lossless Constant Rate Factor (ideal balance of crisp quality and compression)
+    # -preset fast: Fast encoding speed with high compression efficiency
+    # -pix_fmt yuv420p: 100% universal browser and device compatibility
+    # -movflags +faststart: Relocates moov atom to beginning of file for instant web streaming
+    # -vf scale='min(1920,iw)':-2: Scales down 4K/oversized to max 1080p, preserving aspect ratio and even dimensions
+    # -c:a aac -b:a 128k: Clean AAC audio compression
+    cmd = [
+        ffmpeg_exe, '-y',
+        '-i', file_path,
+        '-c:v', 'libx264',
+        '-crf', '24',
+        '-preset', 'fast',
+        '-pix_fmt', 'yuv420p',
+        '-movflags', '+faststart',
+        '-vf', "scale='min(1920,iw)':-2",
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        temp_output
+    ]
+
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        if proc.returncode == 0 and os.path.exists(temp_output) and os.path.getsize(temp_output) > 0:
+            compressed_size = os.path.getsize(temp_output)
+            
+            # If the compressed version is smaller, replace the original!
+            if compressed_size < original_size:
+                saved_bytes = original_size - compressed_size
+                saved_pct = round((saved_bytes / original_size) * 100, 1)
+                os.replace(temp_output, file_path)
+                msg = f"Compressed from {original_size/(1024*1024):.1f} MB to {compressed_size/(1024*1024):.1f} MB ({saved_pct}% reduction, visually lossless) with +faststart streaming."
+                print(f"[VIDEO COMPRESSION SUCCESS] {msg}")
+                return {
+                    'success': True,
+                    'is_compressed': True,
+                    'original_size': original_size,
+                    'compressed_size': compressed_size,
+                    'saved_percent': saved_pct,
+                    'message': msg
+                }
+            else:
+                # If already highly compressed, apply faststart remuxing so it starts playing immediately
+                try:
+                    os.remove(temp_output)
+                except Exception:
+                    pass
+                msg = f"Video is already optimally compressed ({original_size/(1024*1024):.1f} MB). Preserved high quality with +faststart streaming."
+                print(f"[VIDEO COMPRESSION] {msg}")
+                return {
+                    'success': True,
+                    'is_compressed': False,
+                    'original_size': original_size,
+                    'compressed_size': original_size,
+                    'saved_percent': 0,
+                    'message': msg
+                }
+        else:
+            print(f"[VIDEO COMPRESSION WARNING] FFmpeg code {proc.returncode}: {proc.stderr[:300]}")
+            if os.path.exists(temp_output):
+                os.remove(temp_output)
+            return {'success': False, 'message': 'Compression skipped, keeping original video.'}
+    except Exception as e:
+        print(f"[VIDEO COMPRESSION ERROR] {e}")
+        if os.path.exists(temp_output):
+            try: os.remove(temp_output)
+            except Exception: pass
+        return {'success': False, 'message': str(e)}
+
+# Helper function to save uploaded files (with Cloudinary, Disk, Pillow Image and FFmpeg Video compression)
+def save_uploaded_file(file_storage, prefix="img", db_conn=None, return_meta=False):
+    """
+    Saves a FileStorage object safely.
+    Compresses images with Pillow and videos with FFmpeg CRF encoding (+faststart).
+    Returns the URL/path to store in the database (or tuple (url, meta) if return_meta=True).
     """
     if not file_storage or not hasattr(file_storage, 'filename') or file_storage.filename == '' or not allowed_file(file_storage.filename):
-        return None
+        return (None, None) if return_meta else None
 
     timestamp_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
     unique_suffix = uuid.uuid4().hex[:8]
@@ -156,7 +255,7 @@ def save_uploaded_file(file_storage, prefix="img", db_conn=None):
             secure_url = upload_result.get('secure_url')
             if secure_url:
                 print(f"[CLOUDINARY SUCCESS] Uploaded {file_storage.filename} -> {secure_url}")
-                return secure_url
+                return (secure_url, {'success': True, 'cloudinary': True}) if return_meta else secure_url
         except Exception as e:
             print(f"[CLOUDINARY ERROR] Upload failed: {e}. Falling back to persistent database storage.")
             try:
@@ -170,9 +269,12 @@ def save_uploaded_file(file_storage, prefix="img", db_conn=None):
     
     ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
     is_image = ext in {'jpg', 'jpeg', 'png', 'webp'}
+    is_video = ext in {'mp4', 'webm', 'mov', 'ogg', 'm4v'}
 
     # Optimize and resize high-res images to web dimensions using Pillow if available
     saved_with_pillow = False
+    compression_info = None
+
     if is_image:
         try:
             from PIL import Image, ImageOps
@@ -203,6 +305,13 @@ def save_uploaded_file(file_storage, prefix="img", db_conn=None):
         file_storage.seek(0)
         file_storage.save(save_path)
     
+    # Automatically compress and web-optimize video uploads using FFmpeg CRF encoding
+    if is_video:
+        try:
+            compression_info = compress_video_web_optimized(save_path)
+        except Exception as vid_err:
+            print(f"[VIDEO OPTIMIZER ERROR] {vid_err}")
+
     # Store binary BLOB in SQLite uploaded_files table as a persistent backup (limit to <= 10MB to avoid SQLite lockups)
     try:
         file_size = os.path.getsize(save_path)
@@ -224,7 +333,8 @@ def save_uploaded_file(file_storage, prefix="img", db_conn=None):
     except Exception as e:
         print(f"[STORAGE WARNING] Failed to backup image to database: {e}")
 
-    return f"/uploads/{filename}"
+    url_path = f"/uploads/{filename}"
+    return (url_path, compression_info) if return_meta else url_path
 
 # Serve uploaded files from persistent storage (with fallback to database BLOB and default images)
 @app.route('/uploads/<path:filename>')
@@ -467,7 +577,8 @@ def home():
     
     conn.close()
     who_we_are_image = get_site_setting('home_who_we_are_image', '/uploads/commercial_solar_featured.png')
-    return render_template('home.html', projects=projects, testimonials=testimonials, blogs=blogs, client_logos=client_logos, who_we_are_image=who_we_are_image)
+    hero_bg_media = get_site_setting('home_hero_bg_media', '/uploads/hero_video.mp4')
+    return render_template('home.html', projects=projects, testimonials=testimonials, blogs=blogs, client_logos=client_logos, who_we_are_image=who_we_are_image, hero_bg_media=hero_bg_media)
 
 @app.route('/about')
 def about():
@@ -1904,15 +2015,17 @@ def api_client_logo_detail(logo_id):
         conn.close()
         return jsonify({'message': 'Client logo deleted successfully'})
 
-# 10. HOME PAGE SETTINGS API
+# 10. HOME PAGE SETTINGS API (Hero Background Video/Image & Who We Are Image)
 @app.route('/api/admin/home-settings', methods=['GET', 'POST'])
 @login_required
 def api_admin_home_settings():
     if request.method == 'GET':
         who_we_are_image = get_site_setting('home_who_we_are_image', '/uploads/commercial_solar_featured.png')
+        hero_bg_media = get_site_setting('home_hero_bg_media', '/uploads/hero_video.mp4')
         return jsonify({
             'success': True,
-            'who_we_are_image': who_we_are_image
+            'who_we_are_image': who_we_are_image,
+            'hero_bg_media': hero_bg_media
         })
 
     # POST - Add / Replace / Remove
@@ -1920,6 +2033,82 @@ def api_admin_home_settings():
         data = request.get_json(silent=True) or {}
     else:
         data = request.form or {}
+
+    target = data.get('target', '').strip()
+    is_hero_target = (
+        target == 'hero_bg'
+        or 'remove_hero_media' in data
+        or 'preset_hero_media' in data
+        or ('hero_media' in request.files if hasattr(request, 'files') else False)
+        or ('hero_bg_media' in request.files if hasattr(request, 'files') else False)
+    )
+
+    # -------------------------------------------------------------
+    # CASE A: HERO BACKGROUND (VIDEO OR IMAGE)
+    # -------------------------------------------------------------
+    if is_hero_target:
+        remove_hero = data.get('remove_hero_media') or data.get('remove_media')
+        if str(remove_hero) == '1' or str(remove_hero).lower() == 'true':
+            set_site_setting('home_hero_bg_media', '')
+            return jsonify({
+                'success': True,
+                'hero_bg_media': '',
+                'message': 'Hero background media removed. The homepage will display the sleek dark engineering theme.'
+            })
+
+        # Preset Hero Media
+        preset_hero = data.get('preset_hero_media') or data.get('preset_media')
+        if preset_hero:
+            preset_hero = preset_hero.strip()
+            set_site_setting('home_hero_bg_media', preset_hero)
+            return jsonify({
+                'success': True,
+                'hero_bg_media': preset_hero,
+                'message': 'Hero background preset applied successfully!'
+            })
+
+        # Uploaded Hero Media File (Video or Image)
+        file = None
+        if hasattr(request, 'files'):
+            file = request.files.get('hero_media') or request.files.get('hero_bg_media') or request.files.get('media_file')
+        if file and file.filename != '':
+            new_path, comp_info = save_uploaded_file(file, prefix="home_hero_bg", return_meta=True)
+            if new_path:
+                set_site_setting('home_hero_bg_media', new_path)
+                
+                # Compose user feedback message with compression info
+                if comp_info and comp_info.get('is_compressed'):
+                    msg = f"Hero video uploaded & compressed ({comp_info.get('saved_percent')}% size reduction, visually lossless)! +faststart streaming enabled."
+                elif comp_info and comp_info.get('success'):
+                    msg = comp_info.get('message', 'Hero video uploaded and optimized for web streaming.')
+                else:
+                    msg = 'Hero background media uploaded and saved successfully!'
+
+                return jsonify({
+                    'success': True,
+                    'hero_bg_media': new_path,
+                    'compression_info': comp_info,
+                    'message': msg
+                })
+            else:
+                return jsonify({'error': 'Invalid file format. Supported: MP4, WEBM, MOV, PNG, JPG, WEBP.'}), 400
+
+        # Custom URL
+        custom_url = data.get('custom_hero_media_url') or data.get('custom_url')
+        if custom_url is not None and custom_url != '':
+            custom_url = custom_url.strip()
+            set_site_setting('home_hero_bg_media', custom_url)
+            return jsonify({
+                'success': True,
+                'hero_bg_media': custom_url,
+                'message': 'Hero background media updated successfully!'
+            })
+
+        return jsonify({'error': 'No hero media file or preset specified.'}), 400
+
+    # -------------------------------------------------------------
+    # CASE B: "WHO WE ARE" FEATURED IMAGE
+    # -------------------------------------------------------------
     remove_image = data.get('remove_image')
     if str(remove_image) == '1' or str(remove_image).lower() == 'true':
         set_site_setting('home_who_we_are_image', '')

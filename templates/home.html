@@ -4,10 +4,16 @@
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero">
-    <video autoplay loop muted playsinline preload="auto" class="hero-video-bg">
-        <source src="/uploads/hero_video.mp4" type="video/mp4">
-    </video>
+<section class="hero {% if not hero_bg_media %}no-hero-media{% endif %}" {% if hero_bg_media and not (hero_bg_media.endswith('.mp4') or hero_bg_media.endswith('.webm') or hero_bg_media.endswith('.mov') or hero_bg_media.endswith('.ogg') or hero_bg_media.endswith('.m4v')) %}style="background-image: url('{{ hero_bg_media }}'); background-size: cover; background-position: center;"{% endif %}>
+    {% if hero_bg_media %}
+        {% if hero_bg_media.endswith('.mp4') or hero_bg_media.endswith('.webm') or hero_bg_media.endswith('.mov') or hero_bg_media.endswith('.ogg') or hero_bg_media.endswith('.m4v') %}
+        <video autoplay loop muted playsinline preload="auto" class="hero-video-bg">
+            <source src="{{ hero_bg_media }}" type="video/mp4">
+        </video>
+        {% else %}
+        <img src="{{ hero_bg_media }}" alt="EarthX Designs Solar Engineering" class="hero-video-bg" style="object-fit: cover;">
+        {% endif %}
+    {% endif %}
     <div class="hero-overlay"></div>
     <div class="container">
         <div class="hero-content">

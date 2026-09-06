@@ -2263,9 +2263,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 10. HOME PAGE FEATURED IMAGE SETTINGS
+    // 10. HOME PAGE SETTINGS (HERO MEDIA & WHO WE ARE)
     // ==========================================
+    let currentHeroMedia = '';
     let currentHomeImage = '';
+
+    const showHeroAlert = (message, type = 'success') => {
+        const box = document.getElementById('hero-media-alert-box');
+        if (!box) return;
+        box.textContent = message;
+        if (type === 'success') {
+            box.style.background = '#dcfce7';
+            box.style.color = '#166534';
+            box.style.border = '1px solid #bbf7d0';
+        } else {
+            box.style.background = '#fee2e2';
+            box.style.color = '#991b1b';
+            box.style.border = '1px solid #fecaca';
+        }
+        box.style.display = 'block';
+        setTimeout(() => {
+            if (box) box.style.display = 'none';
+        }, 5500);
+    };
+
+    const isVideoUrl = (url) => {
+        if (!url) return false;
+        const clean = url.split('?')[0].toLowerCase();
+        return clean.endsWith('.mp4') || clean.endsWith('.webm') || clean.endsWith('.mov') || clean.endsWith('.ogg') || clean.endsWith('.m4v');
+    };
+
+    const updateHeroMediaPreview = (src, isBlobVideo = null) => {
+        const video = document.getElementById('hero-preview-video');
+        const img = document.getElementById('hero-preview-img');
+        const emptyNotice = document.getElementById('hero-media-empty-notice');
+        const badge = document.getElementById('hero-media-status-badge');
+        const pathDisplay = document.getElementById('hero-media-path-display');
+
+        if (src && src.trim() !== '') {
+            if (emptyNotice) emptyNotice.style.display = 'none';
+            const isVid = isBlobVideo !== null ? isBlobVideo : isVideoUrl(src);
+
+            if (isVid) {
+                if (video) {
+                    video.src = src;
+                    video.style.display = 'block';
+                    video.load();
+                }
+                if (img) img.style.display = 'none';
+                if (badge) {
+                    badge.textContent = 'Active Video';
+                    badge.className = 'badge-status badge-published';
+                }
+            } else {
+                if (img) {
+                    img.src = src;
+                    img.style.display = 'block';
+                }
+                if (video) {
+                    video.pause();
+                    video.src = '';
+                    video.style.display = 'none';
+                }
+                if (badge) {
+                    badge.textContent = 'Active Image';
+                    badge.className = 'badge-status badge-published';
+                }
+            }
+            if (pathDisplay) pathDisplay.textContent = 'Path: ' + src;
+        } else {
+            if (video) {
+                video.pause();
+                video.src = '';
+                video.style.display = 'none';
+            }
+            if (img) {
+                img.src = '';
+                img.style.display = 'none';
+            }
+            if (emptyNotice) emptyNotice.style.display = 'flex';
+            if (badge) {
+                badge.textContent = 'No Media (Dark Theme)';
+                badge.className = 'badge-status badge-draft';
+            }
+            if (pathDisplay) pathDisplay.textContent = 'No background media set (solid dark solar theme displayed)';
+        }
+        initIcons();
+    };
 
     const showHomeAlert = (message, type = 'success') => {
         const box = document.getElementById('home-img-alert-box');
@@ -2325,10 +2409,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/admin/home-settings');
             if (res.ok) {
                 const data = await res.json();
+                
+                // 1. Hero background media
+                currentHeroMedia = data.hero_bg_media || '';
+                updateHeroMediaPreview(currentHeroMedia);
+                document.querySelectorAll('.hero-preset-btn').forEach(btn => {
+                    if (btn.getAttribute('data-preset') === currentHeroMedia) {
+                        btn.classList.add('active-preset');
+                    } else {
+                        btn.classList.remove('active-preset');
+                    }
+                });
+
+                // 2. Who We Are image
                 currentHomeImage = data.who_we_are_image || '';
                 updateHomeImagePreview(currentHomeImage);
-                
-                // Highlight active preset button if match
                 document.querySelectorAll('.home-preset-btn').forEach(btn => {
                     if (btn.getAttribute('data-preset') === currentHomeImage) {
                         btn.classList.add('active-preset');
@@ -2342,7 +2437,178 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Preset button clicks
+    // --- Hero Preset button clicks ---
+    document.querySelectorAll('.hero-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const presetUrl = btn.getAttribute('data-preset');
+            const presetInput = document.getElementById('hero-preset-input');
+            const removeInput = document.getElementById('hero-remove-input');
+            if (presetInput) presetInput.value = presetUrl;
+            if (removeInput) removeInput.value = '0';
+            const fileInput = document.getElementById('hero-media-file-input');
+            if (fileInput) fileInput.value = '';
+
+            document.querySelectorAll('.hero-preset-btn').forEach(b => b.classList.remove('active-preset'));
+            btn.classList.add('active-preset');
+
+            updateHeroMediaPreview(presetUrl);
+            const badge = document.getElementById('hero-media-status-badge');
+            if (badge) {
+                badge.textContent = 'Preset Selected (Click Save)';
+                badge.className = 'badge-status badge-draft';
+            }
+        });
+    });
+
+    // --- Hero File input preview ---
+    const heroFileInput = document.getElementById('hero-media-file-input');
+    if (heroFileInput) {
+        heroFileInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) {
+                const presetInput = document.getElementById('hero-preset-input');
+                const removeInput = document.getElementById('hero-remove-input');
+                if (presetInput) presetInput.value = '';
+                if (removeInput) removeInput.value = '0';
+                document.querySelectorAll('.hero-preset-btn').forEach(b => b.classList.remove('active-preset'));
+                
+                const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mov|ogg|m4v)$/i.test(file.name);
+                const objectUrl = URL.createObjectURL(file);
+                updateHeroMediaPreview(objectUrl, isVideo);
+
+                const pathDisplay = document.getElementById('hero-media-path-display');
+                if (pathDisplay) {
+                    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                    pathDisplay.textContent = `Selected: ${file.name} (${sizeMb} MB) - Ready to compress & upload`;
+                }
+                const badge = document.getElementById('hero-media-status-badge');
+                if (badge) {
+                    badge.textContent = (isVideo ? 'Video Ready' : 'Image Ready') + ' (Click Save)';
+                    badge.className = 'badge-status badge-draft';
+                }
+            }
+        });
+    }
+
+    // --- Hero Form submit ---
+    const heroForm = document.getElementById('form-hero-media-settings');
+    if (heroForm) {
+        heroForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('btn-save-hero-media');
+            const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:16px;height:16px;vertical-align:middle;margin-right:6px;"></i> Compressing & Uploading...';
+                initIcons();
+            }
+
+            try {
+                const formData = new FormData(heroForm);
+                const res = await fetch('/api/admin/home-settings', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (res.status === 401) {
+                    alert('Your admin session has expired. Please log in again.');
+                    window.location.href = '/admin/login';
+                    return;
+                }
+
+                const result = await res.json();
+                if (res.ok) {
+                    currentHeroMedia = result.hero_bg_media || '';
+                    updateHeroMediaPreview(currentHeroMedia);
+                    showHeroAlert(result.message || 'Hero background media updated successfully!', 'success');
+                    if (heroFileInput) heroFileInput.value = '';
+                    const presetInput = document.getElementById('hero-preset-input');
+                    if (presetInput) presetInput.value = '';
+                    const removeInput = document.getElementById('hero-remove-input');
+                    if (removeInput) removeInput.value = '0';
+                    fetchHomeSettings();
+                } else {
+                    alert(result.error || 'Failed to update hero background media.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('An error occurred while saving: ' + (err.message || 'Network error'));
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                    initIcons();
+                }
+            }
+        });
+    }
+
+    // --- Hero Reset to Default button ---
+    const btnResetDefaultHero = document.getElementById('btn-reset-default-hero-media');
+    if (btnResetDefaultHero) {
+        btnResetDefaultHero.addEventListener('click', async () => {
+            if (!confirm('Reset the Hero background media to the default Solar Drone Video?')) {
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('target', 'hero_bg');
+                formData.append('preset_hero_media', '/uploads/hero_video.mp4');
+                const res = await fetch('/api/admin/home-settings', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    currentHeroMedia = result.hero_bg_media;
+                    updateHeroMediaPreview(currentHeroMedia);
+                    showHeroAlert('Reset to default hero video successfully!', 'success');
+                    fetchHomeSettings();
+                } else {
+                    alert(result.error || 'Failed to reset.');
+                }
+            } catch (err) {
+                alert('Error resetting hero video: ' + err.message);
+            }
+        });
+    }
+
+    // --- Hero Remove Media button ---
+    const btnRemoveHero = document.getElementById('btn-remove-hero-media');
+    if (btnRemoveHero) {
+        btnRemoveHero.addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to remove the Hero background media? The homepage hero will display the solid dark solar gradient.')) {
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('target', 'hero_bg');
+                formData.append('remove_hero_media', '1');
+                const res = await fetch('/api/admin/home-settings', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    currentHeroMedia = '';
+                    updateHeroMediaPreview('');
+                    showHeroAlert('Hero background media removed successfully.', 'success');
+                    document.querySelectorAll('.hero-preset-btn').forEach(b => b.classList.remove('active-preset'));
+                    if (heroFileInput) heroFileInput.value = '';
+                    const presetInput = document.getElementById('hero-preset-input');
+                    if (presetInput) presetInput.value = '';
+                    const removeInput = document.getElementById('hero-remove-input');
+                    if (removeInput) removeInput.value = '0';
+                } else {
+                    alert(result.error || 'Failed to remove media.');
+                }
+            } catch (err) {
+                alert('Error removing hero media: ' + err.message);
+            }
+        });
+    }
+
+    // Preset button clicks for Who We Are
     document.querySelectorAll('.home-preset-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const presetUrl = btn.getAttribute('data-preset');
@@ -2365,7 +2631,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // File input change preview
+    // File input change preview for Who We Are
     const homeFileInput = document.getElementById('home-img-file-input');
     if (homeFileInput) {
         homeFileInput.addEventListener('change', (e) => {
@@ -2390,7 +2656,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Save / Update form submit
+    // Save / Update form submit for Who We Are
     const homeForm = document.getElementById('form-home-image-settings');
     if (homeForm) {
         homeForm.addEventListener('submit', async (e) => {
@@ -2444,7 +2710,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Reset to Default button
+    // Reset to Default button for Who We Are
     const btnResetDefault = document.getElementById('btn-reset-default-home-image');
     if (btnResetDefault) {
         btnResetDefault.addEventListener('click', async () => {
@@ -2473,7 +2739,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Remove Image button
+    // Remove Image button for Who We Are
     const btnRemoveHomeImg = document.getElementById('btn-remove-home-image');
     if (btnRemoveHomeImg) {
         btnRemoveHomeImg.addEventListener('click', async () => {

@@ -266,5 +266,91 @@ class EarthXDesignsTestCase(unittest.TestCase):
         self.assertEqual(home_res4.status_code, 200)
         self.assertIn(b'/uploads/commercial_solar_featured.png', home_res4.data)
 
+    def test_home_hero_bg_media_settings_and_video_compression(self):
+        """Test adding, replacing, presets, removal of Home Hero background (video/image) and video compression."""
+        import io
+        import os
+        from app import compress_video_web_optimized, get_ffmpeg_executable
+
+        # 1. Login as admin
+        self.app.post('/admin/login', data={'email': 'sales.earthxd@gmail.com', 'password': 'EarthX@123'})
+
+        # 2. GET current home settings (must return hero_bg_media)
+        res = self.app.get('/api/admin/home-settings')
+        self.assertEqual(res.status_code, 200)
+        data = res.get_json()
+        self.assertTrue(data.get('success'))
+        self.assertIn('hero_bg_media', data)
+
+        # 3. Test Preset (Image preset: Commercial Solar)
+        res_preset = self.app.post('/api/admin/home-settings', data={
+            'target': 'hero_bg',
+            'preset_hero_media': '/uploads/commercial_solar_featured.png'
+        })
+        self.assertEqual(res_preset.status_code, 200)
+        self.assertEqual(res_preset.get_json()['hero_bg_media'], '/uploads/commercial_solar_featured.png')
+
+        # Check Home page renders image in hero
+        home_res = self.app.get('/')
+        self.assertEqual(home_res.status_code, 200)
+        self.assertIn(b'/uploads/commercial_solar_featured.png', home_res.data)
+
+        # 4. Test Remove Hero Media
+        res_remove = self.app.post('/api/admin/home-settings', data={
+            'target': 'hero_bg',
+            'remove_hero_media': '1'
+        })
+        self.assertEqual(res_remove.status_code, 200)
+        self.assertEqual(res_remove.get_json()['hero_bg_media'], '')
+
+        # Check Home page handles removed media cleanly (no-hero-media class)
+        home_res2 = self.app.get('/')
+        self.assertEqual(home_res2.status_code, 200)
+        self.assertIn(b'no-hero-media', home_res2.data)
+
+        # 5. Test Reset to Default Video
+        res_reset = self.app.post('/api/admin/home-settings', data={
+            'target': 'hero_bg',
+            'preset_hero_media': '/uploads/hero_video.mp4'
+        })
+        self.assertEqual(res_reset.status_code, 200)
+        self.assertEqual(res_reset.get_json()['hero_bg_media'], '/uploads/hero_video.mp4')
+
+        home_res3 = self.app.get('/')
+        self.assertEqual(home_res3.status_code, 200)
+        self.assertIn(b'/uploads/hero_video.mp4', home_res3.data)
+
+        # 6. Test Video Compression System with FFmpeg
+        ffmpeg_exe = get_ffmpeg_executable()
+        self.assertIsNotNone(ffmpeg_exe)
+        self.assertTrue(os.path.exists(ffmpeg_exe))
+
+        # Test compression function on the existing hero video
+        test_video = 'data/uploads/hero_video.mp4'
+        if os.path.exists(test_video):
+            comp_res = compress_video_web_optimized(test_video)
+            self.assertTrue(comp_res.get('success'))
+            self.assertIn('original_size', comp_res)
+
+        # 7. Test Uploading New Hero Media File (Image)
+        fake_img = (io.BytesIO(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82'), 'custom_hero_solar.png')
+        res_upload = self.app.post('/api/admin/home-settings', data={
+            'target': 'hero_bg',
+            'hero_media': fake_img
+        }, content_type='multipart/form-data')
+        self.assertEqual(res_upload.status_code, 200)
+        new_hero_path = res_upload.get_json()['hero_bg_media']
+        self.assertTrue('home_hero_bg' in new_hero_path)
+
+        home_res4 = self.app.get('/')
+        self.assertEqual(home_res4.status_code, 200)
+        self.assertIn(new_hero_path.encode('utf-8'), home_res4.data)
+
+        # Restore default video
+        self.app.post('/api/admin/home-settings', data={
+            'target': 'hero_bg',
+            'preset_hero_media': '/uploads/hero_video.mp4'
+        })
+
 if __name__ == '__main__':
     unittest.main()
