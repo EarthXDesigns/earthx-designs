@@ -1975,9 +1975,9 @@ a {
     position: relative;
     width: 100%;
     overflow: hidden;
-    background-color: #090d16;
-    border-top: 1px solid rgba(74, 222, 128, 0.2);
-    border-bottom: 1px solid rgba(74, 222, 128, 0.15);
+    background-color: #FFFFFF;
+    border-top: 1px solid rgba(226, 232, 240, 0.9);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
     padding: 2.2rem 0;
     margin-bottom: 0;
     user-select: none;
@@ -1991,19 +1991,19 @@ a {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 80px;
+    width: 90px;
     z-index: 5;
     pointer-events: none;
 }
 
 .pre-footer-marquee-container::before {
     left: 0;
-    background: linear-gradient(to right, #090d16, transparent);
+    background: linear-gradient(to right, #FFFFFF, rgba(255, 255, 255, 0));
 }
 
 .pre-footer-marquee-container::after {
     right: 0;
-    background: linear-gradient(to left, #090d16, transparent);
+    background: linear-gradient(to left, #FFFFFF, rgba(255, 255, 255, 0));
 }
 
 .marquee-energy-glow {
@@ -2011,8 +2011,8 @@ a {
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.5), transparent);
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
 .marquee-track {
@@ -2043,25 +2043,25 @@ a {
     text-transform: uppercase;
     letter-spacing: 0.04em;
     color: transparent;
-    -webkit-text-stroke: 1.5px #4ADE80;
+    -webkit-text-stroke: 1.8px #0B192F;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     display: inline-block;
     line-height: 1.1;
 }
 
 .marquee-phrase-wrap:hover .marquee-text-outline {
-    color: #4ADE80;
-    -webkit-text-stroke: 1.5px #4ADE80;
-    filter: drop-shadow(0 0 18px rgba(74, 222, 128, 0.65));
+    color: var(--accent);
+    -webkit-text-stroke: 1.8px var(--accent);
+    filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.35));
     transform: scale(1.02);
 }
 
 .marquee-separator {
     margin-left: 1.8rem;
     font-size: clamp(1.8rem, 3.5vw, 3rem);
-    color: #4ADE80;
-    text-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
-    opacity: 0.9;
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.45);
+    opacity: 0.95;
 }
 
 @media (max-width: 768px) {
@@ -2070,7 +2070,7 @@ a {
     }
     .marquee-text-outline {
         font-size: 2.2rem;
-        -webkit-text-stroke: 1.2px #4ADE80;
+        -webkit-text-stroke: 1.4px #0B192F;
     }
     .marquee-separator {
         margin-left: 1rem;
