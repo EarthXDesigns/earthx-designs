@@ -188,9 +188,14 @@ def get_db_connection():
             os.environ.get('CLOUDFLARE_API_TOKEN')
         )
     db_path = os.path.join(CONFIGURED_DATA_DIR, 'database.db')
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30.0, check_same_thread=False)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON;")
+    try:
+        conn.execute("PRAGMA journal_mode = WAL;")
+        conn.execute("PRAGMA synchronous = NORMAL;")
+        conn.execute("PRAGMA foreign_keys = ON;")
+    except Exception:
+        pass
     return conn
 
 def copy_generated_images(uploads_dir):

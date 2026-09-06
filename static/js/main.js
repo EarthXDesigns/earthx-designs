@@ -35,51 +35,121 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('scroll', handleScroll);
     }
 
-    // 3. Mobile Navigation Toggle Menu
+    // 3. Mobile Navigation Toggle Menu & Submenu Controller
     const navToggle = document.getElementById('nav-toggle');
     const navLinks = document.getElementById('nav-links');
-    if (navToggle && navLinks) {
-        navToggle.addEventListener('click', () => {
-            navToggle.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
-        
-        // Close menu when clicking outside or on links
-        document.addEventListener('click', (e) => {
-            if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
-                navToggle.classList.remove('active');
-                navLinks.classList.remove('active');
-            }
-        });
-        
-        const links = navLinks.querySelectorAll('a:not(.dropdown-toggle)');
-        links.forEach(link => {
-            link.addEventListener('click', () => {
-                navToggle.classList.remove('active');
-                navLinks.classList.remove('active');
+    const navBackdrop = document.getElementById('nav-backdrop');
+    const mobileNavClose = document.getElementById('mobile-nav-close');
+    const submenuBackBtn = document.getElementById('submenu-back-btn');
+    const submenuCloseBtn = document.getElementById('submenu-close-btn');
+    const servicesMenuTrigger = document.getElementById('services-menu-trigger');
+
+    const closeNavMenu = () => {
+        if (navToggle && navLinks) {
+            navToggle.classList.remove('active');
+            navLinks.classList.remove('active');
+            if (navBackdrop) navBackdrop.classList.remove('active');
+            document.body.classList.remove('nav-open');
+            // Close any open submenus
+            document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+                dropdown.classList.remove('expanded');
+                const toggle = dropdown.querySelector('.dropdown-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
             });
+        }
+    };
+
+    if (navToggle && navLinks) {
+        navToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = navLinks.classList.toggle('active');
+            navToggle.classList.toggle('active', isOpen);
+            if (navBackdrop) navBackdrop.classList.toggle('active', isOpen);
+            document.body.classList.toggle('nav-open', isOpen);
         });
 
-        const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-        dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', (e) => {
+        // Dedicated Mobile Nav Close Button
+        if (mobileNavClose) {
+            mobileNavClose.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeNavMenu();
+            });
+        }
+
+        // Submenu Back Button (Closes the sliding submenu panel and returns to main nav)
+        if (submenuBackBtn) {
+            submenuBackBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const parentDropdown = submenuBackBtn.closest('.nav-dropdown');
+                if (parentDropdown) {
+                    parentDropdown.classList.remove('expanded');
+                    const toggle = parentDropdown.querySelector('.dropdown-toggle');
+                    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        // Submenu Close Button (Closes entire mobile navigation immediately)
+        if (submenuCloseBtn) {
+            submenuCloseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeNavMenu();
+            });
+        }
+
+        // Services Menu Trigger on Mobile (Opens full sliding sub-panel)
+        if (servicesMenuTrigger) {
+            servicesMenuTrigger.addEventListener('click', (e) => {
                 if (window.innerWidth <= 992) {
-                    const parent = toggle.closest('.nav-dropdown');
-                    if (parent && !parent.classList.contains('expanded')) {
-                        // On mobile, first tap expands dropdown
-                        e.preventDefault();
-                        parent.classList.add('expanded');
-                        toggle.setAttribute('aria-expanded', 'true');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const parent = servicesMenuTrigger.closest('.nav-dropdown');
+                    if (parent) {
+                        const isExpanded = parent.classList.toggle('expanded');
+                        servicesMenuTrigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
                     }
                 }
             });
+        }
+        
+        if (navBackdrop) {
+            navBackdrop.addEventListener('click', closeNavMenu);
+        }
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (navLinks.classList.contains('active') && !navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+                closeNavMenu();
+            }
+        });
+
+        // Close on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navLinks.classList.contains('active')) {
+                // If a submenu is expanded, close the submenu first
+                const openSubmenu = document.querySelector('.nav-dropdown.expanded');
+                if (openSubmenu && window.innerWidth <= 992) {
+                    openSubmenu.classList.remove('expanded');
+                } else {
+                    closeNavMenu();
+                }
+            }
+        });
+        
+        // Links inside mobile nav should close the menu upon selection
+        const links = navLinks.querySelectorAll('a:not(.dropdown-toggle)');
+        links.forEach(link => {
+            link.addEventListener('click', closeNavMenu);
         });
     }
 
-    // Speculative prefetching on link hover / touch for instant zero-delay navigation
+    // Optimized speculative prefetching with hover debouncing to prevent server congestion
     const prefetchCache = new Set();
     const prefetchUrl = (url) => {
-        if (!url || url.startsWith('#') || url.startsWith('javascript') || prefetchCache.has(url)) return;
+        if (!url || url.startsWith('#') || url.startsWith('javascript') || url.startsWith('/admin') || url.startsWith('/api') || prefetchCache.has(url)) return;
         prefetchCache.add(url);
         const linkElem = document.createElement('link');
         linkElem.rel = 'prefetch';
@@ -87,9 +157,28 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(linkElem);
     };
 
+    const linkHoverTimers = new Map();
     document.querySelectorAll('a[href^="/"]').forEach(a => {
-        a.addEventListener('mouseenter', () => prefetchUrl(a.getAttribute('href')), { passive: true });
-        a.addEventListener('touchstart', () => prefetchUrl(a.getAttribute('href')), { passive: true });
+        const href = a.getAttribute('href');
+        if (!href || href.startsWith('/admin') || href.startsWith('/api')) return;
+
+        a.addEventListener('mouseenter', () => {
+            // Wait 180ms of steady hover before prefetching to avoid storming the server during rapid mouse sweeps across dropdown items
+            const timer = setTimeout(() => {
+                prefetchUrl(href);
+            }, 180);
+            linkHoverTimers.set(a, timer);
+        }, { passive: true });
+
+        a.addEventListener('mouseleave', () => {
+            const timer = linkHoverTimers.get(a);
+            if (timer) {
+                clearTimeout(timer);
+                linkHoverTimers.delete(a);
+            }
+        }, { passive: true });
+
+        a.addEventListener('touchstart', () => prefetchUrl(href), { passive: true });
     });
 
     // 4. Testimonials Slideshow/Carousel

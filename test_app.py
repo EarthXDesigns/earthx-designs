@@ -18,11 +18,25 @@ class EarthXDesignsTestCase(unittest.TestCase):
         init_db()
 
     def test_public_pages(self):
-        """Test that all public pages return a 200 OK status code."""
-        pages = ['/', '/about', '/services', '/portfolio', '/testimonials', '/blog', '/contact', '/admin/login']
+        """Test that all public pages return a 200 OK status code and include mobile navigation components."""
+        pages = [
+            '/', 
+            '/about', 
+            '/services', 
+            '/services/pre-sales-design',
+            '/portfolio', 
+            '/portfolio/1',
+            '/testimonials', 
+            '/blog', 
+            '/contact', 
+            '/admin/login'
+        ]
         for page in pages:
             response = self.app.get(page)
             self.assertEqual(response.status_code, 200, f"Page {page} failed to load with status code {response.status_code}")
+            if page != '/admin/login':
+                self.assertIn(b'id="nav-backdrop"', response.data, f"nav-backdrop missing on {page}")
+                self.assertIn(b'id="nav-toggle"', response.data, f"nav-toggle missing on {page}")
 
     def test_admin_dashboard_requires_login(self):
         """Test that access to the admin dashboard is redirected when not logged in."""

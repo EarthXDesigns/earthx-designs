@@ -3,8 +3,8 @@
 {% block title %}{{ category.name }} Services | EarthX Designs{% endblock %}
 
 {% block content %}
-<!-- Page Hero Banner (Configurable background image behind text with dark-green overlay) -->
-<section class="service-page-hero" style="background-image: linear-gradient(135deg, rgba(7, 24, 18, 0.88) 0%, rgba(11, 28, 38, 0.90) 100%), url('{{ category.hero_bg_image or category.hero_image or "/uploads/commercial_solar_featured.png" }}');">
+<!-- Page Hero Banner (Configurable background image behind text with luminous solar overlay) -->
+<section class="service-page-hero" style="background-image: linear-gradient(135deg, rgba(10, 25, 47, 0.58) 0%, rgba(16, 44, 40, 0.50) 100%), url('{% if category.hero_bg_image and not (category.hero_bg_image.endswith(".mp4") or category.hero_bg_image.endswith(".webm") or category.hero_bg_image.endswith(".mov")) %}{{ category.hero_bg_image }}{% elif category.hero_image and not (category.hero_image.endswith(".mp4") or category.hero_image.endswith(".webm") or category.hero_image.endswith(".mov")) %}{{ category.hero_image }}{% else %}/uploads/commercial_solar_featured.png{% endif %}');">
     <div class="container">
         <div class="service-hero-main">
             <!-- Upper Path / Breadcrumbs -->

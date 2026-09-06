@@ -22,7 +22,7 @@
     
     <!-- Favicon & Stylesheet -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ asset_version }}">
     
     <!-- Lucide Icons (Local Fast Load, Non-blocking) -->
     <script src="{{ url_for('static', filename='js/lucide.min.js') }}" defer></script>
@@ -35,8 +35,8 @@
     <nav class="navbar" id="navbar">
         <div class="container nav-container">
             <a href="{{ url_for('home') }}" class="logo">
-                <img src="/uploads/logo_white.png" alt="EarthX Designs Logo" class="logo-light">
-                <img src="/uploads/logo_black.png" alt="EarthX Designs Logo" class="logo-dark">
+                <img src="/uploads/logo_white.png?v={{ asset_version }}" alt="EarthX Designs Logo" class="logo-light">
+                <img src="/uploads/logo_black.png?v={{ asset_version }}" alt="EarthX Designs Logo" class="logo-dark">
             </a>
             
             <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
@@ -46,26 +46,78 @@
             </button>
             
             <div class="nav-links" id="nav-links">
-                <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
-                <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
-                <div class="nav-dropdown">
-                    <a href="{{ url_for('services') }}" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
-                        Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
+                <!-- Mobile Nav Header with Logo and Close Button (Visible on Mobile Only) -->
+                <div class="mobile-nav-header">
+                    <a href="{{ url_for('home') }}" class="mobile-nav-logo">
+                        <img src="/uploads/logo_white.png?v={{ asset_version }}" alt="EarthX Designs Logo" style="height: 34px; width: auto;">
                     </a>
-                    <div class="nav-dropdown-menu">
-                        <a href="{{ url_for('services') }}">All Services</a>
-                        {% for cat in nav_services %}
-                            <a href="{{ url_for('service_category', slug=cat.slug) }}">{{ cat.name }}</a>
-                        {% endfor %}
+                    <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close Menu">
+                        <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+                    </button>
+                </div>
+
+                <div class="mobile-nav-body">
+                    <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
+                    <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
+                    <div class="nav-dropdown">
+                        <a href="{{ url_for('services') }}" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false" id="services-menu-trigger">
+                            <span>Services</span>
+                            <span class="services-badge">8 Services</span>
+                            <i data-lucide="chevron-right" class="dropdown-chevron"></i>
+                        </a>
+                        <div class="nav-dropdown-menu" id="services-dropdown-panel">
+                            <!-- Mobile Submenu Header with Back Button (Visible on Mobile Only) -->
+                            <div class="mobile-submenu-header">
+                                <button type="button" class="submenu-back-btn" id="submenu-back-btn" aria-label="Back to Menu">
+                                    <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+                                    <span>Main Menu</span>
+                                </button>
+                                <span class="submenu-title">Our Services</span>
+                                <button type="button" class="submenu-close-btn" id="submenu-close-btn" aria-label="Close Menu">
+                                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                                </button>
+                            </div>
+
+                            <a href="{{ url_for('services') }}" class="nav-dropdown-all">
+                                <span class="nav-all-label">
+                                    <i data-lucide="layout-grid" style="width: 17px; height: 17px; margin-right: 8px; display: inline-block; vertical-align: middle;"></i>
+                                    <strong>All Services Overview</strong>
+                                </span>
+                                <i data-lucide="arrow-right" class="nav-all-arrow" style="width: 16px; height: 16px;"></i>
+                            </a>
+                            <div class="nav-dropdown-divider"></div>
+                            <div class="nav-dropdown-category-list">
+                                {% for cat in nav_services %}
+                                    <a href="{{ url_for('service_category', slug=cat.slug) }}" class="nav-dropdown-cat {% if request.path == url_for('service_category', slug=cat.slug) %}active-sub{% endif %}">
+                                        <span class="cat-dot"></span>
+                                        <span class="cat-name">{{ cat.name }}</span>
+                                        <i data-lucide="chevron-right" class="cat-arrow"></i>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
+                    <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
+                    <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %} nav-quote-btn">Request Quote</a>
+
+                    <!-- Mobile Contact Info Bar (Visible on Mobile Only) -->
+                    <div class="mobile-nav-contact">
+                        <a href="tel:+919978841256" class="contact-pill">
+                            <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
+                            <span>+91 9978841256</span>
+                        </a>
+                        <a href="mailto:sales.earthxd@gmail.com" class="contact-pill">
+                            <i data-lucide="mail" style="width: 14px; height: 14px;"></i>
+                            <span>sales.earthxd@gmail.com</span>
+                        </a>
                     </div>
                 </div>
-                <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
-                <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
-                <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
-                <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %}" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
             </div>
         </div>
     </nav>
+    <div class="nav-backdrop" id="nav-backdrop"></div>
 
     <!-- Main Content Area -->
     <main>
@@ -149,7 +201,7 @@
     </a>
 
     <!-- Page main Javascript -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v={{ asset_version }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

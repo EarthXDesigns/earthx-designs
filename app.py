@@ -156,19 +156,55 @@ def save_uploaded_file(file_storage, prefix="img"):
     # Local disk storage + Database BLOB backup
     filename = secure_filename(f"{prefix}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{file_storage.filename}")
     save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file_storage.save(save_path)
     
-    # Store binary BLOB in SQLite uploaded_files table as a persistent backup
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else ''
+    is_image = ext in {'jpg', 'jpeg', 'png', 'webp'}
+
+    # Optimize and resize high-res images to web dimensions using Pillow if available
+    saved_with_pillow = False
+    if is_image:
+        try:
+            from PIL import Image, ImageOps
+            file_storage.seek(0)
+            img = Image.open(file_storage)
+            img = ImageOps.exif_transpose(img) # Preserve orientation from camera/drone EXIF
+
+            # Max dimension 1920x1080 (maintains crisp quality while slashing multi-megabyte payloads)
+            max_size = (1920, 1080)
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+
+            if ext in {'jpg', 'jpeg'}:
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+                img.save(save_path, 'JPEG', quality=85, optimize=True)
+            elif ext == 'png':
+                img.save(save_path, 'PNG', optimize=True)
+            elif ext == 'webp':
+                img.save(save_path, 'WEBP', quality=85)
+            else:
+                img.save(save_path)
+            saved_with_pillow = True
+        except Exception as img_err:
+            print(f"[IMAGE OPTIMIZER] Pillow processing skipped: {img_err}")
+            file_storage.seek(0)
+
+    if not saved_with_pillow:
+        file_storage.seek(0)
+        file_storage.save(save_path)
+    
+    # Store binary BLOB in SQLite uploaded_files table as a persistent backup (limit to <= 10MB to avoid SQLite lockups)
     try:
-        with open(save_path, 'rb') as f:
-            file_bytes = f.read()
-        conn = get_db_connection()
-        conn.execute(
-            'INSERT OR REPLACE INTO uploaded_files (filename, mimetype, data) VALUES (?, ?, ?)',
-            (filename, file_storage.mimetype or 'application/octet-stream', file_bytes)
-        )
-        conn.commit()
-        conn.close()
+        file_size = os.path.getsize(save_path)
+        if file_size <= 10 * 1024 * 1024:
+            with open(save_path, 'rb') as f:
+                file_bytes = f.read()
+            conn = get_db_connection()
+            conn.execute(
+                'INSERT OR REPLACE INTO uploaded_files (filename, mimetype, data) VALUES (?, ?, ?)',
+                (filename, file_storage.mimetype or 'application/octet-stream', file_bytes)
+            )
+            conn.commit()
+            conn.close()
     except Exception as e:
         print(f"[STORAGE WARNING] Failed to backup image to database: {e}")
 
@@ -211,6 +247,8 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
+            if request.path.startswith('/api/'):
+                return jsonify({'error': 'Your admin session has expired. Please log in again.', 'session_expired': True}), 401
             return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -270,9 +308,30 @@ Message:
         except Exception as e:
             print(f"[EMAIL SYSTEM] SMTP send error: {e}")
 
+# In-memory cache for global navigation service categories to ensure instant page loads
+_NAV_SERVICES_CACHE = None
+_NAV_SERVICES_CACHE_TIME = 0
+
+def invalidate_nav_services_cache():
+    global _NAV_SERVICES_CACHE, _NAV_SERVICES_CACHE_TIME
+    _NAV_SERVICES_CACHE = None
+    _NAV_SERVICES_CACHE_TIME = 0
+
 # Context processor for global templates
 @app.context_processor
 def inject_global_data():
+    global _NAV_SERVICES_CACHE, _NAV_SERVICES_CACHE_TIME
+    now = datetime.datetime.now()
+    now_ts = now.timestamp()
+
+    # Serve from memory if fresh (< 60 seconds)
+    if _NAV_SERVICES_CACHE is not None and (now_ts - _NAV_SERVICES_CACHE_TIME) < 60:
+        return {
+            'now': now,
+            'nav_services': _NAV_SERVICES_CACHE,
+            'asset_version': '20260906_v7'
+        }
+
     from database import seed_service_categories_and_services
     conn = get_db_connection()
     nav_services = conn.execute(
@@ -284,9 +343,17 @@ def inject_global_data():
             'SELECT name, slug FROM service_categories WHERE is_published = 1 ORDER BY display_order'
         ).fetchall()
     conn.close()
+
+    _NAV_SERVICES_CACHE = nav_services
+    _NAV_SERVICES_CACHE_TIME = now_ts
+
+    # Cache busting timestamp for static assets (updated upon code deploys)
+    asset_version = "20260906_v7"
+
     return {
-        'now': datetime.datetime.now(),
-        'nav_services': nav_services
+        'now': now,
+        'nav_services': nav_services,
+        'asset_version': asset_version
     }
 
 @app.route('/api/admin/restore-service-categories', methods=['GET', 'POST'])
@@ -303,6 +370,7 @@ def restore_service_categories():
             print(f"[RESTORE] Clean tables error: {e}")
             
     seed_service_categories_and_services(conn, force=force)
+    invalidate_nav_services_cache()
     
     count_after = 0
     svc_count = 0
@@ -1202,6 +1270,7 @@ def api_service_categories():
             conn.commit()
             new_id = cursor.lastrowid
             conn.close()
+            invalidate_nav_services_cache()
             return jsonify({'message': 'Service category created successfully', 'id': new_id}), 201
         except sqlite3.IntegrityError:
             conn.close()
@@ -1286,6 +1355,7 @@ def api_service_category_detail(cat_id):
             ))
             conn.commit()
             conn.close()
+            invalidate_nav_services_cache()
             return jsonify({'message': 'Service category updated successfully'})
         except sqlite3.IntegrityError:
             conn.close()
@@ -1295,6 +1365,7 @@ def api_service_category_detail(cat_id):
         conn.execute('DELETE FROM service_categories WHERE id = ?', (cat_id,))
         conn.commit()
         conn.close()
+        invalidate_nav_services_cache()
         return jsonify({'message': 'Service category deleted successfully'})
 
 @app.route('/api/service-categories/reorder', methods=['POST'])
@@ -1309,6 +1380,7 @@ def api_service_categories_reorder():
         conn.execute('UPDATE service_categories SET display_order = ? WHERE id = ?', (item.get('display_order', 0), item.get('id')))
     conn.commit()
     conn.close()
+    invalidate_nav_services_cache()
     return jsonify({'message': 'Categories reordered'})
 
 # 7. SERVICES API
