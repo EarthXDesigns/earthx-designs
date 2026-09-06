@@ -1970,6 +1970,114 @@ a {
     border: 1px solid #6EE7B7;
 }
 
+/* Pre-Footer Infinite Marquee Banner (Directly Above Footer) */
+.pre-footer-marquee-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background-color: #090d16;
+    border-top: 1px solid rgba(74, 222, 128, 0.2);
+    border-bottom: 1px solid rgba(74, 222, 128, 0.15);
+    padding: 2.2rem 0;
+    margin-bottom: 0;
+    user-select: none;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+}
+
+.pre-footer-marquee-container::before,
+.pre-footer-marquee-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.pre-footer-marquee-container::before {
+    left: 0;
+    background: linear-gradient(to right, #090d16, transparent);
+}
+
+.pre-footer-marquee-container::after {
+    right: 0;
+    background: linear-gradient(to left, #090d16, transparent);
+}
+
+.marquee-energy-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.5), transparent);
+}
+
+.marquee-track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+}
+
+.marquee-content {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.marquee-phrase-wrap {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 1.2rem;
+    cursor: default;
+}
+
+.marquee-text-outline {
+    font-family: 'Syne', 'Anton', 'Oswald', var(--font-heading), sans-serif;
+    font-size: clamp(2.6rem, 5.5vw, 5.5rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: transparent;
+    -webkit-text-stroke: 1.5px #4ADE80;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-block;
+    line-height: 1.1;
+}
+
+.marquee-phrase-wrap:hover .marquee-text-outline {
+    color: #4ADE80;
+    -webkit-text-stroke: 1.5px #4ADE80;
+    filter: drop-shadow(0 0 18px rgba(74, 222, 128, 0.65));
+    transform: scale(1.02);
+}
+
+.marquee-separator {
+    margin-left: 1.8rem;
+    font-size: clamp(1.8rem, 3.5vw, 3rem);
+    color: #4ADE80;
+    text-shadow: 0 0 12px rgba(74, 222, 128, 0.8);
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .pre-footer-marquee-container {
+        padding: 1.4rem 0;
+    }
+    .marquee-text-outline {
+        font-size: 2.2rem;
+        -webkit-text-stroke: 1.2px #4ADE80;
+    }
+    .marquee-separator {
+        margin-left: 1rem;
+        font-size: 1.5rem;
+    }
+}
+
 /* Footer Section */
 .footer {
     background-color: var(--primary);

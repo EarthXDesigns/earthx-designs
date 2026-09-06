@@ -295,4 +295,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
         statNumbers.forEach(s => statsObserver.observe(s));
     }
+
+    // 7. Pre-Footer Infinite Marquee Controller (Autoplay + Velocity Scroll)
+    const marqueeTrack = document.getElementById('preFooterMarqueeTrack');
+    if (marqueeTrack) {
+        let xPos = 0;
+        const baseSpeed = 1.4; // Continuous baseline idle speed
+        let scrollVelocity = 0;
+        let lastScrollY = window.scrollY;
+        let lastTime = performance.now();
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            const deltaY = Math.abs(currentScrollY - lastScrollY);
+            scrollVelocity += deltaY * 0.08;
+            lastScrollY = currentScrollY;
+        }, { passive: true });
+
+        const animateMarquee = (currentTime) => {
+            const dt = Math.min((currentTime - lastTime) / 16.67, 2.5);
+            lastTime = currentTime;
+
+            // Decay scroll velocity smoothly like spring inertia
+            scrollVelocity *= 0.92;
+
+            // Move right to left with velocity boost
+            const currentSpeed = (baseSpeed + Math.min(scrollVelocity, 18)) * dt;
+            xPos -= currentSpeed;
+
+            // Loop smoothly at half width of track (since track has 2 identical sets)
+            const halfWidth = marqueeTrack.scrollWidth / 2;
+            if (halfWidth > 0 && Math.abs(xPos) >= halfWidth) {
+                xPos += halfWidth;
+            }
+
+            marqueeTrack.style.transform = `translate3d(${xPos}px, 0, 0)`;
+            requestAnimationFrame(animateMarquee);
+        };
+
+        requestAnimationFrame(animateMarquee);
+    }
 });
