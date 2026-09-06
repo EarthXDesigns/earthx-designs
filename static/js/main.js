@@ -35,34 +35,33 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('scroll', handleScroll);
     }
 
-    // 3. Mobile Navigation Toggle Menu & Submenu Controller
+    // 3. Mobile Navigation Toggle Menu & Submenu Controller (Mobile Only)
     const navToggle = document.getElementById('nav-toggle');
-    const navLinks = document.getElementById('nav-links');
+    const mobileNavDrawer = document.getElementById('mobile-nav-drawer');
     const navBackdrop = document.getElementById('nav-backdrop');
     const mobileNavClose = document.getElementById('mobile-nav-close');
     const submenuBackBtn = document.getElementById('submenu-back-btn');
     const submenuCloseBtn = document.getElementById('submenu-close-btn');
     const servicesMenuTrigger = document.getElementById('services-menu-trigger');
+    const mobileServicesDropdown = document.getElementById('mobile-services-dropdown');
 
     const closeNavMenu = () => {
-        if (navToggle && navLinks) {
-            navToggle.classList.remove('active');
-            navLinks.classList.remove('active');
-            if (navBackdrop) navBackdrop.classList.remove('active');
-            document.body.classList.remove('nav-open');
-            // Close any open submenus
-            document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
-                dropdown.classList.remove('expanded');
-                const toggle = dropdown.querySelector('.dropdown-toggle');
-                if (toggle) toggle.setAttribute('aria-expanded', 'false');
-            });
+        if (navToggle) navToggle.classList.remove('active');
+        if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+        if (navBackdrop) navBackdrop.classList.remove('active');
+        document.body.classList.remove('nav-open');
+        if (mobileServicesDropdown) {
+            mobileServicesDropdown.classList.remove('expanded');
+        }
+        if (servicesMenuTrigger) {
+            servicesMenuTrigger.setAttribute('aria-expanded', 'false');
         }
     };
 
-    if (navToggle && navLinks) {
+    if (navToggle && mobileNavDrawer) {
         navToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            const isOpen = navLinks.classList.toggle('active');
+            const isOpen = mobileNavDrawer.classList.toggle('active');
             navToggle.classList.toggle('active', isOpen);
             if (navBackdrop) navBackdrop.classList.toggle('active', isOpen);
             document.body.classList.toggle('nav-open', isOpen);
@@ -77,17 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Submenu Back Button (Closes the sliding submenu panel and returns to main nav)
-        if (submenuBackBtn) {
+        // Submenu Back Button (Returns from sliding submenu panel back to main mobile drawer)
+        if (submenuBackBtn && mobileServicesDropdown) {
             submenuBackBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                const parentDropdown = submenuBackBtn.closest('.nav-dropdown');
-                if (parentDropdown) {
-                    parentDropdown.classList.remove('expanded');
-                    const toggle = parentDropdown.querySelector('.dropdown-toggle');
-                    if (toggle) toggle.setAttribute('aria-expanded', 'false');
-                }
+                mobileServicesDropdown.classList.remove('expanded');
+                if (servicesMenuTrigger) servicesMenuTrigger.setAttribute('aria-expanded', 'false');
             });
         }
 
@@ -100,18 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Services Menu Trigger on Mobile (Opens full sliding sub-panel)
-        if (servicesMenuTrigger) {
+        // Services Menu Trigger on Mobile (Toggles sliding sub-panel)
+        if (servicesMenuTrigger && mobileServicesDropdown) {
             servicesMenuTrigger.addEventListener('click', (e) => {
-                if (window.innerWidth <= 992) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const parent = servicesMenuTrigger.closest('.nav-dropdown');
-                    if (parent) {
-                        const isExpanded = parent.classList.toggle('expanded');
-                        servicesMenuTrigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
-                    }
-                }
+                e.preventDefault();
+                e.stopPropagation();
+                const isExpanded = mobileServicesDropdown.classList.toggle('expanded');
+                servicesMenuTrigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
             });
         }
         
@@ -119,28 +109,27 @@ document.addEventListener('DOMContentLoaded', () => {
             navBackdrop.addEventListener('click', closeNavMenu);
         }
         
-        // Close menu when clicking outside
+        // Close menu when clicking outside mobile drawer
         document.addEventListener('click', (e) => {
-            if (navLinks.classList.contains('active') && !navToggle.contains(e.target) && !navLinks.contains(e.target)) {
+            if (mobileNavDrawer.classList.contains('active') && !navToggle.contains(e.target) && !mobileNavDrawer.contains(e.target)) {
                 closeNavMenu();
             }
         });
 
         // Close on ESC key
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && navLinks.classList.contains('active')) {
-                // If a submenu is expanded, close the submenu first
-                const openSubmenu = document.querySelector('.nav-dropdown.expanded');
-                if (openSubmenu && window.innerWidth <= 992) {
-                    openSubmenu.classList.remove('expanded');
+            if (e.key === 'Escape' && mobileNavDrawer.classList.contains('active')) {
+                if (mobileServicesDropdown && mobileServicesDropdown.classList.contains('expanded')) {
+                    mobileServicesDropdown.classList.remove('expanded');
+                    if (servicesMenuTrigger) servicesMenuTrigger.setAttribute('aria-expanded', 'false');
                 } else {
                     closeNavMenu();
                 }
             }
         });
         
-        // Links inside mobile nav should close the menu upon selection
-        const links = navLinks.querySelectorAll('a:not(.dropdown-toggle)');
+        // Navigation links inside mobile drawer close the drawer upon click
+        const links = mobileNavDrawer.querySelectorAll('a');
         links.forEach(link => {
             link.addEventListener('click', closeNavMenu);
         });
