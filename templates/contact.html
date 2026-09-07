@@ -1,19 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Request a Quote | EarthX Designs - Solar Engineering & RFP Intake{% endblock %}
+{% block title %}Request a Quote | EarthX Designs - Solar Design & Engineering{% endblock %}
 
 {% block content %}
 <!-- Page Hero -->
-<section class="page-hero fabrica-page-hero">
+<section class="page-hero">
     <div class="container">
-        <div class="hero-pretitle font-mono">
-            <span class="pretitle-index">(001)</span>
-            <span class="pretitle-text">HIGH-CONVERSION RFP INTAKE ENGINE</span>
-        </div>
-        <h1 class="page-title">Request a Solar Design Quote</h1>
-        <p class="page-subtitle text-secondary">
-            Submit your project specifications and site parameters below. Our engineering team will review your requirements and follow up with scoping terms within 24 hours.
-        </p>
+        <h1>Request a Solar Design Quote</h1>
+        <p>Submit your project details and parameters below. Our engineering team will review your requirements and follow up within 24 hours.</p>
     </div>
 </section>
 
@@ -21,218 +15,118 @@
 <section class="section-padding">
     <div class="container">
         
-        <div class="contact-layout grid" style="grid-template-columns: 1fr 2fr; gap: 3.5rem;">
+        <div class="contact-layout grid">
             
-            <!-- Left Panel: Studio Coordinates & NDA Notice -->
-            <aside class="contact-info-panel font-mono">
-                <div class="fabrica-spec-box" style="margin-bottom: 2rem;">
-                    <div class="spec-box-index">[002 DESK DIRECT]</div>
-                    <h3 class="spec-box-title font-sans" style="font-size: 1.25rem; margin-bottom: 1rem;">EarthX Designs Studio</h3>
-                    <p class="font-sans text-secondary" style="font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">
-                        Contact our design offices directly or use the RFP intake engine to share project blueprints, load profiles, or structural measurements.
-                    </p>
+            <!-- Left Panel: Contact info -->
+            <div class="contact-info-panel">
+                <div>
+                    <h2>EarthX Designs Support</h2>
+                    <p>Contact our design offices directly or use the contact form to share project blueprints, load profiles, or structural measurements.</p>
                     
                     <div class="contact-details-list">
-                        <div class="contact-detail-row" style="margin-bottom: 1.2rem;">
-                            <span class="text-muted" style="display: block; font-size: 0.75rem;">ENGINEERING INQUIRIES:</span>
-                            <a href="mailto:Sales@earthxdesigns.com" class="text-primary hover-link" style="font-size: 0.9rem;">Sales@earthxdesigns.com</a>
+                        <div class="contact-detail-item">
+                            <div class="contact-icon">
+                                <i data-lucide="mail"></i>
+                            </div>
+                            <div>
+                                <h4>Engineering Inquiries</h4>
+                                <p><a href="mailto:Sales@earthxdesigns.com" style="color: inherit; text-decoration: none;">Sales@earthxdesigns.com</a></p>
+                            </div>
                         </div>
                         
-                        <div class="contact-detail-row" style="margin-bottom: 1.2rem;">
-                            <span class="text-muted" style="display: block; font-size: 0.75rem;">DIRECT TELEPHONE:</span>
-                            <a href="tel:+919978841256" class="text-primary hover-link" style="font-size: 0.9rem;">+91 9978841256</a>
+                        <div class="contact-detail-item">
+                            <div class="contact-icon">
+                                <i data-lucide="phone"></i>
+                            </div>
+                            <div>
+                                <h4>Call Support</h4>
+                                <p><a href="tel:+919978841256" style="color: inherit; text-decoration: none;">+91 9978841256</a></p>
+                            </div>
                         </div>
                         
-                        <div class="contact-detail-row" style="margin-bottom: 1.2rem;">
-                            <span class="text-muted" style="display: block; font-size: 0.75rem;">WHATSAPP DESK:</span>
-                            <a href="https://wa.me/919978841256?text=Hello%20EarthX%20Designs%2C%20I%20would%20like%20a%20quote%20for%20a%20solar%20design%20project." target="_blank" rel="noopener noreferrer" class="text-accent hover-link" style="font-size: 0.9rem;">+91 9978841256 ↗</a>
-                        </div>
-
-                        <div class="contact-detail-row">
-                            <span class="text-muted" style="display: block; font-size: 0.75rem;">STUDIO HEADQUARTERS:</span>
-                            <span class="text-primary font-sans" style="font-size: 0.88rem; line-height: 1.5; display: block; margin-top: 4px;">
-                                317, Devashish Business Park, Premchand Nagar Rd, opposite Krishna Complex, Bodakdev, Ahmedabad, Gujarat 380015
-                            </span>
+                        <div class="contact-detail-item">
+                            <div class="contact-icon">
+                                <i data-lucide="map-pin"></i>
+                            </div>
+                            <div>
+                                <h4>Global Headquarters</h4>
+                                <p>317, Devashish Business Park, Premchand Nagar Rd, opposite Krishna Complex, Bodakdev, Ahmedabad, Gujarat 380015</p>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
                 <!-- Extra trust message -->
-                <div class="fabrica-spec-box" style="background: var(--bg-surface); border: 1px solid var(--border-active);">
-                    <div class="spec-box-index">[DATA CONFIDENTIALITY]</div>
-                    <h4 class="font-sans text-primary" style="font-size: 1rem; margin-bottom: 0.5rem;">Non-Disclosure Guarantee</h4>
-                    <p class="font-sans text-secondary" style="font-size: 0.88rem; line-height: 1.6; margin-bottom: 0;">
-                        We take data privacy and intellectual property seriously. Any design drawings, roof mockups, or proprietary project specs you share are protected by standard mutual NDA clauses.
-                    </p>
+                <div style="border-top: 1px solid rgba(255,255,255,0.15); padding-top: 2rem; margin-top: 3rem;">
+                    <p style="font-size: 0.88rem; color: var(--text-light); line-height: 1.5; margin-bottom: 0;">We take data privacy and intellectual property seriously. Any design drawings, roof mockups, or proprietary project specs you share are protected by standard NDA clauses.</p>
                 </div>
-            </aside>
+            </div>
             
-            <!-- Right Panel: Conversion Intake Engine (High-Conversion RFP Module) -->
+            <!-- Right Panel: Form -->
             <div class="contact-form-panel">
-                <div class="intake-container-card" style="margin: 0; padding: 2.5rem;">
-                    <div class="intake-header" style="margin-bottom: 2rem;">
-                        <div class="intake-header-left">
-                            <h2 class="intake-headline font-sans" style="font-size: 1.75rem;">Submit Project Scope</h2>
-                            <p class="intake-subtitle text-secondary">Fill in the project details below. Our engineers will follow up with formal scoping terms within 24 hours.</p>
+                <h3>Submit Project Scope</h3>
+                
+                <!-- Flash feedback alert messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash-message {{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
                         </div>
-                        <div class="intake-header-badge font-mono">
-                            <span class="status-pulse-dot"></span>
-                            <span>SLA: 24-HOUR RESPONSE</span>
+                    {% endif %}
+                {% endwith %}
+                
+                <form action="{{ url_for('contact') }}" method="POST" id="contact-inquiry-form">
+                    
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="name">Your Name *</label>
+                            <input type="text" id="name" name="name" required placeholder="e.g. John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="company_name">Company Name</label>
+                            <input type="text" id="company_name" name="company_name" placeholder="e.g. Solar Pro EPC">
                         </div>
                     </div>
                     
-                    <!-- Flash feedback alert messages -->
-                    {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            <div class="flash-messages font-mono" style="margin-bottom: 2rem;">
-                                {% for category, message in messages %}
-                                    <div class="flash-message {{ category }}">
-                                        {{ message }}
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" required placeholder="e.g. john@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="e.g. +1 (555) 000-0000">
+                        </div>
+                    </div>
                     
-                    <form action="{{ url_for('contact') }}" method="POST" id="contact-inquiry-form" class="fabrica-intake-form">
-                        
-                        <!-- Hidden inputs synchronized by JS for full backend & test_app.py compatibility -->
-                        <input type="hidden" id="form-project-type" name="project_type" value="Commercial & Industrial Rooftop">
-                        
-                        <!-- Step 1: Project Scale Chips -->
-                        <div class="intake-step-block">
-                            <div class="step-legend font-mono">
-                                <span class="legend-num">STEP 01 //</span>
-                                <span class="legend-title">PROJECT SCALE &amp; CATEGORY</span>
-                            </div>
-                            <div class="chip-selector-grid font-mono" id="scale-chips">
-                                <button type="button" class="chip-btn" data-scale="&lt; 5 MW C&amp;I">
-                                    <span class="chip-label">&lt; 5 MW</span>
-                                    <span class="chip-desc text-muted">C&amp;I Rooftop / Carport</span>
-                                </button>
-                                <button type="button" class="chip-btn active" data-scale="5–50 MW Utility">
-                                    <span class="chip-label">5–50 MW</span>
-                                    <span class="chip-desc text-muted">Mid-Scale Ground Mount</span>
-                                </button>
-                                <button type="button" class="chip-btn" data-scale="50+ MW Utility">
-                                    <span class="chip-label">50+ MW</span>
-                                    <span class="chip-desc text-muted">Large Utility Solar Farm</span>
-                                </button>
-                                <button type="button" class="chip-btn" data-scale="3D Render Only">
-                                    <span class="chip-label">3D Render Only</span>
-                                    <span class="chip-desc text-muted">High-Fidelity Flythrough</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Step 2: Required Deliverables Multi-Select -->
-                        <div class="intake-step-block">
-                            <div class="step-legend font-mono">
-                                <span class="legend-num">STEP 02 //</span>
-                                <span class="legend-title">REQUIRED DELIVERABLES (SELECT ALL THAT APPLY)</span>
-                            </div>
-                            <div class="multi-select-grid font-mono" id="deliverable-pills">
-                                <label class="multi-pill active">
-                                    <input type="checkbox" name="deliverable_site_layout" value="Site Layout DWG" checked>
-                                    <span class="pill-box"></span>
-                                    <span class="pill-text">Site Layout DWG (AutoCAD)</span>
-                                </label>
-                                <label class="multi-pill active">
-                                    <input type="checkbox" name="deliverable_shading" value="Shading Simulation" checked>
-                                    <span class="pill-box"></span>
-                                    <span class="pill-text">PVsyst Shading Simulation</span>
-                                </label>
-                                <label class="multi-pill">
-                                    <input type="checkbox" name="deliverable_3d_video" value="3D Video Flythrough">
-                                    <span class="pill-box"></span>
-                                    <span class="pill-text">3D Video Flythrough (4K)</span>
-                                </label>
-                                <label class="multi-pill active">
-                                    <input type="checkbox" name="deliverable_sld" value="Electrical SLD" checked>
-                                    <span class="pill-box"></span>
-                                    <span class="pill-text">Electrical SLD Schematic</span>
-                                </label>
-                                <label class="multi-pill">
-                                    <input type="checkbox" name="deliverable_boq" value="BOQ Schedule">
-                                    <span class="pill-box"></span>
-                                    <span class="pill-text">Bill of Quantities (BOQ)</span>
-                                </label>
-                                <label class="multi-pill">
-                                    <input type="checkbox" name="deliverable_retainer" value="Monthly Engineering Retainer">
-                                    <span class="pill-box"></span>
-                                    <span class="pill-text">Ongoing Monthly Retainer</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Step 3: Direct File Upload Zone (Drop Area) -->
-                        <div class="intake-step-block">
-                            <div class="step-legend font-mono">
-                                <span class="legend-num">STEP 03 //</span>
-                                <span class="legend-title">DROP RAW SITE FILES FOR SCOPING</span>
-                            </div>
-                            <div class="intake-dropzone font-mono" id="intake-dropzone">
-                                <div class="dropzone-icon">⤓</div>
-                                <div class="dropzone-prompt">
-                                    <strong>Drop .KML, .KMZ, .DWG, .DXF, or .PDF site boundary files</strong>
-                                    <span class="text-muted">or click to browse local files (Optional)</span>
-                                </div>
-                                <input type="file" id="site-file-input" class="hidden-file-input" accept=".kml,.kmz,.dwg,.dxf,.pdf,.png,.jpg,.jpeg">
-                                <div class="file-chosen-notice" id="file-chosen-notice"></div>
-                            </div>
-                        </div>
-
-                        <!-- Step 4: Contact & NDA Toggle -->
-                        <div class="intake-step-block">
-                            <div class="step-legend font-mono">
-                                <span class="legend-num">STEP 04 //</span>
-                                <span class="legend-title">CONTACT DETAILS &amp; CONFIDENTIALITY</span>
-                            </div>
-
-                            <div class="contact-inputs-grid">
-                                <div class="form-field">
-                                    <label for="name" class="font-mono">YOUR NAME *</label>
-                                    <input type="text" id="name" name="name" required placeholder="e.g. John Doe">
-                                </div>
-                                <div class="form-field">
-                                    <label for="company_name" class="font-mono">COMPANY NAME</label>
-                                    <input type="text" id="company_name" name="company_name" placeholder="e.g. Solar Pro EPC">
-                                </div>
-                                <div class="form-field">
-                                    <label for="email" class="font-mono">EMAIL ADDRESS *</label>
-                                    <input type="email" id="email" name="email" required placeholder="e.g. john@company.com">
-                                </div>
-                                <div class="form-field">
-                                    <label for="phone" class="font-mono">PHONE NUMBER</label>
-                                    <input type="tel" id="phone" name="phone" placeholder="e.g. +1 (555) 000-0000">
-                                </div>
-                            </div>
-
-                            <div class="form-field" style="margin-top: 1.5rem;">
-                                <label for="message" class="font-mono">PROJECT DESCRIPTION &amp; SCOPE *</label>
-                                <textarea id="message" name="message" required placeholder="Describe your project (e.g. capacity in kW/MW, roof material, layout criteria, files ready to share...)"></textarea>
-                            </div>
-
-                            <!-- NDA Toggle Row -->
-                            <div class="nda-toggle-row font-mono">
-                                <label class="switch-toggle-label">
-                                    <input type="checkbox" id="nda-toggle-checkbox" checked>
-                                    <span class="toggle-slider"></span>
-                                    <span class="toggle-text">Request Mutual NDA (Non-Disclosure Agreement) prior to file intake</span>
-                                </label>
-                                <span class="nda-guarantee text-muted">100% IP Protected</span>
-                            </div>
-
-                            <div class="form-submit-row">
-                                <button type="submit" class="btn btn-primary btn-submit-intake font-mono">
-                                    <span>Submit Project Inquiry</span>
-                                    <span class="submit-arrow" aria-hidden="true">→</span>
-                                </button>
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
+                    <div class="form-group">
+                        <label for="project_type">Project Category / Service Required</label>
+                        <select id="project_type" name="project_type">
+                            <option value="Residential Solar Design">Residential Solar Design</option>
+                            <option value="Commercial & Industrial Rooftop">Commercial & Industrial Rooftop</option>
+                            <option value="Utility-Scale Ground Mount">Utility-Scale Ground Mount</option>
+                            <option value="Shadow Analysis & Layouts">Shadow Analysis & Layouts Only</option>
+                            <option value="SLD Schematic Drafting">SLD Schematic Drafting Only</option>
+                            <option value="Engineering Consultancy">Engineering Consultancy</option>
+                            <option value="Other Service">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Project Description & Scope *</label>
+                        <textarea id="message" name="message" required placeholder="Describe your project (e.g. capacity in kW, roof material, layout criteria, files ready to share...)"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">
+                        <span>Submit Project Inquiry</span>
+                        <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                    </button>
+                    
+                </form>
             </div>
             
         </div>

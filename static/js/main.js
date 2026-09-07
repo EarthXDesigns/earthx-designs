@@ -1,4 +1,4 @@
-// EarthX Designs - "Fabrica" Studio Interaction Script
+// EarthX Designs - Public Frontend Scripting
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Initialize Lucide Icons
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initIcons();
     window.addEventListener('load', initIcons);
 
-    // 2. Hero Background Video Immediate Playback
+    // Hero Background Video Immediate Playback
     const heroVideo = document.querySelector('.hero-video-bg');
     if (heroVideo && heroVideo.tagName === 'VIDEO') {
         heroVideo.muted = true;
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Navbar Scroll Class Toggle
+    // 2. Navbar Scroll Behavior
     const navbar = document.getElementById('navbar');
     if (navbar) {
         const handleScroll = () => {
@@ -30,15 +30,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 navbar.classList.remove('scrolled');
             }
         };
+        // Initial check and scroll event
         handleScroll();
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('scroll', handleScroll);
     }
 
-    // 4. Mobile Navigation Drawer Controller (Preserves all selectors for tests)
+    // 3. Mobile Navigation Toggle Menu & Submenu Controller (Mobile Only)
     const navToggle = document.getElementById('nav-toggle');
     const mobileNavDrawer = document.getElementById('mobile-nav-drawer');
     const navBackdrop = document.getElementById('nav-backdrop');
     const mobileNavClose = document.getElementById('mobile-nav-close');
+    const submenuBackBtn = document.getElementById('submenu-back-btn');
+    const submenuCloseBtn = document.getElementById('submenu-close-btn');
     const servicesMenuTrigger = document.getElementById('services-menu-trigger');
     const mobileServicesDropdown = document.getElementById('mobile-services-dropdown');
 
@@ -64,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.toggle('nav-open', isOpen);
         });
 
+        // Dedicated Mobile Nav Close Button
         if (mobileNavClose) {
             mobileNavClose.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -72,6 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+
+        // Services Menu Trigger on Mobile (Toggles sliding sub-panel)
         if (servicesMenuTrigger && mobileServicesDropdown) {
             servicesMenuTrigger.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -80,202 +86,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 servicesMenuTrigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
             });
         }
-
+        
         if (navBackdrop) {
             navBackdrop.addEventListener('click', closeNavMenu);
         }
-
+        
+        // Close menu when clicking outside mobile drawer
         document.addEventListener('click', (e) => {
             if (mobileNavDrawer.classList.contains('active') && !navToggle.contains(e.target) && !mobileNavDrawer.contains(e.target)) {
                 closeNavMenu();
             }
         });
 
+        // Close on ESC key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && mobileNavDrawer.classList.contains('active')) {
-                closeNavMenu();
+                if (mobileServicesDropdown && mobileServicesDropdown.classList.contains('expanded')) {
+                    mobileServicesDropdown.classList.remove('expanded');
+                    if (servicesMenuTrigger) servicesMenuTrigger.setAttribute('aria-expanded', 'false');
+                } else {
+                    closeNavMenu();
+                }
             }
         });
-
+        
+        // Navigation links inside mobile drawer close the drawer upon click
         const links = mobileNavDrawer.querySelectorAll('a');
         links.forEach(link => {
             link.addEventListener('click', closeNavMenu);
         });
     }
 
-    // 5. Portfolio Matrix Filter Chips Controller
-    const filterContainer = document.getElementById('portfolio-filter-chips');
-    if (filterContainer) {
-        const filterBtns = filterContainer.querySelectorAll('.filter-chip');
-        const projectCards = document.querySelectorAll('.viewport-project-card');
-
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-
-                const filter = btn.getAttribute('data-filter');
-                projectCards.forEach(card => {
-                    const cat = card.getAttribute('data-category') || '';
-                    if (filter === 'all') {
-                        card.style.display = 'flex';
-                    } else if (filter === 'ground' && (cat.includes('ground') || cat.includes('utility'))) {
-                        card.style.display = 'flex';
-                    } else if (filter === '3d' && (cat.includes('3d') || cat.includes('render') || cat.includes('visualization'))) {
-                        card.style.display = 'flex';
-                    } else if (filter === 'rooftop' && (cat.includes('roof') || cat.includes('commercial') || cat.includes('residential'))) {
-                        card.style.display = 'flex';
-                    } else if (filter === 'sld' && (cat.includes('sld') || cat.includes('schematic') || cat.includes('electrical'))) {
-                        card.style.display = 'flex';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
-        });
-    }
-
-    // 6. High-Conversion Intake Engine Funnel (Form Controller)
-    const intakeForm = document.getElementById('intake-rfp-form') || document.getElementById('contact-inquiry-form');
-    if (intakeForm) {
-        // Step 1: Scale Chips Selection
-        const scaleChips = document.querySelectorAll('#scale-chips .chip-btn');
-        const projectTypeInput = document.getElementById('form-project-type') || document.getElementById('project_type');
-        let selectedScale = '<5 MW C&I';
-
-        scaleChips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                scaleChips.forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-                selectedScale = chip.getAttribute('data-scale');
-                if (projectTypeInput) {
-                    projectTypeInput.value = selectedScale;
-                }
-            });
-        });
-
-        // Step 2: Multi-select Checkbox Pills
-        const multiPills = document.querySelectorAll('#deliverable-pills .multi-pill');
-        multiPills.forEach(pill => {
-            const checkbox = pill.querySelector('input[type="checkbox"]');
-            pill.addEventListener('click', (e) => {
-                if (e.target !== checkbox) {
-                    checkbox.checked = !checkbox.checked;
-                }
-                pill.classList.toggle('active', checkbox.checked);
-            });
-        });
-
-        // Step 3: Direct File Upload Drag & Drop
-        const dropzone = document.getElementById('intake-dropzone');
-        const fileInput = document.getElementById('site-file-input');
-        const fileNotice = document.getElementById('file-chosen-notice');
-
-        if (dropzone && fileInput) {
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropzone.classList.add('dragover');
-                });
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropzone.classList.remove('dragover');
-                });
-            });
-
-            dropzone.addEventListener('drop', (e) => {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                if (files.length > 0) {
-                    fileInput.files = files;
-                    updateFileNotice(files[0].name);
-                }
-            });
-
-            fileInput.addEventListener('change', () => {
-                if (fileInput.files.length > 0) {
-                    updateFileNotice(fileInput.files[0].name);
-                }
-            });
-
-            function updateFileNotice(fileName) {
-                if (fileNotice) {
-                    fileNotice.innerHTML = `✓ Staged for scoping: <strong>${fileName}</strong>`;
-                }
-            }
-        }
-
-        // Form Submit Handler: Enrich message body with structured RFP parameters
-        intakeForm.addEventListener('submit', () => {
-            const messageEl = intakeForm.querySelector('#intake-message') || intakeForm.querySelector('#message');
-            const ndaToggle = document.getElementById('nda-toggle-checkbox');
-            
-            // Gather selected deliverables
-            const checkedDeliverables = [];
-            intakeForm.querySelectorAll('#deliverable-pills input[type="checkbox"]:checked').forEach(cb => {
-                checkedDeliverables.push(cb.value);
-            });
-
-            const stagedFile = fileInput && fileInput.files.length > 0 ? fileInput.files[0].name : 'None attached';
-            const ndaStatus = ndaToggle && ndaToggle.checked ? 'YES (Mutual NDA Requested)' : 'Standard';
-
-            if (messageEl) {
-                const originalText = messageEl.value.trim();
-                const rfpMetadata = `
-[RFP CONFIGURATION]
-- Project Scale: ${selectedScale}
-- Deliverables Required: ${checkedDeliverables.join(', ') || 'Not specified'}
-- Mutual NDA Requested: ${ndaStatus}
-- Staged Site File: ${stagedFile}
-----------------------------------------
-CLIENT SCOPE DETAILS:
-`;
-                // Only prepend if not already prepended
-                if (!originalText.includes('[RFP CONFIGURATION]')) {
-                    messageEl.value = rfpMetadata + originalText;
-                }
-            }
-        });
-    }
-
-    // 7. Live Time Zone Indicator (UTC+5:30 IST)
-    const timeIndicator = document.getElementById('live-time-indicator');
-    if (timeIndicator) {
-        const updateISTTime = () => {
-            const now = new Date();
-            // Calculate IST time (UTC + 5:30)
-            const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const istTime = new Date(utcTime + (3600000 * 5.5));
-            const hours = String(istTime.getHours()).padStart(2, '0');
-            const minutes = String(istTime.getMinutes()).padStart(2, '0');
-            timeIndicator.textContent = `UTC+5:30 [IST ${hours}:${minutes}] DESK ACTIVE`;
-        };
-        updateISTTime();
-        setInterval(updateISTTime, 30000);
-    }
-
-    // 8. Exclusive Accordion Rows (Fabrica Services Engine)
-    const accordionRows = document.querySelectorAll('.fabrica-accordion-row');
-    if (accordionRows.length > 0) {
-        accordionRows.forEach(row => {
-            row.addEventListener('toggle', () => {
-                if (row.open) {
-                    accordionRows.forEach(otherRow => {
-                        if (otherRow !== row && otherRow.open) {
-                            otherRow.removeAttribute('open');
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    // 9. Speculative Link Prefetching for Ultra-Fast Page Navigation
+    // Optimized speculative prefetching with hover debouncing to prevent server congestion
     const prefetchCache = new Set();
     const prefetchUrl = (url) => {
         if (!url || url.startsWith('#') || url.startsWith('javascript') || url.startsWith('/admin') || url.startsWith('/api') || prefetchCache.has(url)) return;
@@ -292,6 +134,7 @@ CLIENT SCOPE DETAILS:
         if (!href || href.startsWith('/admin') || href.startsWith('/api')) return;
 
         a.addEventListener('mouseenter', () => {
+            // Wait 180ms of steady hover before prefetching to avoid storming the server during rapid mouse sweeps across dropdown items
             const timer = setTimeout(() => {
                 prefetchUrl(href);
             }, 180);
@@ -308,4 +151,188 @@ CLIENT SCOPE DETAILS:
 
         a.addEventListener('touchstart', () => prefetchUrl(href), { passive: true });
     });
+
+    // 4. Testimonials Slideshow/Carousel
+    const track = document.querySelector('.testimonial-track');
+    if (track) {
+        const slides = Array.from(track.children);
+        const dotsContainer = document.querySelector('.carousel-dots');
+        let currentIdx = 0;
+        let slideInterval;
+
+        // Create navigation dots
+        slides.forEach((_, idx) => {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (idx === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                goToSlide(idx);
+                resetAutoplay();
+            });
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = Array.from(dotsContainer.children);
+
+        const goToSlide = (idx) => {
+            currentIdx = idx;
+            track.style.transform = `translateX(-${idx * 100}%)`;
+            dots.forEach(d => d.classList.remove('active'));
+            dots[idx].classList.add('active');
+        };
+
+        const nextSlide = () => {
+            currentIdx = (currentIdx + 1) % slides.length;
+            goToSlide(currentIdx);
+        };
+
+        const startAutoplay = () => {
+            slideInterval = setInterval(nextSlide, 6000);
+        };
+
+        const resetAutoplay = () => {
+            clearInterval(slideInterval);
+            startAutoplay();
+        };
+
+        // Initialize autoplay
+        startAutoplay();
+
+        // Support swipe/drag on mobile
+        let startX = 0;
+        let isDragging = false;
+
+        track.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            clearInterval(slideInterval);
+        }, { passive: true });
+
+        track.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            const diffX = e.changedTouches[0].clientX - startX;
+            if (Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    // swipe right (prev)
+                    const prevIdx = (currentIdx - 1 + slides.length) % slides.length;
+                    goToSlide(prevIdx);
+                } else {
+                    // swipe left (next)
+                    const nextIdx = (currentIdx + 1) % slides.length;
+                    goToSlide(nextIdx);
+                }
+            }
+            isDragging = false;
+            startAutoplay();
+        }, { passive: true });
+    }
+
+    // 5. Scroll-Reveal Observer with Smooth Staggering
+    const revealTargets = document.querySelectorAll('.reveal-on-scroll, .section-header, .service-card, .project-card, .feature-box, .why-card');
+    if ('IntersectionObserver' in window && revealTargets.length > 0) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            threshold: 0.08,
+            rootMargin: '0px 0px -30px 0px'
+        });
+
+        revealTargets.forEach(el => {
+            el.classList.add('reveal-on-scroll');
+            const parent = el.parentElement;
+            if (parent) {
+                const siblings = Array.from(parent.children);
+                const siblingIdx = siblings.indexOf(el);
+                if (siblingIdx > 0 && siblingIdx <= 4) {
+                    el.classList.add(`delay-${Math.min(siblingIdx, 4)}`);
+                }
+            }
+            revealObserver.observe(el);
+        });
+    } else {
+        revealTargets.forEach(el => el.classList.add('revealed'));
+    }
+
+    // 6. Smooth Number Counter for Stats on Scroll
+    const statNumbers = document.querySelectorAll('.stat-number');
+    if (statNumbers.length > 0 && 'IntersectionObserver' in window) {
+        const statsObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    const text = el.textContent.trim();
+                    const match = text.match(/^(\d+)(.*)$/);
+                    if (match) {
+                        const targetNum = parseInt(match[1], 10);
+                        const suffix = match[2] || '';
+                        const duration = 1200;
+                        const startTime = performance.now();
+                        
+                        const updateNumber = (currentTime) => {
+                            const elapsed = currentTime - startTime;
+                            const progress = Math.min(elapsed / duration, 1);
+                            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+                            const currentVal = Math.floor(easeOutCubic * targetNum);
+                            el.textContent = currentVal + suffix;
+                            
+                            if (progress < 1) {
+                                requestAnimationFrame(updateNumber);
+                            } else {
+                                el.textContent = text;
+                            }
+                        };
+                        requestAnimationFrame(updateNumber);
+                    }
+                    observer.unobserve(el);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        statNumbers.forEach(s => statsObserver.observe(s));
+    }
+
+    // 7. Pre-Footer Infinite Marquee Controller (Autoplay + Velocity Scroll)
+    const marqueeTrack = document.getElementById('preFooterMarqueeTrack');
+    if (marqueeTrack) {
+        let xPos = 0;
+        const baseSpeed = 1.4; // Continuous baseline idle speed
+        let scrollVelocity = 0;
+        let lastScrollY = window.scrollY;
+        let lastTime = performance.now();
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            const deltaY = Math.abs(currentScrollY - lastScrollY);
+            scrollVelocity += deltaY * 0.08;
+            lastScrollY = currentScrollY;
+        }, { passive: true });
+
+        const animateMarquee = (currentTime) => {
+            const dt = Math.min((currentTime - lastTime) / 16.67, 2.5);
+            lastTime = currentTime;
+
+            // Decay scroll velocity smoothly like spring inertia
+            scrollVelocity *= 0.92;
+
+            // Move right to left with velocity boost
+            const currentSpeed = (baseSpeed + Math.min(scrollVelocity, 18)) * dt;
+            xPos -= currentSpeed;
+
+            // Loop smoothly at half width of track (since track has 2 identical sets)
+            const halfWidth = marqueeTrack.scrollWidth / 2;
+            if (halfWidth > 0 && Math.abs(xPos) >= halfWidth) {
+                xPos += halfWidth;
+            }
+
+            marqueeTrack.style.transform = `translate3d(${xPos}px, 0, 0)`;
+            requestAnimationFrame(animateMarquee);
+        };
+
+        requestAnimationFrame(animateMarquee);
+    }
 });

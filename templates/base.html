@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- Primary SEO Metadata -->
-    <title>{% block title %}EarthX Designs | Precision Solar Engineering & 3D Modeling{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}IFC-Grade AutoCAD Solar Drafting, 3D Photorealistic Terrain Flythroughs, PVsyst Yield Simulations, and Electrical SLDs for Utility and Commercial Solar Developers worldwide.{% endblock %}">
-    <meta name="keywords" content="Solar Design Studio, Utility Scale Solar Modeling, Solar CAD Outsourcing, 3D Terrain Visualization, Shadow Modeling, PVsyst Simulation, Electrical SLD, EarthX Designs">
+    <title>{% block title %}EarthX Designs | Solar Design & Engineering Solutions{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Professional Solar 3D Design, Shadow Analysis, SLDs, BOQs, and Engineering Consultancy for EPC companies, solar developers, and installers worldwide.{% endblock %}">
+    <meta name="keywords" content="Solar Design Company, Solar Design Services, Solar Engineering Services, Solar 3D Design, Solar Layout Design, Shadow Analysis, Solar SLD Drawings, BOQ Preparation, Ground Mount Solar Design, EarthX Designs">
     <meta name="author" content="EarthX Designs">
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{% block og_title %}EarthX Designs | Precision Solar Engineering Studio{% endblock %}">
-    <meta property="og:description" content="{% block og_desc %}High-contrast engineering studio specializing in utility-scale solar layout modeling, 3D terrain visualization, and IFC-grade AutoCAD drafting.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}EarthX Designs | Solar Design & Engineering{% endblock %}">
+    <meta property="og:description" content="{% block og_desc %}Professional 2D & 3D solar designs, shadow analysis, SLDs and complete engineering packages for solar installers globally.{% endblock %}">
     
-    <!-- Google Fonts: Geist, Inter & JetBrains Mono for Swiss Minimalist Architectural Aesthetic -->
+    <!-- Google Fonts Preconnect & Optimized Load (Plus Jakarta Sans + Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Favicon & Stylesheet -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
@@ -29,89 +29,57 @@
     
     {% block head_extra %}{% endblock %}
 </head>
-<body class="fabrica-theme">
+<body>
 
-    <!-- Global Sticky Split Header -->
-    <header class="navbar" id="navbar">
+    <!-- Header & Navigation -->
+    <nav class="navbar" id="navbar">
         <div class="container nav-container">
-            <!-- Left: Brand Wordmark & Live Capacity Indicator -->
-            <div class="nav-left">
-                <a href="{{ url_for('home') }}" class="logo brand-wordmark" aria-label="EarthX Designs Home">
-                    <span class="wordmark-text">EARTHX DESIGNS</span>
-                </a>
-                <div class="capacity-status-badge" title="Current Engineering Production Availability">
-                    <span class="status-pulse-dot" aria-hidden="true"></span>
-                    <span class="status-text font-mono">Q3/Q4 Production Capacity Available</span>
-                </div>
-            </div>
+            <a href="{{ url_for('home') }}" class="logo">
+                <img src="/uploads/logo_white.png?v={{ asset_version }}" alt="EarthX Designs Logo" class="logo-light">
+                <img src="/uploads/logo_black.png?v={{ asset_version }}" alt="EarthX Designs Logo" class="logo-dark">
+            </a>
             
-            <!-- Center: Minimalist Route Links -->
-            <nav class="nav-links desktop-nav" id="desktop-nav-links" aria-label="Primary Navigation">
-                <a href="{{ url_for('portfolio') }}" class="nav-item {% if '/portfolio' in request.path %}active{% endif %}">
-                    <span class="nav-label">Work</span>
-                </a>
+            <!-- Mobile Toggle Button (Visible on Mobile <= 992px Only) -->
+            <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <!-- Desktop Navigation Links (Verbatim Baseline bcb475f, Visible on Desktop > 992px) -->
+            <div class="nav-links desktop-nav" id="desktop-nav-links">
+                <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
+                <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
                 <div class="nav-dropdown">
-                    <a href="{{ url_for('services') }}" class="dropdown-toggle nav-item {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
-                        <span class="nav-label">Services</span>
-                        <i data-lucide="chevron-down" class="dropdown-chevron"></i>
+                    <a href="{{ url_for('services') }}" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
+                        Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
                     </a>
                     <div class="nav-dropdown-menu">
-                        <div class="dropdown-header font-mono">ENGINEERING MODULES</div>
-                        <a href="{{ url_for('services') }}" class="dropdown-link-all">
-                            <span>All Services Overview</span>
-                            <span class="font-mono text-muted">→</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('services') }}">All Services</a>
                         {% for cat in nav_services %}
-                            <a href="{{ url_for('service_category', slug=cat.slug) }}" class="dropdown-link-item">
-                                <span class="dropdown-cat-bullet font-mono">0{{ loop.index }}</span>
-                                <span class="dropdown-cat-title">{{ cat.name }}</span>
-                            </a>
+                            <a href="{{ url_for('service_category', slug=cat.slug) }}">{{ cat.name }}</a>
                         {% endfor %}
                     </div>
                 </div>
-                <a href="{{ url_for('home') }}#workflow" class="nav-item">
-                    <span class="nav-label">Workflow</span>
-                </a>
-                <a href="{{ url_for('about') }}" class="nav-item {% if request.path == url_for('about') %}active{% endif %}">
-                    <span class="nav-label">About</span>
-                </a>
-                <a href="{{ url_for('blog') }}" class="nav-item {% if '/blog' in request.path %}active{% endif %}">
-                    <span class="nav-label">Journal</span>
-                </a>
-                <a href="{{ url_for('contact') }}" class="nav-item {% if request.path == url_for('contact') %}active{% endif %}">
-                    <span class="nav-label">Contact</span>
-                </a>
-            </nav>
-
-            <!-- Right: Persistent High-Contrast CTA + Mobile Toggle -->
-            <div class="nav-right">
-                <a href="{{ url_for('contact') }}" class="btn-rfp-cta">
-                    <span>Request Project RFP</span>
-                    <span class="cta-arrow" aria-hidden="true">↗</span>
-                </a>
-                
-                <!-- Mobile Toggle Button (Required for test_app.py) -->
-                <button class="nav-toggle" id="nav-toggle" aria-label="Toggle Navigation" aria-expanded="false">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                </button>
+                <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
+                <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
+                <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
+                <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %}" style="padding: 0.6rem 1.4rem; font-size: 0.9rem;">Request Quote</a>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <!-- Mobile Navigation Backdrop (Dark dimming, Required for test_app.py) -->
+    <!-- Mobile Navigation Backdrop (Dark dimming, ZERO blur) -->
     <div class="nav-backdrop" id="nav-backdrop"></div>
 
-    <!-- Mobile Navigation Drawer -->
+    <!-- Mobile Navigation Drawer (Visible on Mobile <= 992px Only) -->
     <div class="mobile-nav-drawer" id="mobile-nav-drawer">
         <div class="mobile-nav-header">
-            <a href="{{ url_for('home') }}" class="mobile-nav-logo brand-wordmark">
-                <span class="wordmark-text">EARTHX DESIGNS</span>
+            <a href="{{ url_for('home') }}" class="mobile-nav-logo">
+                <img src="/uploads/logo_white.png?v={{ asset_version }}" alt="EarthX Designs Logo" style="height: 34px; width: auto;">
             </a>
             <button type="button" class="mobile-nav-close" id="mobile-nav-close" aria-label="Close Menu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -119,230 +87,194 @@
         </div>
 
         <div class="mobile-nav-body">
-            <div class="mobile-capacity-pill">
-                <span class="status-pulse-dot"></span>
-                <span class="font-mono">Q3/Q4 Production Capacity Available</span>
-            </div>
-
-            <div class="mobile-nav-links">
-                <a href="{{ url_for('home') }}" class="mobile-link {% if request.path == url_for('home') %}active{% endif %}">
-                    <span class="font-mono text-muted">01</span>
-                    <span>Home</span>
-                </a>
-                <a href="{{ url_for('portfolio') }}" class="mobile-link {% if '/portfolio' in request.path %}active{% endif %}">
-                    <span class="font-mono text-muted">02</span>
-                    <span>Work (Portfolio)</span>
-                </a>
-                
-                <!-- Mobile Services Collapsible -->
-                <div class="mobile-nav-dropdown" id="mobile-services-dropdown">
-                    <button type="button" class="mobile-dropdown-toggle" id="services-menu-trigger" aria-expanded="false">
-                        <span class="mobile-toggle-left">
-                            <span class="font-mono text-muted">03</span>
-                            <span>Services</span>
-                        </span>
-                        <span class="mobile-toggle-right">
-                            <span class="mobile-services-badge font-mono">{{ nav_services|length }} Categories</span>
-                            <i data-lucide="chevron-down" class="mobile-chevron"></i>
-                        </span>
-                    </button>
-                    <div class="mobile-submenu-panel" id="services-dropdown-panel">
-                        <div class="mobile-submenu-inner">
-                            <a href="{{ url_for('services') }}" class="mobile-sub-all">
-                                <span>All Services Overview</span>
-                                <span class="font-mono">→</span>
-                            </a>
-                            <div class="mobile-sub-list">
-                                {% for cat in nav_services %}
-                                    <a href="{{ url_for('service_category', slug=cat.slug) }}" class="mobile-sub-item {% if request.path == url_for('service_category', slug=cat.slug) %}active-sub{% endif %}">
-                                        <span class="font-mono text-muted">03.{{ loop.index }}</span>
-                                        <span>{{ cat.name }}</span>
-                                    </a>
-                                {% endfor %}
-                            </div>
+            <a href="{{ url_for('home') }}" class="{% if request.path == url_for('home') %}active{% endif %}">Home</a>
+            <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
+            <div class="mobile-nav-dropdown" id="mobile-services-dropdown">
+                <button type="button" class="mobile-dropdown-toggle" id="services-menu-trigger" aria-expanded="false">
+                    <span class="mobile-toggle-left">
+                        <span>Services</span>
+                    </span>
+                    <span class="mobile-toggle-right">
+                        <span class="mobile-services-badge">8 Services</span>
+                        <svg class="mobile-dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </span>
+                </button>
+                <div class="mobile-submenu-panel" id="services-dropdown-panel">
+                    <div class="mobile-submenu-panel-inner">
+                        <a href="{{ url_for('services') }}" class="mobile-dropdown-all">
+                            <span class="mobile-all-label">
+                                <i data-lucide="layout-grid" style="width: 17px; height: 17px; margin-right: 8px; display: inline-block; vertical-align: middle;"></i>
+                                <strong>All Services Overview</strong>
+                            </span>
+                            <i data-lucide="arrow-right" class="nav-all-arrow" style="width: 16px; height: 16px;"></i>
+                        </a>
+                        <div class="mobile-dropdown-divider"></div>
+                        <div class="mobile-dropdown-cat-list">
+                            {% for cat in nav_services %}
+                                <a href="{{ url_for('service_category', slug=cat.slug) }}" class="mobile-dropdown-cat {% if request.path == url_for('service_category', slug=cat.slug) %}active-sub{% endif %}">
+                                    <span class="cat-name-wrap">
+                                        <span class="cat-dot"></span>
+                                        <span class="cat-name">{{ cat.name }}</span>
+                                    </span>
+                                    <svg class="cat-arrow" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </a>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
-
-                <a href="{{ url_for('home') }}#workflow" class="mobile-link">
-                    <span class="font-mono text-muted">04</span>
-                    <span>Workflow</span>
-                </a>
-                <a href="{{ url_for('about') }}" class="mobile-link {% if request.path == url_for('about') %}active{% endif %}">
-                    <span class="font-mono text-muted">05</span>
-                    <span>About Us</span>
-                </a>
-                <a href="{{ url_for('testimonials') }}" class="mobile-link {% if request.path == url_for('testimonials') %}active{% endif %}">
-                    <span class="font-mono text-muted">06</span>
-                    <span>Reviews</span>
-                </a>
-                <a href="{{ url_for('blog') }}" class="mobile-link {% if '/blog' in request.path %}active{% endif %}">
-                    <span class="font-mono text-muted">07</span>
-                    <span>Engineering Journal</span>
-                </a>
-                <a href="{{ url_for('contact') }}" class="mobile-link {% if request.path == url_for('contact') %}active{% endif %}">
-                    <span class="font-mono text-muted">08</span>
-                    <span>Contact</span>
-                </a>
             </div>
+            <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
+            <a href="{{ url_for('testimonials') }}" class="{% if request.path == url_for('testimonials') %}active{% endif %}">Testimonials</a>
+            <a href="{{ url_for('blog') }}" class="{% if '/blog' in request.path %}active{% endif %}">Blog</a>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary {% if request.path == url_for('contact') %}active{% endif %} nav-quote-btn">Request Quote</a>
 
-            <div class="mobile-nav-bottom">
-                <a href="{{ url_for('contact') }}" class="btn-rfp-cta btn-block">
-                    <span>Request Project RFP</span>
-                    <span>↗</span>
+            <!-- Mobile Contact Info Bar -->
+            <div class="mobile-nav-contact">
+                <a href="tel:+919978841256" class="contact-pill">
+                    <i data-lucide="phone" style="width: 14px; height: 14px;"></i>
+                    <span>+91 9978841256</span>
                 </a>
-                <div class="mobile-direct-coords font-mono">
-                    <a href="mailto:Sales@earthxdesigns.com">Sales@earthxdesigns.com</a>
-                    <a href="tel:+919978841256">+91 9978841256</a>
-                </div>
+                <a href="mailto:Sales@earthxdesigns.com" class="contact-pill">
+                    <i data-lucide="mail" style="width: 14px; height: 14px;"></i>
+                    <span>Sales@earthxdesigns.com</span>
+                </a>
             </div>
         </div>
     </div>
 
     <!-- Main Content Area -->
-    <main id="main-content" class="fabrica-main">
+    <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Minimalist Architectural Global Footer (4-Column Hairline Grid) -->
-    <footer class="footer fabrica-footer">
-        <!-- Proof Hairline Bar -->
-        <div class="footer-pre-strip">
-            <div class="container">
-                <div class="footer-strip-grid font-mono">
-                    <div class="strip-item">
-                        <span class="strip-dot"></span>
-                        <span>STUDIO: EARTHX DESIGNS PVT LTD</span>
-                    </div>
-                    <div class="strip-item">
-                        <span>EST. 2020 • UTILITY SOLAR ENGINEERING</span>
-                    </div>
-                    <div class="strip-item">
-                        <span class="status-pulse-dot"></span>
-                        <span id="live-time-indicator">UTC+5:30 [IST] DESK ACTIVE</span>
-                    </div>
+    <!-- Pre-Footer Infinite Marquee Banner -->
+    <section class="pre-footer-marquee-container" id="preFooterMarquee" aria-label="Solar Engineering Highlights">
+        <div class="marquee-energy-glow"></div>
+        <div class="marquee-track" id="preFooterMarqueeTrack">
+            <!-- First loop set -->
+            <div class="marquee-content">
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">GENERATE YOUR OWN POWER</span>
+                    <span class="marquee-separator">⚡</span>
+                </div>
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">UTILITY-SCALE PRECISION</span>
+                    <span class="marquee-separator">⚡</span>
+                </div>
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">ZERO-MARGIN BLUEPRINTS</span>
+                    <span class="marquee-separator">⚡</span>
+                </div>
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">BANKABLE ENGINEERING</span>
+                    <span class="marquee-separator">⚡</span>
+                </div>
+            </div>
+            <!-- Second loop set for seamless infinite wrap -->
+            <div class="marquee-content" aria-hidden="true">
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">GENERATE YOUR OWN POWER</span>
+                    <span class="marquee-separator">⚡</span>
+                </div>
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">UTILITY-SCALE PRECISION</span>
+                    <span class="marquee-separator">⚡</span>
+                </div>
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">ZERO-MARGIN BLUEPRINTS</span>
+                    <span class="marquee-separator">⚡</span>
+                </div>
+                <div class="marquee-phrase-wrap">
+                    <span class="marquee-text-outline">BANKABLE ENGINEERING</span>
+                    <span class="marquee-separator">⚡</span>
                 </div>
             </div>
         </div>
+    </section>
 
+    <!-- Footer Section -->
+    <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
+            <div class="footer-grid grid">
                 
-                <!-- Column 1: EarthX Statement & Studio Coordinates -->
-                <div class="footer-col col-statement">
-                    <div class="footer-brand-title">
-                        <span class="brand-wordmark">EARTHX DESIGNS</span>
-                    </div>
-                    <p class="footer-bio">
-                        Precision solar engineering studio providing utility-scale site layout drafting, 3D terrain visualizations, PVsyst bankability modeling, and electrical Single Line Diagrams for global developers and EPCs.
-                    </p>
-                    <div class="footer-meta-block font-mono">
-                        <div class="meta-row">
-                            <span class="meta-label text-muted">LOCATION:</span>
-                            <span class="meta-val">AHMEDABAD, GUJARAT, INDIA</span>
-                        </div>
-                        <div class="meta-row">
-                            <span class="meta-label text-muted">DISPATCH:</span>
-                            <span class="meta-val">WORLDWIDE (USA, EU, APAC, MEA)</span>
-                        </div>
-                    </div>
+                <!-- Widget 1: Brand -->
+                <div class="footer-widget">
+                    <a href="{{ url_for('home') }}" class="logo" style="color: #FFFFFF;">
+                        <img src="/uploads/logo_white.png" alt="EarthX Designs Logo" style="height: 38px; width: auto;">
+                    </a>
+                    <p>Providing high-precision solar design, electrical engineering, shadow analysis, and BOQ preparation support for solar EPC installers and developers globally.</p>
                 </div>
                 
-                <!-- Column 2: Direct Site Navigation Links -->
-                <div class="footer-col col-links">
-                    <h3 class="footer-header font-mono">INDEX (001)</h3>
-                    <ul class="footer-list">
-                        <li><a href="{{ url_for('portfolio') }}">Project Matrix (Work)</a></li>
-                        <li><a href="{{ url_for('services') }}">Engineering Services</a></li>
-                        <li><a href="{{ url_for('home') }}#workflow">Drop-to-Delivery Pipeline</a></li>
-                        <li><a href="{{ url_for('about') }}">Engineering Pedigree (About)</a></li>
-                        <li><a href="{{ url_for('testimonials') }}">Client Verifications</a></li>
-                        <li><a href="{{ url_for('blog') }}">Technical Journal & Guides</a></li>
-                        <li><a href="{{ url_for('contact') }}">Intake RFP Portal</a></li>
-                        <li><a href="{{ url_for('admin_login') }}" class="text-muted font-mono">Admin Console ↗</a></li>
+                <!-- Widget 2: Services (Synchronized with Upper Navigation) -->
+                <div class="footer-widget">
+                    <h3>Our Services</h3>
+                    <ul class="footer-links">
+                        {% for cat in nav_services %}
+                        <li><a href="{{ url_for('service_category', slug=cat.slug) }}">{{ cat.name }}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
                 
-                <!-- Column 3: Deliverable Formats & Standards Supported -->
-                <div class="footer-col col-standards">
-                    <h3 class="footer-header font-mono">SPECIFICATIONS (002)</h3>
-                    <ul class="footer-spec-list font-mono">
-                        <li>
-                            <span class="spec-tag">.DWG / .DXF</span>
-                            <span class="spec-desc text-muted">AutoCAD Civil 3D & 2D GA Layouts</span>
-                        </li>
-                        <li>
-                            <span class="spec-tag">.PVC / .PAN</span>
-                            <span class="spec-desc text-muted">PVsyst Yield & Shading Files</span>
-                        </li>
-                        <li>
-                            <span class="spec-tag">.KMZ / .KML</span>
-                            <span class="spec-desc text-muted">Google Earth Satellite Vector Overlays</span>
-                        </li>
-                        <li>
-                            <span class="spec-tag">4K MP4 / WebM</span>
-                            <span class="spec-desc text-muted">3D Photorealistic Site Flythroughs</span>
-                        </li>
-                        <li>
-                            <span class="spec-tag">IEC & NEC</span>
-                            <span class="spec-desc text-muted">Compliant Electrical SLD Schedules</span>
-                        </li>
+                <!-- Widget 3: Quick Links -->
+                <div class="footer-widget">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('about') }}">About Us</a></li>
+                        <li><a href="{{ url_for('portfolio') }}">Our Portfolio</a></li>
+                        <li><a href="{{ url_for('blog') }}">Engineering Blog</a></li>
+                        <li><a href="{{ url_for('testimonials') }}">Client Reviews</a></li>
+                        <li><a href="{{ url_for('contact') }}">Contact & Quote Request</a></li>
                     </ul>
                 </div>
                 
-                <!-- Column 4: Direct Contact Details & WhatsApp Link -->
-                <div class="footer-col col-contact">
-                    <h3 class="footer-header font-mono">COMMUNICATIONS (003)</h3>
-                    <div class="footer-contact-box font-mono">
-                        <div class="contact-line">
-                            <span class="text-muted">DIRECT:</span>
-                            <a href="mailto:Sales@earthxdesigns.com" class="highlight-link">Sales@earthxdesigns.com</a>
-                        </div>
-                        <div class="contact-line">
-                            <span class="text-muted">HOTLINE:</span>
-                            <a href="tel:+919978841256" class="highlight-link">+91 9978841256</a>
-                        </div>
-                        <div class="contact-line">
-                            <span class="text-muted">WHATSAPP:</span>
-                            <a href="https://wa.me/919978841256?text=Hello%20EarthX%20Designs%2C%20I%20would%20like%20a%20quote%20for%20a%20solar%20design%20project." target="_blank" rel="noopener noreferrer" class="highlight-link">Direct Engineer Chat ↗</a>
-                        </div>
-                        <div class="contact-line">
-                            <span class="text-muted">ADDRESS:</span>
-                            <span class="text-primary address-text">317 Devashish Business Park, Bodakdev, Ahmedabad, 380015</span>
-                        </div>
-                    </div>
+                <!-- Widget 4: Contact info -->
+                <div class="footer-widget">
+                    <h3>Get in Touch</h3>
+                    <ul class="footer-contact">
+                        <li>
+                            <i data-lucide="mail"></i>
+                            <a href="mailto:Sales@earthxdesigns.com" style="color: inherit; text-decoration: none;">Sales@earthxdesigns.com</a>
+                        </li>
+                        <li>
+                            <i data-lucide="phone"></i>
+                            <a href="tel:+919978841256" style="color: inherit; text-decoration: none;">+91 9978841256</a>
+                        </li>
+                        <li>
+                            <i data-lucide="map-pin"></i>
+                            <span>317, Devashish Business Park, Premchand Nagar Rd, opposite Krishna Complex, Bodakdev, Ahmedabad, Gujarat 380015</span>
+                        </li>
+                    </ul>
                 </div>
                 
             </div>
             
-            <!-- Bottom Copyright & Legal Strip -->
-            <div class="footer-bottom-hairline">
-                <div class="footer-bottom-content font-mono">
-                    <p class="copyright-text">
-                        © {{ now.year }} EARTHX DESIGNS PVT LTD. ALL RIGHTS RESERVED. ZERO DATA OMISSION BUILD.
-                    </p>
-                    <div class="footer-bottom-links">
-                        <span class="text-muted">PRECISION UTILITY-SCALE ENGINEERING</span>
-                        <a href="{{ url_for('admin_login') }}">SYSTEM ACCESS</a>
-                    </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ now.year }} EarthX Designs. All rights reserved. Precision Solar Engineering & Design.</p>
+                <div class="footer-bottom-links">
+                    <a href="{{ url_for('admin_login') }}">Admin Portal</a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Sleek Floating WhatsApp Integration -->
+    <!-- Floating WhatsApp Integration -->
     <a href="https://wa.me/919978841256?text=Hello%20EarthX%20Designs%2C%20I%20would%20like%20a%20quote%20for%20a%20solar%20design%20project." 
        class="whatsapp-float" 
        target="_blank" 
        rel="noopener noreferrer" 
-       aria-label="Direct Engineering Chat on WhatsApp">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+       aria-label="Contact us on WhatsApp">
+        <svg viewBox="0 0 24 24" width="32" height="32">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.59 2.028 14.11 1.002 11.99 1.002c-5.438 0-9.821 4.372-9.825 9.804-.002 1.8.49 3.55 1.42 5.12L2.53 20.944l5.117-1.79zM16.14 13.9c-.3-.15-1.782-.876-2.056-.975-.274-.1-.474-.15-.673.15-.2.3-.772.975-.947 1.173-.175.2-.35.225-.65.075-.3-.15-1.267-.466-2.413-1.488-.891-.795-1.493-1.777-1.668-2.077-.175-.3-.018-.462.13-.61.135-.134.3-.349.45-.524.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.673-1.62-.922-2.206-.24-.58-.507-.5-.69-.51-.178-.008-.383-.01-.588-.01-.205 0-.54.077-.822.38-.282.305-1.077 1.053-1.077 2.566 0 1.513 1.1 2.978 1.252 3.18.152.201 2.163 3.3 5.242 4.628.732.316 1.302.505 1.747.646.737.234 1.41.201 1.94.122.59-.088 1.783-.728 2.032-1.43.25-.702.25-1.303.175-1.43-.075-.127-.275-.202-.575-.352z"/>
         </svg>
     </a>
 
-    <!-- Page Main Javascript -->
+    <!-- Page main Javascript -->
     <script src="{{ url_for('static', filename='js/main.js') }}?v={{ asset_version }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
+

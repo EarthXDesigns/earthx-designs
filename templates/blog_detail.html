@@ -1,103 +1,100 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ post.title }} | EarthX Designs Technical Journal{% endblock %}
+{% block title %}{{ post.title }} | EarthX Designs Solar Blog{% endblock %}
 
 {% block content %}
 <!-- Page Hero Banner -->
-<section class="page-hero fabrica-page-hero" style="text-align: left;">
+<section class="page-hero blog-detail-hero" style="text-align: left;">
     <div class="container">
-        <!-- Breadcrumb -->
-        <nav class="service-breadcrumbs font-mono" style="margin-bottom: 1rem;">
-            <a href="{{ url_for('home') }}">HOME</a>
-            <span class="bc-sep">/</span>
-            <a href="{{ url_for('blog') }}">JOURNAL</a>
-            <span class="bc-sep">/</span>
-            <span class="bc-current text-accent">{{ post.category|upper }}</span>
-        </nav>
-
-        <h1 class="page-title" style="max-width: 960px;">{{ post.title }}</h1>
-        <div class="blog-meta-header font-mono text-muted" style="margin-top: 1rem;">
-            <span>PUBLISHED: {{ post.created_at.split(' ')[0] }}</span>
-            <span style="margin: 0 8px;">•</span>
-            <span>AUTHOR: EARTHX ENGINEERING DESK</span>
-            <span style="margin: 0 8px;">•</span>
-            <span class="text-accent">CATEGORY: {{ post.category }}</span>
-        </div>
+        <span class="section-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 4px; display: inline-block; margin-bottom: 1rem;">
+            {{ post.category }}
+        </span>
+        <h1 style="font-size: clamp(2rem, 4vw, 3rem); line-height: 1.2; max-width: 900px; color: #FFFFFF;">
+            {{ post.title }}
+        </h1>
     </div>
 </section>
 
 <!-- Blog Reading Section -->
-<section class="section-padding" style="background-color: var(--bg-base);">
+<section class="section-padding" style="background-color: #FFFFFF;">
     <div class="container">
         
-        <div class="blog-detail-layout grid" style="grid-template-columns: 2.2fr 1fr; gap: 3.5rem;">
+        <div class="blog-detail-layout grid">
             
             <!-- Main Content Area -->
             <div>
-                <div class="fabrica-viewport-card" style="margin-bottom: 2.5rem;">
-                    <div class="viewport-media-wrap">
-                        <img src="{{ post.featured_image }}" alt="{{ post.title }}">
-                    </div>
+                <div class="blog-main-image">
+                    <img src="{{ post.featured_image }}" alt="{{ post.title }}">
                 </div>
                 
-                <article class="blog-rich-content font-sans text-secondary">
+                <div class="blog-meta-details">
+                    <span>
+                        <i data-lucide="calendar" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                        Published: {{ post.created_at.split(' ')[0] }}
+                    </span>
+                    <span>
+                        <i data-lucide="user" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                        Author: EarthX Engineering Team
+                    </span>
+                </div>
+                
+                <article class="blog-rich-content">
+                    <!-- Format paragraphs split by double newlines for basic rich formatting in Jinja -->
                     {% for paragraph in post.content.split('\n\n') %}
                         {% if paragraph.strip() %}
                             {% if paragraph.strip().startswith('##') %}
-                                <h2 class="font-sans text-primary" style="font-size: 1.5rem; margin: 2rem 0 1rem 0;">{{ paragraph.replace('##', '').strip() }}</h2>
+                                <h2>{{ paragraph.replace('##', '').strip() }}</h2>
                             {% elif paragraph.strip().startswith('###') %}
-                                <h3 class="font-sans text-primary" style="font-size: 1.25rem; margin: 1.5rem 0 0.8rem 0;">{{ paragraph.replace('###', '').strip() }}</h3>
+                                <h3>{{ paragraph.replace('###', '').strip() }}</h3>
                             {% elif paragraph.strip().startswith('>') %}
-                                <blockquote class="fabrica-quote font-mono">{{ paragraph.replace('>', '').strip() }}</blockquote>
+                                <blockquote>{{ paragraph.replace('>', '').strip() }}</blockquote>
                             {% else %}
-                                <p style="font-size: 1.05rem; line-height: 1.8; margin-bottom: 1.4rem;">{{ paragraph.strip() }}</p>
+                                <p>{{ paragraph.strip() }}</p>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
                 </article>
                 
                 <!-- Share or Return section -->
-                <div class="blog-nav-footer font-mono" style="margin-top: 4rem; border-top: 1px solid var(--border-hairline); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                    <a href="{{ url_for('blog') }}" class="btn btn-outline btn-sm">
-                        <span>← Back to Technical Journal</span>
+                <div style="margin-top: 4rem; border-top: 1px solid rgba(226, 232, 240, 0.8); padding-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <a href="{{ url_for('blog') }}" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.9rem;">
+                        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                        <span>Back to Articles</span>
                     </a>
                     
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <span class="text-muted" style="font-size: 0.85rem;">Ready to scope a project?</span>
-                        <a href="{{ url_for('contact') }}" class="btn btn-primary btn-sm">Request Scoping Terms →</a>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--primary);">Contact us for designs:</span>
+                        <a href="{{ url_for('contact') }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;">Get Quote</a>
                     </div>
                 </div>
             </div>
             
             <!-- Sidebar Widget -->
             <aside class="blog-sidebar">
-                <div class="fabrica-spec-box font-mono" style="margin-bottom: 2rem;">
-                    <div class="spec-box-index">[001 ARCHIVE]</div>
-                    <h3 class="spec-box-title font-sans" style="font-size: 1.15rem; margin-bottom: 1.5rem;">Recent Reports</h3>
+                <div class="sidebar-widget">
+                    <h3>Recent Articles</h3>
                     
-                    <div class="recent-posts-list">
-                        {% for r in recent %}
-                        <div class="recent-post-row" style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-hairline);">
-                            <div class="recent-post-date text-muted" style="font-size: 0.75rem; margin-bottom: 4px;">{{ r.created_at.split(' ')[0] }}</div>
-                            <h4 class="font-sans" style="font-size: 0.95rem; line-height: 1.4;">
-                                <a href="{{ url_for('blog_detail', slug=r.slug) }}" class="text-primary hover-link">{{ r.title }}</a>
-                            </h4>
+                    {% for r in recent %}
+                    <div class="recent-post-item">
+                        <div class="recent-post-thumb">
+                            <img src="{{ r.featured_image }}" alt="{{ r.title }}">
                         </div>
-                        {% endfor %}
+                        <div class="recent-post-info">
+                            <h4><a href="{{ url_for('blog_detail', slug=r.slug) }}">{{ r.title }}</a></h4>
+                            <span>{{ r.created_at.split(' ')[0] }}</span>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
                 
                 <!-- Consultancy Badge -->
-                <div class="fabrica-spec-box font-mono" style="background: var(--bg-surface); border: 1px solid var(--border-active);">
-                    <div class="spec-box-index">[DRAFTING DESK]</div>
-                    <h4 class="font-sans text-primary" style="font-size: 1.1rem; margin-bottom: 0.5rem;">Outsource Your Drafting</h4>
-                    <p class="font-sans text-secondary" style="font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.5rem;">
-                        We draft single line diagrams, shadow charts, and tracker layout drawings for solar EPCs globally with 24–48h turnarounds.
-                    </p>
-                    <a href="{{ url_for('contact') }}" class="btn btn-primary btn-block font-mono">
-                        <span>Request Scoping Scope</span>
-                        <span>→</span>
-                    </a>
+                <div class="why-card" style="background-color: var(--primary); color: var(--bg-white); border-color: var(--primary); padding: 1.5rem; text-align: center; border-radius: var(--radius-md);">
+                    <div class="why-card-icon" style="background-color: rgba(255,255,255,0.1); color: var(--accent); margin-bottom: 12px; padding: 10px; border-radius: 50%;">
+                        <i data-lucide="cpu" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <h4 style="color: #FFFFFF; font-size: 1rem; margin-bottom: 6px;">Solar Engineering Support</h4>
+                    <p style="color: var(--text-light); font-size: 0.82rem; line-height: 1.5; margin-bottom: 1.2rem;">We draft single line diagrams, shadow charts, and tracker layout drawings for solar EPCs globally.</p>
+                    <a href="{{ url_for('contact') }}" class="btn btn-primary" style="width: 100%; font-size: 0.82rem; padding: 0.5rem;">Request Quote</a>
                 </div>
             </aside>
             
