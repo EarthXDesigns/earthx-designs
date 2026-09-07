@@ -1,13 +1,19 @@
 {% extends 'base.html' %}
 
-{% block title %}Solar Design & Engineering Blog | EarthX Designs{% endblock %}
+{% block title %}Solar Engineering Journal | EarthX Designs Technical Insights{% endblock %}
 
 {% block content %}
 <!-- Page Hero -->
-<section class="page-hero">
+<section class="page-hero fabrica-page-hero">
     <div class="container">
-        <h1>Engineering & Design Blog</h1>
-        <p>Insights, guides, and regulatory checklists for solar layout design, shadow modeling, and electrical compliance.</p>
+        <div class="hero-pretitle font-mono">
+            <span class="pretitle-index">(001)</span>
+            <span class="pretitle-text">TECHNICAL JOURNAL &amp; RESEARCH</span>
+        </div>
+        <h1 class="page-title">Engineering &amp; Design Journal</h1>
+        <p class="page-subtitle text-secondary">
+            Insights, guides, and regulatory checklists for solar layout design, shadow modeling, and electrical compliance.
+        </p>
     </div>
 </section>
 
@@ -15,60 +21,66 @@
 <section class="section-padding">
     <div class="container">
         
-        <!-- Search and Category Filters -->
-        <div class="search-box" style="margin-bottom: 2.5rem;">
-            <form action="{{ url_for('blog') }}" method="GET">
+        <!-- Search and Category Filters in Monospace -->
+        <div class="portfolio-search-container font-mono" style="margin-bottom: 2rem;">
+            <form action="{{ url_for('blog') }}" method="GET" class="fabrica-search-form">
                 {% if active_category %}
                     <input type="hidden" name="category" value="{{ active_category }}">
                 {% endif %}
-                <i data-lucide="search" style="width: 18px; height: 18px;"></i>
-                <input type="text" name="q" placeholder="Search blog articles..." value="{{ search_query }}">
+                <span class="search-icon">⌕</span>
+                <input type="text" name="q" placeholder="SEARCH ARTICLES BY KEYWORD, TOPIC..." value="{{ search_query }}">
+                {% if search_query %}
+                    <a href="{{ url_for('blog', category=active_category) }}" class="search-clear-link">[CLEAR]</a>
+                {% endif %}
             </form>
         </div>
         
-        <div class="portfolio-filter" style="margin-bottom: 3.5rem;">
-            <a href="{{ url_for('blog', q=search_query) }}" class="filter-btn {% if not active_category %}active{% endif %}">
-                All Topics
+        <div class="portfolio-filter-strip font-mono" style="margin-bottom: 3.5rem;">
+            <a href="{{ url_for('blog', q=search_query) }}" class="filter-pill {% if not active_category %}active{% endif %}">
+                ALL TOPICS
             </a>
             {% for cat in categories %}
-            <a href="{{ url_for('blog', category=cat, q=search_query) }}" class="filter-btn {% if active_category == cat %}active{% endif %}">
-                {{ cat }}
+            <a href="{{ url_for('blog', category=cat, q=search_query) }}" class="filter-pill {% if active_category == cat %}active{% endif %}">
+                {{ cat|upper }}
             </a>
             {% endfor %}
         </div>
         
         <!-- Blog Cards Grid -->
         {% if posts %}
-        <div class="grid grid-3">
+        <div class="grid grid-3 fabrica-card-grid">
             {% for post in posts %}
-            <article class="blog-card">
-                <div class="blog-img-wrapper">
-                    <img src="{{ post.featured_image }}" alt="{{ post.title }}">
-                </div>
-                <div class="blog-info">
-                    <div class="blog-meta">
-                        <span class="blog-tag">{{ post.category }}</span>
-                        <span>
-                            <i data-lucide="calendar" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
-                            {{ post.created_at.split(' ')[0] }}
-                        </span>
-                    </div>
-                    <h3>{{ post.title }}</h3>
-                    <p>{{ post.excerpt }}</p>
-                    <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="blog-readmore">
-                        <span>Read Article</span>
-                        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+            <article class="fabrica-blog-card font-mono">
+                <div class="blog-card-media">
+                    <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="media-link-wrap">
+                        <img src="{{ post.featured_image }}" alt="{{ post.title }}" loading="lazy">
+                        <span class="blog-cat-badge">{{ post.category }}</span>
                     </a>
+                </div>
+                <div class="blog-card-body">
+                    <div class="blog-card-date text-muted">
+                        <span>PUBLISHED: {{ post.created_at.split(' ')[0] }}</span>
+                    </div>
+                    <h3 class="blog-card-title font-sans">
+                        <a href="{{ url_for('blog_detail', slug=post.slug) }}">{{ post.title }}</a>
+                    </h3>
+                    <p class="blog-card-excerpt font-sans text-secondary">{{ post.excerpt }}</p>
+                    <div class="blog-card-footer">
+                        <a href="{{ url_for('blog_detail', slug=post.slug) }}" class="blog-read-link">
+                            <span>Read Technical Report</span>
+                            <span>→</span>
+                        </a>
+                    </div>
                 </div>
             </article>
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center" style="padding: 4rem 1rem;">
-            <i data-lucide="file-warning" style="width: 48px; height: 48px; color: var(--text-muted); margin-bottom: 1.5rem;"></i>
-            <h3>No Articles Found</h3>
-            <p style="margin-top: 0.5rem;">We couldn't find any articles matching your search criteria. Please try again.</p>
-            <a href="{{ url_for('blog') }}" class="btn btn-primary" style="margin-top: 1.5rem;">Reset All Filters</a>
+        <div class="empty-results-box font-mono">
+            <div class="empty-icon">[!]</div>
+            <h3 class="font-sans">No Articles Found</h3>
+            <p class="text-secondary font-sans" style="margin-top: 0.5rem;">We couldn't find any articles matching your search criteria. Please try again.</p>
+            <a href="{{ url_for('blog') }}" class="btn btn-outline" style="margin-top: 1.5rem;">Reset All Filters</a>
         </div>
         {% endif %}
         

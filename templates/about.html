@@ -1,98 +1,153 @@
 {% extends 'base.html' %}
 
-{% block title %}About Us | EarthX Designs - Solar Design & Engineering{% endblock %}
+{% block title %}About Us | EarthX Designs - Solar Engineering Studio{% endblock %}
 
 {% block content %}
-<!-- Page Hero -->
-<section class="page-hero">
+<!-- Page Hero Banner -->
+<section class="page-hero fabrica-page-hero">
     <div class="container">
-        <h1>About EarthX Designs</h1>
-        <p>A trusted technical design partner for top-tier solar developers, EPCs, and installation professionals worldwide.</p>
+        <div class="hero-pretitle font-mono">
+            <span class="pretitle-index">(001)</span>
+            <span class="pretitle-text">STUDIO PEDIGREE &amp; ENGINEERING PRINCIPLES</span>
+        </div>
+        <h1 class="page-title">About EarthX Designs</h1>
+        <p class="page-subtitle text-secondary">
+            A trusted technical design partner for top-tier solar developers, EPCs, and installation professionals worldwide.
+        </p>
     </div>
 </section>
 
-<!-- Company Background -->
+<!-- Company Background Story -->
 <section class="section-padding">
     <div class="container">
-        <div class="grid grid-2 about-story-grid" style="align-items: center;">
+        <div class="section-meta-header font-mono">
+            <span class="meta-tag">(002) GENESIS</span>
+            <span class="meta-line"></span>
+            <span class="meta-note">ENGINEERING BACK-OFFICE FOR SOLAR DEVELOPERS</span>
+        </div>
+
+        <div class="grid grid-2 about-story-grid" style="align-items: center; gap: 3rem;">
             <div>
-                <span class="section-tag">Our Story</span>
-                <h2>Pioneering Solar Engineering Solutions</h2>
-                <p style="margin-bottom: 1.5rem; line-height: 1.8;">Founded by a group of passionate solar engineers, EarthX Designs has grown to become a leading drafting and technical documentation agency. We recognized that fast-growing solar installers often struggle with engineering bottlenecks, permit delays, and non-compliance drafting cycles. We set out to solve this.</p>
-                <p style="margin-bottom: 1.5rem; line-height: 1.8;">Today, we provide a full-spectrum engineering back-office for solar companies. By outsourcing drafting, electrical routing designs, and structural calculations to us, our clients speed up installation cycles, lower overhead, and increase permit approval rates.</p>
-                <p style="line-height: 1.8;">From small residential layouts to massive multi-megawatt ground-mount arrays with tracking systems, our designs are optimized for field buildability and local codes.</p>
+                <h2 class="section-heading">Pioneering Solar Engineering Solutions</h2>
+                <p class="lead-paragraph">
+                    Founded by a group of passionate solar engineers, EarthX Designs has grown to become a leading drafting and technical documentation agency. We recognized that fast-growing solar installers often struggle with engineering bottlenecks, permit delays, and non-compliance drafting cycles. We set out to solve this.
+                </p>
+                <p class="body-paragraph text-secondary">
+                    Today, we provide a full-spectrum engineering back-office for solar companies. By outsourcing drafting, electrical routing designs, and structural calculations to us, our clients speed up installation cycles, lower overhead, and increase permit approval rates.
+                </p>
+                <p class="body-paragraph text-secondary">
+                    From small residential layouts to massive multi-megawatt ground-mount arrays with tracking systems, our designs are optimized for field buildability and local codes.
+                </p>
             </div>
             <div>
-                <div class="about-home-image" style="aspect-ratio: 16/11;">
-                    <img src="/uploads/ground_mount_featured.png" alt="Utility Solar Engineering Team Work">
+                <div class="fabrica-viewport-card">
+                    <div class="viewport-card-header font-mono">
+                        <span class="viewport-title">ASSET // UTILITY_SITE_PREVIEW</span>
+                        <span class="viewport-tag">CAD_VERIFIED</span>
+                    </div>
+                    <div class="viewport-media-wrap">
+                        <img src="/uploads/ground_mount_featured.png" alt="Utility Solar Engineering Team Work" loading="lazy">
+                        <div class="viewport-reticle" aria-hidden="true"></div>
+                    </div>
+                    <div class="viewport-footer font-mono">
+                        <div class="footer-stat">
+                            <span class="stat-lbl text-muted">STANDARD:</span>
+                            <span class="stat-v">IEC 62548 COMPLIANT</span>
+                        </div>
+                        <div class="footer-stat">
+                            <span class="stat-lbl text-muted">REVISION SLA:</span>
+                            <span class="stat-v text-accent">&lt; 24 HOURS</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Values Section -->
-<section class="section-padding bg-light-sec">
+<!-- Values Section (Core Principles) -->
+<section class="section-padding values-section">
     <div class="container">
-        <div class="section-header text-center">
-            <span class="section-tag">Core Principles</span>
-            <h2>Our Operational Standards</h2>
-            <p>Every engineering layout that leaves our office goes through a strict quality checklist to ensure zero errors in the field.</p>
+        <div class="section-meta-header font-mono">
+            <span class="meta-tag">(003) CORE PRINCIPLES</span>
+            <span class="meta-line"></span>
+            <span class="meta-note">QUALITY CONTROL CHECKLIST</span>
+        </div>
+
+        <div class="section-intro-split">
+            <h2 class="section-heading">Our Operational Standards</h2>
+            <p class="section-intro-text text-secondary">
+                Every engineering layout that leaves our office goes through a strict quality checklist to ensure zero errors in the field.
+            </p>
         </div>
         
-        <div class="grid grid-3">
-            <div class="service-card" style="border: 1px solid var(--admin-border);">
-                <div class="service-icon" style="color: var(--accent);">
-                    <i data-lucide="shield-alert" style="width: 36px; height: 36px;"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.8rem;">Regulatory Compliance</h3>
-                <p style="font-size: 0.95rem;">We stay updated on NEC code changes, local municipal permit guidelines, and utility interconnect requirements to ensure your plans are approved on first submission.</p>
+        <div class="grid grid-3 fabrica-card-grid">
+            <div class="fabrica-spec-box font-mono">
+                <div class="spec-box-index">[01]</div>
+                <h3 class="spec-box-title font-sans">Regulatory Compliance</h3>
+                <p class="spec-box-body font-sans text-secondary">
+                    We stay updated on NEC code changes, local municipal permit guidelines, and utility interconnect requirements to ensure your plans are approved on first submission.
+                </p>
+                <div class="spec-box-tag text-muted">AHJ &amp; UTILITY READY</div>
             </div>
             
-            <div class="service-card" style="border: 1px solid var(--admin-border);">
-                <div class="service-icon" style="color: var(--accent);">
-                    <i data-lucide="trending-up" style="width: 36px; height: 36px;"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.8rem;">Engineering Optimization</h3>
-                <p style="font-size: 0.95rem;">We don't just draft; we optimize. We analyze inverter loading ratios, string lengths, cable sizing, and structural racking configurations to optimize balance-of-system (BOS) costs.</p>
+            <div class="fabrica-spec-box font-mono">
+                <div class="spec-box-index">[02]</div>
+                <h3 class="spec-box-title font-sans">Engineering Optimization</h3>
+                <p class="spec-box-body font-sans text-secondary">
+                    We don't just draft; we optimize. We analyze inverter loading ratios, string lengths, cable sizing, and structural racking configurations to optimize balance-of-system (BOS) costs.
+                </p>
+                <div class="spec-box-tag text-muted">BOS VALUE ENGINEERING</div>
             </div>
             
-            <div class="service-card" style="border: 1px solid var(--admin-border);">
-                <div class="service-icon" style="color: var(--accent);">
-                    <i data-lucide="clock" style="width: 36px; height: 36px;"></i>
-                </div>
-                <h3 style="font-size: 1.25rem; margin-bottom: 0.8rem;">Agile Turnaround</h3>
-                <p style="font-size: 0.95rem;">Solar installations operate on tight deadlines. Our design pipeline is structured to return draft files in 24 to 48 hours, keeping your installation crews active in the field.</p>
+            <div class="fabrica-spec-box font-mono">
+                <div class="spec-box-index">[03]</div>
+                <h3 class="spec-box-title font-sans">Agile Turnaround</h3>
+                <p class="spec-box-body font-sans text-secondary">
+                    Solar installations operate on tight deadlines. Our design pipeline is structured to return draft files in 24 to 48 hours, keeping your installation crews active in the field.
+                </p>
+                <div class="spec-box-tag text-accent">24–48H DISPATCH SLA</div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Tools & Software We Use -->
-<section class="section-padding">
+<section class="section-padding software-stack-section">
     <div class="container">
-        <div class="section-header text-center">
-            <span class="section-tag">Technology Stack</span>
-            <h2>Industry-Standard Engineering Software</h2>
-            <p>We leverage premium design tools to model site conditions and generate precise CAD schematics.</p>
+        <div class="section-meta-header font-mono">
+            <span class="meta-tag">(004) TECHNOLOGY KERNEL</span>
+            <span class="meta-line"></span>
+            <span class="meta-note">INDUSTRY-STANDARD ENGINEERING SOFTWARE</span>
+        </div>
+
+        <div class="section-intro-split">
+            <h2 class="section-heading">Engineering Software Suite</h2>
+            <p class="section-intro-text text-secondary">
+                We leverage premium design tools to model site conditions and generate precise CAD schematics.
+            </p>
         </div>
         
-        <div class="grid grid-4 text-center">
-            <div class="why-card" style="padding: 2rem;">
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">AutoCAD</div>
-                <p style="font-size: 0.88rem;">Precision 2D drafting for layout schematics, electrical line wiring, and structure details.</p>
+        <div class="grid grid-4 fabrica-tool-grid font-mono">
+            <div class="tool-card">
+                <div class="tool-name">AutoCAD Civil 3D</div>
+                <div class="tool-tag text-accent">2D / 3D DRAFTING</div>
+                <p class="tool-desc text-muted font-sans">Precision 2D drafting for layout schematics, electrical line wiring, and structural details.</p>
             </div>
-            <div class="why-card" style="padding: 2rem;">
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">HelioScope</div>
-                <p style="font-size: 0.88rem;">Commercial layout configuration, string optimizer, and monthly yield simulation reports.</p>
+            <div class="tool-card">
+                <div class="tool-name">HelioScope</div>
+                <div class="tool-tag text-accent">C&amp;I MODELING</div>
+                <p class="tool-desc text-muted font-sans">Commercial layout configuration, string optimizer, and monthly yield simulation reports.</p>
             </div>
-            <div class="why-card" style="padding: 2rem;">
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">PVsyst</div>
-                <p style="font-size: 0.88rem;">Detailed utility-scale production modeling, weather data analysis, and shading losses.</p>
+            <div class="tool-card">
+                <div class="tool-name">PVsyst 7.4</div>
+                <div class="tool-tag text-accent">BANKABILITY</div>
+                <p class="tool-desc text-muted font-sans">Detailed utility-scale production modeling, weather data analysis, and shading losses.</p>
             </div>
-            <div class="why-card" style="padding: 2rem;">
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-bottom: 0.5rem;">Sketchup / V-Ray</div>
-                <p style="font-size: 0.88rem;">3D modeling of roofs, shading obstructions, and high-fidelity presentation renders.</p>
+            <div class="tool-card">
+                <div class="tool-name">SketchUp / V-Ray</div>
+                <div class="tool-tag text-accent">3D CINEMATICS</div>
+                <p class="tool-desc text-muted font-sans">3D modeling of roofs, shading obstructions, and high-fidelity presentation renders.</p>
             </div>
         </div>
     </div>

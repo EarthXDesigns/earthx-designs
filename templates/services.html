@@ -1,63 +1,105 @@
 {% extends 'base.html' %}
 
-{% block title %}Our Services | EarthX Designs - Solar Design & Engineering{% endblock %}
+{% block title %}Our Services | EarthX Designs - Solar Design & Engineering Studio{% endblock %}
 
 {% block content %}
-<!-- Page Hero -->
-<section class="page-hero">
+<!-- Page Hero Banner -->
+<section class="page-hero fabrica-page-hero">
     <div class="container">
-        <h1>Solar Engineering Services</h1>
-        <p>Comprehensive design and engineering packages tailored for residential installers, commercial developers, and utility EPC firms.</p>
+        <div class="hero-pretitle font-mono">
+            <span class="pretitle-index">(001)</span>
+            <span class="pretitle-text">FULL-SPECTRUM ENGINEERING OUTSOURCING</span>
+        </div>
+        <h1 class="page-title">Solar Engineering Services</h1>
+        <p class="page-subtitle text-secondary">
+            Comprehensive design and engineering packages tailored for residential installers, commercial developers, and utility EPC firms.
+        </p>
     </div>
 </section>
 
 <!-- Services Detail Section -->
-<section class="section-padding">
+<section class="section-padding services-matrix-section">
     <div class="container">
+        
         {% for cat in categories %}
-        <div class="category-section" style="margin-bottom: 4rem;">
-            <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
-                <div>
-                    <h2>{{ cat.name }}</h2>
-                    {% if cat.hero_subtitle %}<p style="color: var(--text-muted); margin-top: 0.25rem;">{{ cat.hero_subtitle }}</p>{% endif %}
+        <div class="service-category-block" style="margin-bottom: 5rem;">
+            <div class="category-block-header font-mono">
+                <div class="cat-header-left">
+                    <span class="cat-number text-accent">(CAT-0{{ loop.index }})</span>
+                    <h2 class="cat-title font-sans">{{ cat.name }}</h2>
+                    {% if cat.hero_subtitle %}
+                        <p class="cat-subtitle font-sans text-muted">{{ cat.hero_subtitle }}</p>
+                    {% endif %}
                 </div>
-                <a href="{{ url_for('service_category', slug=cat.slug) }}" class="btn btn-outline" style="font-size: 0.85rem; padding: 0.45rem 1rem;">View Details &rarr;</a>
+                <div class="cat-header-right">
+                    <a href="{{ url_for('service_category', slug=cat.slug) }}" class="btn btn-outline btn-sm font-mono">
+                        <span>Inspect Detailed Scope</span>
+                        <span>→</span>
+                    </a>
+                </div>
             </div>
-            <div class="services-grid grid grid-3">
+
+            <!-- Services Grid for this Category -->
+            <div class="services-grid grid grid-3 fabrica-card-grid">
                 {% for service in services_by_cat[cat.id] %}
-                <div class="service-card" style="display:flex; flex-direction:column;">
+                <div class="fabrica-service-card font-mono">
                     {% if service.image %}
-                    <div class="service-card-media" style="margin: -2.2rem -2.2rem 1.5rem -2.2rem; overflow: hidden; border-top-left-radius: var(--radius-md); border-top-right-radius: var(--radius-md); background: #0F172A; position: relative;">
+                    <div class="service-card-media">
                         {% if service.image.endswith('.mp4') or service.image.endswith('.webm') or service.image.endswith('.mov') or service.image.endswith('.ogg') %}
-                        <video autoplay loop muted playsinline class="service-media-video" style="width: 100%; height: 200px; object-fit: cover; display: block;">
+                        <video autoplay loop muted playsinline class="service-media-video">
                             <source src="{{ service.image }}" type="video/mp4">
                         </video>
                         {% else %}
-                        <img src="{{ service.image }}" alt="{{ service.name }}" class="service-media-img" style="width: 100%; height: 200px; object-fit: cover; display: block;" loading="lazy">
+                        <img src="{{ service.image }}" alt="{{ service.name }}" class="service-media-img" loading="lazy">
                         {% endif %}
+                        <div class="service-card-tag">SPEC_0{{ loop.index }}</div>
                     </div>
                     {% endif %}
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.8rem;">
-                        <div class="service-icon" style="margin-bottom: 0; font-size: 1.8rem;"><i data-lucide="{{ service.icon or 'box' }}"></i></div>
-                        <h3 style="margin-bottom: 0;">{{ service.name }}</h3>
+                    
+                    <div class="service-card-body">
+                        <div class="service-card-title-row">
+                            <h3 class="service-card-title font-sans">{{ service.name }}</h3>
+                        </div>
+                        <p class="service-card-description font-sans text-secondary">{{ service.short_description }}</p>
+                        
+                        <div class="service-card-footer">
+                            <a href="{{ url_for('service_category', slug=cat.slug) }}" class="service-details-link">
+                                <span>View Category Standards</span>
+                                <span>→</span>
+                            </a>
+                        </div>
                     </div>
-                    <p style="margin-top: 0.5rem;">{{ service.short_description }}</p>
                 </div>
                 {% else %}
-                <p>No services currently available in this category.</p>
+                <div class="empty-notice font-mono text-muted">
+                    No services currently populated in this category.
+                </div>
                 {% endfor %}
             </div>
         </div>
         {% else %}
-        <p>No service categories available at the moment.</p>
+        <div class="empty-notice font-mono text-muted">
+            No service categories available at the moment.
+        </div>
         {% endfor %}
         
-        <!-- Call to Action Link -->
-        <div class="text-center" style="margin-top: 4rem; background: var(--bg-light); padding: 3rem; border-radius: var(--radius-md); border: 1px solid var(--admin-border);">
-            <h3>Need a Custom Design Package?</h3>
-            <p style="margin-bottom: 1.5rem; max-width: 600px; margin-left: auto; margin-right: auto; margin-top: 0.5rem;">We provide customized monthly engineering retainer contracts for high-volume installers, as well as pay-per-project designs.</p>
-            <a href="{{ url_for('contact') }}" class="btn btn-primary">Request a Custom Proposal</a>
+        <!-- Custom Design Proposal CTA -->
+        <div class="fabrica-cta-banner font-mono">
+            <div class="cta-banner-content">
+                <span class="cta-banner-tag text-accent">RETAINER CONTRACTS</span>
+                <h3 class="cta-banner-title font-sans">Need a Custom Design Package?</h3>
+                <p class="cta-banner-desc font-sans text-secondary">
+                    We provide customized monthly engineering retainer contracts for high-volume installers, as well as pay-per-project designs.
+                </p>
+            </div>
+            <div class="cta-banner-actions">
+                <a href="{{ url_for('contact') }}" class="btn btn-primary font-mono">
+                    <span>Request Custom Retainer Terms</span>
+                    <span>→</span>
+                </a>
+            </div>
         </div>
+
     </div>
 </section>
 {% endblock %}
