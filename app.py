@@ -696,6 +696,15 @@ def project_detail(project_id):
     
     return render_template('project_detail.html', project=project, images=images, related=related, services_delivered=services_delivered)
 
+@app.route('/calculators')
+def calculators():
+    return render_template('calculators.html')
+
+@app.route('/calculators/pan-file-generator')
+@app.route('/pan-generator')
+def pan_generator():
+    return render_template('pan_generator.html')
+
 @app.route('/testimonials')
 def testimonials():
     conn = get_db_connection()

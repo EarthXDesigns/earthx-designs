@@ -44,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const submenuCloseBtn = document.getElementById('submenu-close-btn');
     const servicesMenuTrigger = document.getElementById('services-menu-trigger');
     const mobileServicesDropdown = document.getElementById('mobile-services-dropdown');
+    const calculatorsMenuTrigger = document.getElementById('calculators-menu-trigger');
+    const mobileCalculatorsDropdown = document.getElementById('mobile-calculators-dropdown');
 
     const closeNavMenu = () => {
         if (navToggle) navToggle.classList.remove('active');
@@ -55,6 +57,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (servicesMenuTrigger) {
             servicesMenuTrigger.setAttribute('aria-expanded', 'false');
+        }
+        if (mobileCalculatorsDropdown) {
+            mobileCalculatorsDropdown.classList.remove('expanded');
+        }
+        if (calculatorsMenuTrigger) {
+            calculatorsMenuTrigger.setAttribute('aria-expanded', 'false');
         }
     };
 
@@ -86,6 +94,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 servicesMenuTrigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
             });
         }
+
+        // Calculators Menu Trigger on Mobile (Toggles sliding sub-panel)
+        if (calculatorsMenuTrigger && mobileCalculatorsDropdown) {
+            calculatorsMenuTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isExpanded = mobileCalculatorsDropdown.classList.toggle('expanded');
+                calculatorsMenuTrigger.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+            });
+        }
         
         if (navBackdrop) {
             navBackdrop.addEventListener('click', closeNavMenu);
@@ -104,6 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mobileServicesDropdown && mobileServicesDropdown.classList.contains('expanded')) {
                     mobileServicesDropdown.classList.remove('expanded');
                     if (servicesMenuTrigger) servicesMenuTrigger.setAttribute('aria-expanded', 'false');
+                } else if (mobileCalculatorsDropdown && mobileCalculatorsDropdown.classList.contains('expanded')) {
+                    mobileCalculatorsDropdown.classList.remove('expanded');
+                    if (calculatorsMenuTrigger) calculatorsMenuTrigger.setAttribute('aria-expanded', 'false');
                 } else {
                     closeNavMenu();
                 }

@@ -1,0 +1,171 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}Electrical Design Calculators | EarthX Designs - Solar Engineering Tools{% endblock %}
+{% block meta_description %}Free professional solar & electrical design calculators by EarthX Designs. Generate PVsyst .PAN files, size solar strings, calculate voltage drop, and engineer bankable solar plants.{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="{{ url_for('home') }}" style="color: rgba(255,255,255,0.7);">Home</a> &nbsp;/&nbsp; <span>Electrical Design Calculators</span>
+        </div>
+        <h1>Electrical Design Calculators</h1>
+        <p>High-precision engineering calculators and simulation tools developed by EarthX Designs for solar EPC contractors, developers, and electrical engineers.</p>
+    </div>
+</section>
+
+<!-- Calculators Showcase Section -->
+<section class="section-padding">
+    <div class="container">
+        
+        <!-- Section Header -->
+        <div style="margin-bottom: 2.5rem;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+                <span style="background: rgba(16, 185, 129, 0.15); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(16, 185, 129, 0.3);">Featured Engineering Tool</span>
+            </div>
+            <h2>Active Calculators</h2>
+            <p style="color: var(--text-muted); margin-top: 0.25rem;">Select a calculator below to start designing and simulating immediately.</p>
+        </div>
+
+        <!-- Flagship Active Tool: PAN File Generator -->
+        <div class="why-card" style="padding: 2.5rem; border-left: 4px solid var(--accent); background: linear-gradient(135deg, #0A192F 0%, #112240 100%); color: #FFFFFF; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); margin-bottom: 4rem;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 2rem;">
+                <div style="flex: 1; min-width: 300px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; color: var(--accent);">
+                            <i data-lucide="file-code" style="width: 26px; height: 26px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #FFFFFF; font-size: 1.5rem; margin-bottom: 2px;">PVsyst .PAN File Generator</h3>
+                            <span style="font-size: 0.78rem; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 6px; font-family: monospace; border: 1px solid rgba(52, 211, 153, 0.3);">Clean IAM &bull; PVsyst v7 & v8 &bull; 1-Diode Autosolved</span>
+                        </div>
+                    </div>
+                    <p style="color: #cbd5e1; font-size: 1.05rem; line-height: 1.7; margin-bottom: 1.5rem;">
+                        Upload any manufacturer solar module datasheet in PDF format to automatically extract STC matrices, mechanical dimensions, temperature coefficients, and compute a strict 1-diode model with standard Fresnel AR Optics. Generates zero-warning, bankable <strong>.PAN</strong> files ready for PVsyst energy yield simulation.
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #94a3b8;">
+                            <i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                            <span>PDF Datasheet Multi-Strategy Parser</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #94a3b8;">
+                            <i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                            <span>Multi-Wp Power Class Selection</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #94a3b8;">
+                            <i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                            <span>Diode Model Autosolver (Rs, Rsh, &gamma;)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #94a3b8;">
+                            <i data-lucide="check-circle" style="width: 16px; height: 16px; color: var(--accent);"></i>
+                            <span>Instant Binary .PAN File Download</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+                        <a href="{{ url_for('pan_generator') }}" class="btn btn-primary" style="padding: 0.85rem 2.2rem; font-size: 1rem; font-weight: 700;">
+                            Launch PAN File Generator <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                        </a>
+                        <span style="font-size: 0.85rem; color: #94a3b8;">100% Client-Side &bull; No login required</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Calculators Roadmap -->
+        <div style="margin-top: 5rem;">
+            <div style="margin-bottom: 2rem;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+                    <span style="background: rgba(14, 165, 233, 0.15); color: #0284c7; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(14, 165, 233, 0.3);">Tool Pipeline</span>
+                </div>
+                <h2>Upcoming Electrical Calculators</h2>
+                <p style="color: var(--text-muted); margin-top: 0.25rem;">We are constantly expanding our electrical engineering suite. More specialized calculators will be available soon.</p>
+            </div>
+
+            <div class="grid grid-3">
+                <!-- Upcoming 1: String Sizing -->
+                <div class="service-card" style="opacity: 0.9; border: 1px dashed rgba(100, 116, 139, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div class="service-icon" style="background: rgba(14, 165, 233, 0.1); color: #0284c7;">
+                            <i data-lucide="layers"></i>
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px;">In Development</span>
+                    </div>
+                    <h3>Solar String Sizing Calculator</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.92rem;">Compute minimum and maximum series modules per string based on extreme site temperatures, inverter MPPT voltage window, and maximum Voc thresholds.</p>
+                </div>
+
+                <!-- Upcoming 2: DC & AC Cable Sizing -->
+                <div class="service-card" style="opacity: 0.9; border: 1px dashed rgba(100, 116, 139, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div class="service-icon" style="background: rgba(245, 158, 11, 0.1); color: #d97706;">
+                            <i data-lucide="zap"></i>
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px;">In Development</span>
+                    </div>
+                    <h3>DC/AC Cable Sizing & Voltage Drop</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.92rem;">Calculate exact cable cross-sections (Cu/Al), allowable ampacity derating, and voltage drop percentage across solar string cables and AC feeders.</p>
+                </div>
+
+                <!-- Upcoming 3: Inverter Clipping & DC/AC Ratio -->
+                <div class="service-card" style="opacity: 0.9; border: 1px dashed rgba(100, 116, 139, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div class="service-icon" style="background: rgba(139, 92, 246, 0.1); color: #7c3aed;">
+                            <i data-lucide="cpu"></i>
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px;">Planned</span>
+                    </div>
+                    <h3>Inverter DC/AC Overload Ratio</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.92rem;">Optimize inverter DC loading ratio (ILR / DC-to-AC ratio) to evaluate clipping losses versus levelized cost of energy (LCOE) gains.</p>
+                </div>
+
+                <!-- Upcoming 4: Earthing & Grounding Conductor -->
+                <div class="service-card" style="opacity: 0.9; border: 1px dashed rgba(100, 116, 139, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div class="service-icon" style="background: rgba(16, 185, 129, 0.1); color: #059669;">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px;">Planned</span>
+                    </div>
+                    <h3>Earthing & Grounding Sizing</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.92rem;">Determine equipment grounding conductor (EGC) and grounding electrode conductor (GEC) sizing conforming to IEEE 80 and IS/IEC 62305 standards.</p>
+                </div>
+
+                <!-- Upcoming 5: BESS Battery Storage Sizing -->
+                <div class="service-card" style="opacity: 0.9; border: 1px dashed rgba(100, 116, 139, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div class="service-icon" style="background: rgba(236, 72, 153, 0.1); color: #db2777;">
+                            <i data-lucide="battery-charging"></i>
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px;">Planned</span>
+                    </div>
+                    <h3>BESS Energy Storage Sizing</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.92rem;">Estimate battery energy storage capacity (kWh/MWh), C-rate requirements, and state-of-charge (SOC) cycles for solar-plus-storage applications.</p>
+                </div>
+
+                <!-- Upcoming 6: Solar Transformer Sizing -->
+                <div class="service-card" style="opacity: 0.9; border: 1px dashed rgba(100, 116, 139, 0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div class="service-icon" style="background: rgba(249, 115, 22, 0.1); color: #ea580c;">
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <span style="font-size: 0.72rem; font-weight: 700; background: #f1f5f9; color: #64748b; padding: 3px 8px; border-radius: 12px;">Planned</span>
+                    </div>
+                    <h3>Solar Step-Up Transformer Sizing</h3>
+                    <p style="margin-top: 0.5rem; font-size: 0.92rem;">Calculate kVA rating, impedance values, and harmonic K-factor derating for solar inverter duty transformers (IDTs).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Engineering Consultation CTA -->
+        <div class="text-center" style="margin-top: 5rem; background: var(--bg-light); padding: 3rem; border-radius: var(--radius-md); border: 1px solid rgba(226, 232, 240, 0.8);">
+            <h3>Need a Custom Electrical Calculation or Full Engineering Package?</h3>
+            <p style="margin-bottom: 1.5rem; max-width: 650px; margin-left: auto; margin-right: auto; margin-top: 0.5rem;">Our electrical and solar engineers provide complete SLD schematics, cable scheduling, short circuit calculations, protection coordination, and PVsyst yield simulation reports.</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Request Engineering Support</a>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

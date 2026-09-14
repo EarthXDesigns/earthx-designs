@@ -1,0 +1,286 @@
+﻿{% extends 'base.html' %}
+
+{% block title %}PVsyst .PAN File Generator | EarthX Designs - Electrical Calculators{% endblock %}
+{% block meta_description %}Automated PVsyst .PAN File Generator by EarthX Designs. Upload PDF datasheets, autosolve 1-diode models, configure STC power bins, and download bankable .PAN files.{% endblock %}
+
+{% block head_extra %}
+<!-- Tailwind CSS for PAN Generator UI (Preflight disabled to preserve EarthX layout & typography) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    corePlugins: {
+      preflight: false
+    }
+  }
+</script>
+<!-- PDF.js for Datasheet Parsing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  .pan-generator-wrapper {
+    background-color: #020617;
+    color: #e2e8f0;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+    border: 1px solid #1e293b;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .pan-generator-wrapper * {
+    box-sizing: border-box;
+  }
+  .active-wp {
+    background-color: #0284c7 !important;
+    border-color: #38bdf8 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(14, 165, 233, 0.45);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="{{ url_for('home') }}" style="color: rgba(255,255,255,0.7);">Home</a> &nbsp;/&nbsp; 
+            <a href="{{ url_for('calculators') }}" style="color: rgba(255,255,255,0.7);">Electrical Design Calculators</a> &nbsp;/&nbsp; 
+            <span>PAN File Generator</span>
+        </div>
+        <h1>PVsyst .PAN File Generator</h1>
+        <p>Strict STC &bull; Standard Fresnel AR Optics &bull; Fully Computed 1-Diode Model &bull; Zero Warnings in PVsyst v7 & v8</p>
+    </div>
+</section>
+
+<!-- Calculator Tool Section -->
+<section class="section-padding" style="padding-top: 2rem; background: #0A192F;">
+    <div class="container">
+        
+        <!-- Back navigation link -->
+        <div style="margin-bottom: 1.5rem;">
+            <a href="{{ url_for('calculators') }}" style="display: inline-flex; align-items: center; gap: 6px; color: var(--accent); font-size: 0.9rem; font-weight: 600; text-decoration: none;">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Back to All Calculators
+            </a>
+        </div>
+
+        <div class="pan-generator-wrapper max-w-6xl mx-auto space-y-6">
+
+            <!-- Header & Download -->
+            <header class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+              <div>
+                <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-1" style="color: #ffffff; font-size: 1.35rem;">
+                  PVsyst .PAN File Generator
+                  <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded border border-emerald-500/20 font-mono">Clean IAM</span>
+                </h2>
+                <p class="text-xs text-slate-400">Strict STC &bull; Standard Fresnel AR Optics &bull; Fully Computed Diode Model &bull; Zero Warnings</p>
+              </div>
+              <button type="button" onclick="downloadPAN()" class="px-6 py-3 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-sky-600/30 flex items-center gap-2.5 transition active:scale-95 border-0 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download .PAN File
+              </button>
+            </header>
+
+            <!-- Drag & Drop Zone -->
+            <div id="dropZone" class="border-2 border-dashed border-slate-800 hover:border-sky-500 bg-slate-900/70 rounded-2xl p-6 text-center cursor-pointer transition">
+              <input type="file" id="fileInput" accept=".pdf" class="hidden" />
+              <svg class="w-10 h-10 mx-auto text-sky-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: block; margin: 0 auto;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+              <h3 class="text-white font-semibold text-sm mb-1" style="color: #ffffff;">Drag & Drop Datasheet PDF Here</h3>
+              <p class="text-xs text-slate-400 mt-1" id="statusMsg">Upload PDF to auto-detect STC matrix, mechanical specs, & thermal ratings</p>
+            </div>
+
+            <!-- 1. STC Power Class Selection -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">1. Select STC Power Class (Wp):</span>
+                <span id="binCount" class="text-[11px] text-sky-400 bg-sky-500/10 px-2.5 py-0.5 rounded-full">0 Bins Found</span>
+              </div>
+
+              <div id="binGrid" class="flex flex-wrap gap-2">
+                <span class="text-xs text-slate-500 italic">Upload a PDF or add manually below...</span>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800 flex flex-wrap items-center gap-2">
+                <span class="text-xs text-slate-400">Manual Wp Entry:</span>
+                <input type="number" id="manualWp" placeholder="e.g. 600" class="bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-xs text-white w-28 outline-none focus:border-sky-500" />
+                <button type="button" onclick="addManualWp()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded text-xs font-semibold border border-slate-700 cursor-pointer">+ Add Wp</button>
+              </div>
+            </div>
+
+            <!-- 2. Basic Data & STC Parameters -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">2. Basic Data & STC Parameters:</span>
+                <div class="flex items-center gap-3">
+                  <span id="pcalcDiff" class="text-[11px] text-emerald-400 font-semibold">Pnom Check: Optimal</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Manufacturer</label>
+                  <input type="text" id="manufacturer" placeholder="Manufacturer" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Model Name</label>
+                  <input type="text" id="model" placeholder="Model SKU" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Technology</label>
+                  <select id="cellTech" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                    <option value="mtSiMono" selected>Si-mono (TOPCon / PERC)</option>
+                    <option value="mtSiPoly">Si-poly</option>
+                    <option value="mtSiHJT">Heterojunction (HJT)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Bifaciality (&phi;)</label>
+                  <select id="bifacial" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                    <option value="0.800" selected>Bifacial (80%)</option>
+                    <option value="0.750">Bifacial (75%)</option>
+                    <option value="0.700">Bifacial (70%)</option>
+                    <option value="0.000">Monofacial (0%)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 pt-2">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Nom. Power Pnom (Wp)</label>
+                  <input type="number" id="pnom" step="0.1" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-bold text-base" oninput="recalcGeometryAndEff()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Vmp (V)</label>
+                  <input type="number" id="vmp" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-semibold" oninput="checkAgreement()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Imp (A)</label>
+                  <input type="number" id="imp" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-semibold" oninput="checkAgreement()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Voc (V)</label>
+                  <input type="number" id="voc" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-semibold" oninput="calculateDiodeModel()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Isc (A)</label>
+                  <input type="number" id="isc" step="0.01" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-semibold" oninput="calculateDiodeModel()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-sky-400 mb-1 font-semibold">Module Efficiency (%)</label>
+                  <input type="number" id="stcEff" step="0.01" class="w-full bg-slate-950 border border-sky-500/50 rounded-lg p-2 text-sky-400 font-bold" />
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Sizes and Technology Tab -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">3. PVsyst "Sizes & Technology" Tab Specifications:</span>
+                <span class="text-[11px] text-sky-400 font-semibold">Dimensions in Millimeters (mm)</span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Length (mm)</label>
+                  <input type="number" id="lenMm" placeholder="Length (mm)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-semibold" oninput="handleDimensionChange()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Width (mm)</label>
+                  <input type="number" id="widMm" placeholder="Width (mm)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-semibold" oninput="handleDimensionChange()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Thickness (mm)</label>
+                  <input type="number" id="thkMm" placeholder="Thickness (mm)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-semibold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Weight (kg)</label>
+                  <input type="number" id="weight" step="0.01" placeholder="Weight (kg)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Module Area (m&sup2;)</label>
+                  <input type="number" id="modArea" readonly step="0.001" class="w-full bg-slate-900 border border-slate-700/60 rounded-lg p-2 text-xs text-emerald-400 font-bold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">In Series (NCelS)</label>
+                  <input type="number" id="ncels" placeholder="66" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white" oninput="handleCellCountChange()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">In Parallel (NCelP)</label>
+                  <input type="number" id="ncelp" value="2" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white" oninput="recalcGeometryAndEff()" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3 pt-2">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cell Size W (mm)</label>
+                  <input type="number" id="cellW" step="0.1" placeholder="210.0" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white" oninput="recalcGeometryAndEff()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cell Size H (mm)</label>
+                  <input type="number" id="cellH" step="0.1" placeholder="105.0" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white" oninput="recalcGeometryAndEff()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cell Area (cm&sup2;)</label>
+                  <input type="number" id="cellAreaCm2" readonly step="0.1" class="w-full bg-slate-900 border border-slate-700/60 rounded-lg p-2 text-xs text-sky-400 font-bold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Cells Area (m&sup2;)</label>
+                  <input type="number" id="cellsTotalArea" readonly step="0.001" class="w-full bg-slate-900 border border-slate-700/60 rounded-lg p-2 text-xs text-sky-400 font-bold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Max Array IEC (V)</label>
+                  <input type="number" id="vmaxIec" value="1500" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Max Array UL (V)</label>
+                  <input type="number" id="vmaxUl" value="1500" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white" />
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Temperature Coefficients & Diode Model -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">4. Temperature Coefficients & Diode Model:</span>
+                <span class="text-[11px] text-emerald-400 font-semibold">1-Diode Autosolved</span>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">&mu;Isc (%/&deg;C) [&alpha;]</label>
+                  <input type="number" id="muIscPct" step="0.001" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono" oninput="calculateDiodeModel()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">&mu;Voc (%/&deg;C) [&beta;]</label>
+                  <input type="number" id="muVocPct" step="0.001" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono" oninput="calculateDiodeModel()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">&mu;Pmp (%/&deg;C) [&gamma;]</label>
+                  <input type="number" id="muPmpPct" step="0.001" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">R shunt (&Omega;)</label>
+                  <input type="number" id="rshunt" step="1" value="1000" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono" oninput="calculateDiodeModel()" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">R serie (&Omega;)</label>
+                  <input type="number" id="rserie" step="0.001" value="0.155" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[11px] text-slate-400 mb-1">Gamma (&gamma;)</label>
+                  <input type="number" id="gamma" step="0.001" value="1.055" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white font-mono" oninput="calculateDiodeModel()" />
+                </div>
+              </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pan_generator.js') }}?v={{ asset_version }}"></script>
+{% endblock %}
