@@ -11,11 +11,16 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from database import get_db_connection, init_db
 
-from flask_compress import Compress
+try:
+    from flask_compress import Compress
+    compress = Compress()
+except ImportError:
+    compress = None
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'earthx_designs_secret_2026_super_key')
-Compress(app)
+if compress:
+    compress.init_app(app)
 
 import shutil
 
