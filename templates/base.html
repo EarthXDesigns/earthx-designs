@@ -52,7 +52,7 @@
                 <a href="{{ url_for('about') }}" class="{% if request.path == url_for('about') %}active{% endif %}">About Us</a>
                 <div class="nav-dropdown">
                     <a href="{{ url_for('services') }}" class="dropdown-toggle {% if '/services' in request.path %}active{% endif %}" aria-expanded="false">
-                        Services <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
+                        <span>Services</span><i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 3px; vertical-align: middle; flex-shrink: 0;"></i>
                     </a>
                     <div class="nav-dropdown-menu">
                         <a href="{{ url_for('services') }}">All Services</a>
@@ -64,7 +64,7 @@
                 <a href="{{ url_for('portfolio') }}" class="{% if '/portfolio' in request.path %}active{% endif %}">Portfolio</a>
                 <div class="nav-dropdown">
                     <a href="{{ url_for('calculators') }}" class="dropdown-toggle {% if '/calculators' in request.path or '/pan-generator' in request.path %}active{% endif %}" aria-expanded="false">
-                        Electrical Design Calculators <i data-lucide="chevron-down" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;"></i>
+                        <span>Electrical Design Calculators</span><i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 3px; vertical-align: middle; flex-shrink: 0;"></i>
                     </a>
                     <div class="nav-dropdown-menu" style="min-width: 250px;">
                         <a href="{{ url_for('calculators') }}">All Calculators</a>
