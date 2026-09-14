@@ -372,19 +372,39 @@ def serve_uploads(filename):
         return send_from_directory(os.path.join(app.root_path, 'static', 'default_images'), filename, max_age=86400)
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename, max_age=86400)
 
+_SITE_SETTINGS_CACHE = {}
+_SITE_SETTINGS_CACHE_TIME = 0
+
 def get_site_setting(key, default=''):
+    global _SITE_SETTINGS_CACHE, _SITE_SETTINGS_CACHE_TIME
+    import time
+    now_ts = time.time()
+    
+    # Return from fast in-memory cache if available (< 180s)
+    if _SITE_SETTINGS_CACHE and (now_ts - _SITE_SETTINGS_CACHE_TIME) < 180:
+        val = _SITE_SETTINGS_CACHE.get(key)
+        return val if val is not None else default
+
     try:
         conn = get_db_connection()
         conn.execute("CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
-        row = conn.execute("SELECT value FROM site_settings WHERE key = ?", (key,)).fetchone()
+        rows = conn.execute("SELECT key, value FROM site_settings").fetchall()
         conn.close()
-        if row and row['value'] is not None:
-            return row['value']
+        
+        new_cache = {}
+        for r in rows:
+            new_cache[r['key']] = r['value']
+        _SITE_SETTINGS_CACHE = new_cache
+        _SITE_SETTINGS_CACHE_TIME = now_ts
+        
+        val = _SITE_SETTINGS_CACHE.get(key)
+        return val if val is not None else default
     except Exception as e:
         print(f"[SITE SETTINGS GET ERROR] {e}")
     return default
 
 def set_site_setting(key, value):
+    global _SITE_SETTINGS_CACHE, _HOME_DATA_CACHE
     try:
         conn = get_db_connection()
         conn.execute("CREATE TABLE IF NOT EXISTS site_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
@@ -392,6 +412,9 @@ def set_site_setting(key, value):
         cursor.execute("INSERT OR REPLACE INTO site_settings (key, value) VALUES (?, ?)", (key, value))
         conn.commit()
         conn.close()
+        if _SITE_SETTINGS_CACHE is not None:
+            _SITE_SETTINGS_CACHE[key] = value
+        _HOME_DATA_CACHE = None
         return True
     except Exception as e:
         print(f"[SITE SETTINGS SET ERROR] {e}")
@@ -464,6 +487,9 @@ Message:
         except Exception as e:
             print(f"[EMAIL SYSTEM] SMTP send error: {e}")
 
+# Fixed server startup deployment version (avoids invalidating browser cache repeatedly)
+SERVER_ASSET_VERSION = "20260914_v1"
+
 # In-memory cache for global navigation service categories to ensure instant page loads
 _NAV_SERVICES_CACHE = None
 _NAV_SERVICES_CACHE_TIME = 0
@@ -480,12 +506,12 @@ def inject_global_data():
     now = datetime.datetime.now()
     now_ts = now.timestamp()
 
-    # Serve from memory if fresh (< 60 seconds)
-    if _NAV_SERVICES_CACHE is not None and (now_ts - _NAV_SERVICES_CACHE_TIME) < 60:
+    # Serve from memory if fresh (< 300 seconds)
+    if _NAV_SERVICES_CACHE is not None and (now_ts - _NAV_SERVICES_CACHE_TIME) < 300:
         return {
             'now': now,
             'nav_services': _NAV_SERVICES_CACHE,
-            'asset_version': '20260906_v15'
+            'asset_version': SERVER_ASSET_VERSION
         }
 
     from database import seed_service_categories_and_services
@@ -503,13 +529,10 @@ def inject_global_data():
     _NAV_SERVICES_CACHE = nav_services
     _NAV_SERVICES_CACHE_TIME = now_ts
 
-    # Cache busting timestamp for static assets (updated upon code deploys)
-    asset_version = f"20260906_{int(now_ts)}"
-
     return {
         'now': now,
         'nav_services': nav_services,
-        'asset_version': asset_version
+        'asset_version': SERVER_ASSET_VERSION
     }
 
 @app.after_request
@@ -555,12 +578,29 @@ def restore_service_categories():
         'message': f'Successfully restored {count_after} service categories and {svc_count} services!'
     })
 
+# In-memory home page cache
+_HOME_DATA_CACHE = None
+_HOME_DATA_CACHE_TIME = 0
+
+def invalidate_home_cache():
+    global _HOME_DATA_CACHE, _HOME_DATA_CACHE_TIME
+    _HOME_DATA_CACHE = None
+    _HOME_DATA_CACHE_TIME = 0
+
 # ==========================================
 # PUBLIC ROUTES
 # ==========================================
 
 @app.route('/')
 def home():
+    global _HOME_DATA_CACHE, _HOME_DATA_CACHE_TIME
+    import time
+    now_ts = time.time()
+    
+    # Fast path: Serve from memory cache if fresh (< 120 seconds)
+    if _HOME_DATA_CACHE is not None and (now_ts - _HOME_DATA_CACHE_TIME) < 120:
+        return render_template('home.html', **_HOME_DATA_CACHE)
+
     conn = get_db_connection()
     # Featured projects (3 most recent)
     projects = conn.execute('''
@@ -583,7 +623,19 @@ def home():
     conn.close()
     who_we_are_image = get_site_setting('home_who_we_are_image', '/uploads/commercial_solar_featured.png')
     hero_bg_media = get_site_setting('home_hero_bg_media', '/uploads/hero_video.mp4')
-    return render_template('home.html', projects=projects, testimonials=testimonials, blogs=blogs, client_logos=client_logos, who_we_are_image=who_we_are_image, hero_bg_media=hero_bg_media)
+    
+    home_data = {
+        'projects': projects,
+        'testimonials': testimonials,
+        'blogs': blogs,
+        'client_logos': client_logos,
+        'who_we_are_image': who_we_are_image,
+        'hero_bg_media': hero_bg_media
+    }
+    _HOME_DATA_CACHE = home_data
+    _HOME_DATA_CACHE_TIME = now_ts
+    
+    return render_template('home.html', **home_data)
 
 @app.route('/about')
 def about():

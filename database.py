@@ -194,6 +194,8 @@ def get_db_connection():
         conn.execute("PRAGMA journal_mode = WAL;")
         conn.execute("PRAGMA synchronous = NORMAL;")
         conn.execute("PRAGMA foreign_keys = ON;")
+        conn.execute("PRAGMA cache_size = -64000;") # 64MB SQLite Cache
+        conn.execute("PRAGMA temp_store = MEMORY;")
     except Exception:
         pass
     return conn

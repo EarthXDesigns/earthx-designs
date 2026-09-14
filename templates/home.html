@@ -7,11 +7,11 @@
 <section class="hero {% if not hero_bg_media %}no-hero-media{% endif %}" {% if hero_bg_media and not (hero_bg_media.endswith('.mp4') or hero_bg_media.endswith('.webm') or hero_bg_media.endswith('.mov') or hero_bg_media.endswith('.ogg') or hero_bg_media.endswith('.m4v')) %}style="background-image: url('{{ hero_bg_media }}'); background-size: cover; background-position: center;"{% endif %}>
     {% if hero_bg_media %}
         {% if hero_bg_media.endswith('.mp4') or hero_bg_media.endswith('.webm') or hero_bg_media.endswith('.mov') or hero_bg_media.endswith('.ogg') or hero_bg_media.endswith('.m4v') %}
-        <video autoplay loop muted playsinline preload="auto" class="hero-video-bg">
+        <video autoplay loop muted playsinline preload="metadata" poster="/uploads/commercial_solar_featured.png" class="hero-video-bg">
             <source src="{{ hero_bg_media }}" type="video/mp4">
         </video>
         {% else %}
-        <img src="{{ hero_bg_media }}" alt="EarthX Designs Solar Engineering" class="hero-video-bg" style="object-fit: cover;">
+        <img src="{{ hero_bg_media }}" alt="EarthX Designs Solar Engineering" class="hero-video-bg" style="object-fit: cover;" loading="eager" fetchpriority="high">
         {% endif %}
     {% endif %}
     <div class="hero-overlay"></div>
@@ -287,7 +287,7 @@
             {% for project in projects %}
             <article class="project-card">
                 <div class="project-img-wrapper">
-                    <img src="{{ project.featured_image }}" alt="{{ project.title }}">
+                    <img src="{{ project.featured_image }}" alt="{{ project.title }}" loading="lazy">
                     <span class="project-category-badge">{{ project.category_name }}</span>
                 </div>
                 <div class="project-info">
